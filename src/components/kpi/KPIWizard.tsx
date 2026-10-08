@@ -8,6 +8,7 @@ import {
   UnitType,
   TargetPolicyType,
   OrgGoalLevel,
+  UserSession,
 } from '../../types';
 import { db } from '../../services/db';
 import {
@@ -25,7 +26,10 @@ import {
 } from 'lucide-react';
 
 interface KPIWizardProps {
-  initialDepartmentId: string;
+  initialDepartmentId?: string;
+  initialSectionId?: string;
+  initialSubsectionId?: string;
+  session?: UserSession;
   departments: Department[];
   editingKPI?: KPI | null;
   onSave: (kpiData: Omit<KPI, 'id' | 'kpi_code' | 'created_at' | 'updated_at'>) => void;
@@ -35,6 +39,9 @@ interface KPIWizardProps {
 
 export const KPIWizard: React.FC<KPIWizardProps> = ({
   initialDepartmentId,
+  initialSectionId,
+  initialSubsectionId,
+  session,
   departments,
   editingKPI,
   onSave,
@@ -43,18 +50,26 @@ export const KPIWizard: React.FC<KPIWizardProps> = ({
 }) => {
   const [currentStep, setCurrentStep] = useState<number>(1);
 
+  const isSectionUser = session?.role === 'section';
+  const isSubsectionUser = session?.role === 'subsection';
+
   // Form State
   const [departmentId, setDepartmentId] = useState<string>(
     editingKPI?.department_id || initialDepartmentId || departments[0]?.id || ''
   );
-  const [sectionId, setSectionId] = useState<string>(editingKPI?.section_id || '');
-  const [subsectionId, setSubsectionId] = useState<string>(editingKPI?.subsection_id || '');
+  const [sectionId, setSectionId] = useState<string>(
+    editingKPI?.section_id || (isSubsectionUser || isSectionUser ? session?.sectionId : initialSectionId) || ''
+  );
+  const [subsectionId, setSubsectionId] = useState<string>(
+    editingKPI?.subsection_id || (isSubsectionUser ? session?.subsectionId : initialSubsectionId) || ''
+  );
 
   // Step 1: Objective
   const [kra, setKra] = useState<string>(editingKPI?.kra || '');
   const [majorObjective, setMajorObjective] = useState<string>(editingKPI?.major_objective || '');
   const [orgGoalLevel, setOrgGoalLevel] = useState<OrgGoalLevel>(
-    editingKPI?.aligned_org_goal_level || 'department'
+    editingKPI?.aligned_org_goal_level ||
+    (isSubsectionUser ? 'subsection' : isSectionUser ? 'section' : 'department')
   );
   const [orgGoalId, setOrgGoalId] = useState<string>(
     editingKPI?.aligned_org_goal_id || departmentId
@@ -102,20 +117,33 @@ export const KPIWizard: React.FC<KPIWizardProps> = ({
     if (departmentId) {
       const s = db.getSections(departmentId);
       setSections(s);
-      if (s.length > 0 && !sectionId) {
-        // preserve if editing
+      // Reset sectionId and subsectionId if they don't belong to the newly selected department
+      if (sectionId && !s.some((sec) => sec.id === sectionId)) {
+        if (!isSectionUser && !isSubsectionUser) {
+          setSectionId('');
+          setSubsectionId('');
+        }
       }
     }
-  }, [departmentId]);
+  }, [departmentId, isSectionUser, isSubsectionUser]);
 
   useEffect(() => {
     if (sectionId) {
       const subs = db.getSubsections(sectionId);
       setSubsections(subs);
+      // Reset subsectionId if it doesn't belong to the newly selected section
+      if (subsectionId && !subs.some((sub) => sub.id === subsectionId)) {
+        if (!isSubsectionUser) {
+          setSubsectionId('');
+        }
+      }
     } else {
       setSubsections([]);
+      if (!isSubsectionUser) {
+        setSubsectionId('');
+      }
     }
-  }, [sectionId]);
+  }, [sectionId, isSubsectionUser]);
 
   // Sync orgGoalId with selection
   useEffect(() => {
@@ -170,6 +198,20 @@ export const KPIWizard: React.FC<KPIWizardProps> = ({
       if (!majorObjective.trim()) {
         setError('Major Objective (MO) is required.');
         return false;
+      }
+      if (orgGoalLevel === 'section' && !sectionId) {
+        setError('Please select a Section for Section-level KPI.');
+        return false;
+      }
+      if (orgGoalLevel === 'subsection') {
+        if (!sectionId) {
+          setError('Please select a Section first.');
+          return false;
+        }
+        if (!subsectionId) {
+          setError('Please select a Sub-section for Sub-section-level KPI.');
+          return false;
+        }
       }
       return true;
     }
@@ -239,10 +281,15 @@ export const KPIWizard: React.FC<KPIWizardProps> = ({
       if (sub) goalLabel = sub.name;
     }
 
+    const finalSectionId =
+      orgGoalLevel === 'department' ? undefined : (sectionId || undefined);
+    const finalSubsectionId =
+      orgGoalLevel === 'subsection' ? (subsectionId || undefined) : undefined;
+
     onSave({
       department_id: departmentId,
-      section_id: sectionId || undefined,
-      subsection_id: subsectionId || undefined,
+      section_id: finalSectionId,
+      subsection_id: finalSubsectionId,
       kra: kra.trim(),
       major_objective: majorObjective.trim(),
       aligned_org_goal_level: orgGoalLevel,
@@ -430,10 +477,13 @@ export const KPIWizard: React.FC<KPIWizardProps> = ({
                 <div className="grid grid-cols-3 gap-2">
                   <button
                     type="button"
+                    disabled={isSectionUser || isSubsectionUser}
                     onClick={() => setOrgGoalLevel('department')}
                     className={`py-1.5 px-2 text-center rounded border font-medium text-xs transition-colors ${
                       orgGoalLevel === 'department'
                         ? 'bg-emerald-800 text-white border-emerald-800'
+                        : isSectionUser || isSubsectionUser
+                        ? 'bg-neutral-100 text-neutral-400 border-neutral-200 cursor-not-allowed'
                         : 'bg-white text-neutral-700 border-neutral-300 hover:bg-neutral-100'
                     }`}
                   >
@@ -441,10 +491,13 @@ export const KPIWizard: React.FC<KPIWizardProps> = ({
                   </button>
                   <button
                     type="button"
+                    disabled={isSubsectionUser}
                     onClick={() => setOrgGoalLevel('section')}
                     className={`py-1.5 px-2 text-center rounded border font-medium text-xs transition-colors ${
                       orgGoalLevel === 'section'
                         ? 'bg-emerald-800 text-white border-emerald-800'
+                        : isSubsectionUser
+                        ? 'bg-neutral-100 text-neutral-400 border-neutral-200 cursor-not-allowed'
                         : 'bg-white text-neutral-700 border-neutral-300 hover:bg-neutral-100'
                     }`}
                   >
@@ -471,54 +524,75 @@ export const KPIWizard: React.FC<KPIWizardProps> = ({
 
                 {orgGoalLevel === 'section' && (
                   <div>
-                    <select
-                      value={sectionId}
-                      onChange={(e) => {
-                        setSectionId(e.target.value);
-                        setOrgGoalId(e.target.value);
-                      }}
-                      className="w-full px-2.5 py-1.5 rounded border border-neutral-300 bg-white text-xs text-neutral-900"
-                    >
-                      <option value="">Select Section...</option>
-                      {sections.map((s) => (
-                        <option key={s.id} value={s.id}>
-                          {s.name}
-                        </option>
-                      ))}
-                    </select>
+                    {isSectionUser || isSubsectionUser ? (
+                      <div className="text-xs text-neutral-800 bg-white p-2 rounded border border-neutral-200 flex items-center justify-between">
+                        <span>Section: <strong>{sections.find((s) => s.id === sectionId)?.name || session?.sectionName || 'Current Section'}</strong></span>
+                        <Lock className="w-3 h-3 text-neutral-400" />
+                      </div>
+                    ) : (
+                      <select
+                        value={sectionId}
+                        onChange={(e) => {
+                          setSectionId(e.target.value);
+                          setOrgGoalId(e.target.value);
+                        }}
+                        className="w-full px-2.5 py-1.5 rounded border border-neutral-300 bg-white text-xs text-neutral-900"
+                      >
+                        <option value="">Select Section...</option>
+                        {sections.map((s) => (
+                          <option key={s.id} value={s.id}>
+                            {s.name}
+                          </option>
+                        ))}
+                      </select>
+                    )}
                   </div>
                 )}
 
                 {orgGoalLevel === 'subsection' && (
                   <div className="space-y-1.5">
-                    <select
-                      value={sectionId}
-                      onChange={(e) => setSectionId(e.target.value)}
-                      className="w-full px-2.5 py-1.5 rounded border border-neutral-300 bg-white text-xs text-neutral-900"
-                    >
-                      <option value="">Select Section first...</option>
-                      {sections.map((s) => (
-                        <option key={s.id} value={s.id}>
-                          {s.name}
-                        </option>
-                      ))}
-                    </select>
+                    {isSectionUser || isSubsectionUser ? (
+                      <div className="text-xs text-neutral-800 bg-white p-2 rounded border border-neutral-200 flex items-center justify-between">
+                        <span>Section: <strong>{sections.find((s) => s.id === sectionId)?.name || session?.sectionName || 'Current Section'}</strong></span>
+                        <Lock className="w-3 h-3 text-neutral-400" />
+                      </div>
+                    ) : (
+                      <select
+                        value={sectionId}
+                        onChange={(e) => setSectionId(e.target.value)}
+                        className="w-full px-2.5 py-1.5 rounded border border-neutral-300 bg-white text-xs text-neutral-900"
+                      >
+                        <option value="">Select Section first...</option>
+                        {sections.map((s) => (
+                          <option key={s.id} value={s.id}>
+                            {s.name}
+                          </option>
+                        ))}
+                      </select>
+                    )}
 
-                    <select
-                      value={subsectionId}
-                      onChange={(e) => {
-                        setSubsectionId(e.target.value);
-                        setOrgGoalId(e.target.value);
-                      }}
-                      className="w-full px-2.5 py-1.5 rounded border border-neutral-300 bg-white text-xs text-neutral-900"
-                    >
-                      <option value="">Select Sub-section...</option>
-                      {subsections.map((sub) => (
-                        <option key={sub.id} value={sub.id}>
-                          {sub.name}
-                        </option>
-                      ))}
-                    </select>
+                    {isSubsectionUser ? (
+                      <div className="text-xs text-neutral-800 bg-white p-2 rounded border border-neutral-200 flex items-center justify-between">
+                        <span>Sub-section: <strong>{subsections.find((sub) => sub.id === subsectionId)?.name || session?.subsectionName || 'Current Sub-section'}</strong></span>
+                        <Lock className="w-3 h-3 text-neutral-400" />
+                      </div>
+                    ) : (
+                      <select
+                        value={subsectionId}
+                        onChange={(e) => {
+                          setSubsectionId(e.target.value);
+                          setOrgGoalId(e.target.value);
+                        }}
+                        className="w-full px-2.5 py-1.5 rounded border border-neutral-300 bg-white text-xs text-neutral-900"
+                      >
+                        <option value="">Select Sub-section...</option>
+                        {subsections.map((sub) => (
+                          <option key={sub.id} value={sub.id}>
+                            {sub.name}
+                          </option>
+                        ))}
+                      </select>
+                    )}
                   </div>
                 )}
               </div>

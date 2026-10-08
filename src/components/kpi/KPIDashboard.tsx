@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import {
   Department,
   Section,
@@ -6,6 +6,7 @@ import {
   KPI,
   KPIMonthlyEntry,
   UserSession,
+  OrgGoalLevel,
 } from '../../types';
 import { db } from '../../services/db';
 import { calculateDepartmentSummary } from '../../services/calculations';
@@ -42,8 +43,13 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ session }) => {
   const [selectedDepartmentId, setSelectedDepartmentId] = useState<string>(
     isAdmin ? 'all' : session.departmentId || 'dept-ie'
   );
-  const [selectedSectionId, setSelectedSectionId] = useState<string>('all');
-  const [selectedSubsectionId, setSelectedSubsectionId] = useState<string>('all');
+  const [selectedSectionId, setSelectedSectionId] = useState<string>(
+    session.role === 'section' || session.role === 'subsection' ? session.sectionId || 'all' : 'all'
+  );
+  const [selectedSubsectionId, setSelectedSubsectionId] = useState<string>(
+    session.role === 'subsection' ? session.subsectionId || 'all' : 'all'
+  );
+  const [selectedLevel, setSelectedLevel] = useState<OrgGoalLevel | 'all'>('all');
   const [selectedPerspective, setSelectedPerspective] = useState<string>('all');
   const [selectedYear, setSelectedYear] = useState<number>(2026);
   const [selectedMonth, setSelectedMonth] = useState<number | 'all'>('all');
@@ -73,17 +79,18 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ session }) => {
   }>({ open: false });
 
   // Load Departments
-  const refreshDepartments = () => {
+  const refreshDepartments = useCallback(() => {
     const list = db.getDepartments();
     setDepartments(list);
-  };
+  }, []);
 
-  // Load KPIs and Monthly Entries
-  const refreshKPIsAndEntries = () => {
+  // Load KPIs and Monthly Entries dynamically with active filter parameters
+  const refreshKPIsAndEntries = useCallback(() => {
     const fetchedKpis = db.getKPIs({
       departmentId: selectedDepartmentId,
       sectionId: selectedSectionId,
       subsectionId: selectedSubsectionId,
+      level: selectedLevel,
       perspective: selectedPerspective,
       search: searchQuery,
     });
@@ -92,7 +99,49 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ session }) => {
     const kpiIds = fetchedKpis.map((k) => k.id);
     const entries = db.getMonthlyEntriesForKPIs(kpiIds, selectedYear);
     setMonthlyEntries(entries);
+  }, [
+    selectedDepartmentId,
+    selectedSectionId,
+    selectedSubsectionId,
+    selectedLevel,
+    selectedPerspective,
+    searchQuery,
+    selectedYear,
+  ]);
+
+  // Synchronous filter change handlers to prevent stale hierarchy query bugs
+  const handleDepartmentChange = (newDeptId: string) => {
+    setSelectedDepartmentId(newDeptId);
+    if (session.role !== 'section' && session.role !== 'subsection') {
+      setSelectedSectionId('all');
+      setSelectedSubsectionId('all');
+      if (newDeptId !== 'all') {
+        const secs = db.getSections(newDeptId);
+        setSections(secs);
+      } else {
+        setSections([]);
+      }
+      setSubsections([]);
+    }
   };
+
+  const handleSectionChange = (newSecId: string) => {
+    setSelectedSectionId(newSecId);
+    if (session.role !== 'subsection') {
+      setSelectedSubsectionId('all');
+      if (newSecId !== 'all') {
+        const subs = db.getSubsections(newSecId);
+        setSubsections(subs);
+      } else {
+        setSubsections([]);
+      }
+    }
+  };
+
+  // Re-run filter query whenever ANY filter state changes
+  useEffect(() => {
+    refreshKPIsAndEntries();
+  }, [refreshKPIsAndEntries]);
 
   // Manual Sync trigger
   const handleManualSync = async () => {
@@ -129,16 +178,22 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ session }) => {
       unsubscribe();
       window.removeEventListener('focus', handleFocus);
     };
-  }, []);
+  }, [refreshDepartments, refreshKPIsAndEntries]);
 
   // Update target department, section, and subsection based on session
   useEffect(() => {
     if (!isAdmin && session.departmentId) {
       setSelectedDepartmentId(session.departmentId);
+      const secs = db.getSections(session.departmentId);
+      setSections(secs);
       if (session.role === 'section' && session.sectionId) {
         setSelectedSectionId(session.sectionId);
+        setSubsections(db.getSubsections(session.sectionId));
       } else if (session.role === 'subsection') {
-        if (session.sectionId) setSelectedSectionId(session.sectionId);
+        if (session.sectionId) {
+          setSelectedSectionId(session.sectionId);
+          setSubsections(db.getSubsections(session.sectionId));
+        }
         if (session.subsectionId) setSelectedSubsectionId(session.subsectionId);
       }
     }
@@ -152,12 +207,7 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ session }) => {
     } else {
       setSections([]);
     }
-    // Only reset if user is not locked to a specific section
-    if (session.role !== 'section' && session.role !== 'subsection') {
-      setSelectedSectionId('all');
-      setSelectedSubsectionId('all');
-    }
-  }, [selectedDepartmentId, session.role]);
+  }, [selectedDepartmentId]);
 
   // Load Subsections for the selected section
   useEffect(() => {
@@ -167,11 +217,7 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ session }) => {
     } else {
       setSubsections([]);
     }
-    // Only reset if user is not locked to a specific subsection
-    if (session.role !== 'subsection') {
-      setSelectedSubsectionId('all');
-    }
-  }, [selectedSectionId, session.role]);
+  }, [selectedSectionId]);
 
   // Selected Department Object
   const currentDepartment = departments.find((d) => d.id === selectedDepartmentId);
@@ -304,7 +350,8 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ session }) => {
           <div className="flex flex-wrap items-center gap-1.5">
             <button
               onClick={() => {
-                setSelectedDepartmentId('all');
+                handleDepartmentChange('all');
+                setSelectedLevel('all');
                 setSelectedMonth('all');
                 setShowAllMonths(true);
               }}
@@ -318,7 +365,8 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ session }) => {
             </button>
             <button
               onClick={() => {
-                setSelectedDepartmentId('all');
+                handleDepartmentChange('all');
+                setSelectedLevel('all');
                 setSelectedMonth(3);
                 setShowAllMonths(true);
               }}
@@ -333,7 +381,8 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ session }) => {
             <button
               onClick={() => {
                 if (departments.length > 0) {
-                  setSelectedDepartmentId(departments[0].id);
+                  handleDepartmentChange(departments[0].id);
+                  setSelectedLevel('all');
                   setSelectedMonth('all');
                   setShowAllMonths(true);
                 }
@@ -360,7 +409,7 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ session }) => {
                 <Building2 className="w-3.5 h-3.5 text-neutral-500" />
                 <select
                   value={selectedDepartmentId}
-                  onChange={(e) => setSelectedDepartmentId(e.target.value)}
+                  onChange={(e) => handleDepartmentChange(e.target.value)}
                   className="px-2.5 py-1.5 rounded-md border border-neutral-300 bg-white text-xs font-semibold text-neutral-900 focus:outline-hidden focus:ring-1 focus:ring-emerald-700 min-w-[210px]"
                 >
                   <option value="all">🏢 All Departments (সকল ডিপার্টমেন্ট)</option>
@@ -391,7 +440,7 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ session }) => {
               sections.length > 0 && (
                 <select
                   value={selectedSectionId}
-                  onChange={(e) => setSelectedSectionId(e.target.value)}
+                  onChange={(e) => handleSectionChange(e.target.value)}
                   className="px-2.5 py-1.5 rounded-md border border-neutral-300 bg-white text-xs text-neutral-800 focus:outline-hidden focus:ring-1 focus:ring-emerald-700 max-w-[170px] truncate"
                 >
                   <option value="all">All Sections (সকল সেকশন)</option>
@@ -425,6 +474,19 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ session }) => {
                 </select>
               )
             )}
+
+            {/* Level Filter */}
+            <select
+              value={selectedLevel}
+              onChange={(e) => setSelectedLevel(e.target.value as any)}
+              className="px-2.5 py-1.5 rounded-md border border-neutral-300 bg-white text-xs text-neutral-800 focus:outline-hidden focus:ring-1 focus:ring-emerald-700"
+              title="Filter by organizational hierarchy level"
+            >
+              <option value="all">All Levels (সকল লেভেল)</option>
+              <option value="department">🏢 Dept Level</option>
+              <option value="section">📂 Section Level</option>
+              <option value="subsection">📄 Sub-sec Level</option>
+            </select>
 
             {/* Perspective Filter */}
             <select
@@ -568,6 +630,21 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ session }) => {
               ? (selectedDepartmentId === 'all' ? departments[0]?.id || 'dept-ie' : selectedDepartmentId)
               : (session.departmentId || selectedDepartmentId)
           }
+          initialSectionId={
+            session.role === 'section' || session.role === 'subsection'
+              ? session.sectionId
+              : selectedSectionId !== 'all'
+              ? selectedSectionId
+              : undefined
+          }
+          initialSubsectionId={
+            session.role === 'subsection'
+              ? session.subsectionId
+              : selectedSubsectionId !== 'all'
+              ? selectedSubsectionId
+              : undefined
+          }
+          session={session}
           departments={departments}
           editingKPI={editingKPI}
           lockDepartment={!isAdmin}

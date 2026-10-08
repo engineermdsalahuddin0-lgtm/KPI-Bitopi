@@ -1,4 +1,13 @@
-import { Department, Section, Subsection, KPI, KPIMonthlyEntry, AuditLog } from '../types';
+import {
+  Department,
+  Section,
+  Subsection,
+  KPI,
+  KPIMonthlyEntry,
+  AuditLog,
+  UserRole,
+  OrgGoalLevel,
+} from '../types';
 import { supabase } from './supabase';
 
 const STORAGE_KEYS = {

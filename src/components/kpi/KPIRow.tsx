@@ -100,6 +100,28 @@ export const KPIRow: React.FC<KPIRowProps> = ({
                 {currentDept.short_code}
               </span>
             )}
+            {kpi.aligned_org_goal_level === 'subsection' || kpi.subsection_id ? (
+              <span
+                className="px-1.5 py-0.5 rounded text-[9px] font-semibold bg-amber-50 text-amber-800 border border-amber-200 tracking-tight"
+                title={`Sub-section: ${kpi.aligned_org_goal_label || 'Sub-section'}`}
+              >
+                Sub
+              </span>
+            ) : kpi.aligned_org_goal_level === 'section' || kpi.section_id ? (
+              <span
+                className="px-1.5 py-0.5 rounded text-[9px] font-semibold bg-sky-50 text-sky-800 border border-sky-200 tracking-tight"
+                title={`Section: ${kpi.aligned_org_goal_label || 'Section'}`}
+              >
+                Sec
+              </span>
+            ) : (
+              <span
+                className="px-1.5 py-0.5 rounded text-[9px] font-medium bg-neutral-100 text-neutral-600 border border-neutral-200 tracking-tight"
+                title="Department Level"
+              >
+                Dept
+              </span>
+            )}
           </div>
         </td>
 
@@ -233,9 +255,9 @@ export const KPIRow: React.FC<KPIRowProps> = ({
                 onClick={() =>
                   onOpenMonthlyCell(
                     kpi,
-                    focusedMonth,
-                    MONTH_NAMES[focusedMonth - 1],
-                    getEntryForMonth(focusedMonth)
+                    activeFocusMonth,
+                    MONTH_NAMES[activeFocusMonth - 1],
+                    getEntryForMonth(activeFocusMonth)
                   )
                 }
                 className="p-1.5 rounded-md text-neutral-600 hover:text-emerald-800 hover:bg-emerald-50 transition-colors"
@@ -277,9 +299,9 @@ export const KPIRow: React.FC<KPIRowProps> = ({
                         setMenuOpen(false);
                         onOpenMonthlyCell(
                           kpi,
-                          focusedMonth,
-                          MONTH_NAMES[focusedMonth - 1],
-                          getEntryForMonth(focusedMonth)
+                          activeFocusMonth,
+                          MONTH_NAMES[activeFocusMonth - 1],
+                          getEntryForMonth(activeFocusMonth)
                         );
                       }}
                       className="w-full text-left px-3 py-1.5 flex items-center gap-2 hover:bg-neutral-50 text-neutral-700"
