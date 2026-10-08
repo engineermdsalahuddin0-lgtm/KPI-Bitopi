@@ -163,7 +163,7 @@ class DatabaseService {
         }
       }
 
-      if (deptsRes.data && deptsRes.data.length > 0) {
+      if (deptsRes.data !== null && Array.isArray(deptsRes.data) && deptsRes.data.length > 0) {
         const prev = localStorage.getItem(STORAGE_KEYS.DEPARTMENTS);
         const next = JSON.stringify(deptsRes.data);
         if (prev !== next) {
@@ -172,7 +172,7 @@ class DatabaseService {
         }
       }
 
-      if (sectionsRes.data && sectionsRes.data.length > 0) {
+      if (sectionsRes.data !== null && Array.isArray(sectionsRes.data)) {
         const prev = localStorage.getItem(STORAGE_KEYS.SECTIONS);
         const next = JSON.stringify(sectionsRes.data);
         if (prev !== next) {
@@ -181,7 +181,7 @@ class DatabaseService {
         }
       }
 
-      if (subsRes.data && subsRes.data.length > 0) {
+      if (subsRes.data !== null && Array.isArray(subsRes.data)) {
         const prev = localStorage.getItem(STORAGE_KEYS.SUBSECTIONS);
         const next = JSON.stringify(subsRes.data);
         if (prev !== next) {
@@ -325,6 +325,12 @@ class DatabaseService {
             .on('postgres_changes', { event: '*', schema: 'public', table: 'departments' }, () => {
               this.syncFromSupabase();
             })
+            .on('postgres_changes', { event: '*', schema: 'public', table: 'sections' }, () => {
+              this.syncFromSupabase();
+            })
+            .on('postgres_changes', { event: '*', schema: 'public', table: 'subsections' }, () => {
+              this.syncFromSupabase();
+            })
             .subscribe();
         } catch {
           // ignore
@@ -431,17 +437,105 @@ class DatabaseService {
     return sections;
   }
 
+  getSectionById(id: string): Section | undefined {
+    return this.getSections().find((s) => s.id === id);
+  }
+
   addSection(departmentId: string, name: string): Section {
     const sections = this.getSections();
+    const now = new Date().toISOString();
     const newSection: Section = {
-      id: `sec-${Date.now()}`,
+      id: `sec-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
       department_id: departmentId,
       name: name.trim(),
-      created_at: new Date().toISOString(),
+      created_at: now,
+      updated_at: now,
     };
     sections.push(newSection);
     localStorage.setItem(STORAGE_KEYS.SECTIONS, JSON.stringify(sections));
+    this.broadcastUpdate();
+
+    if (supabase) {
+      Promise.resolve(
+        supabase.from('sections').insert({
+          id: newSection.id,
+          department_id: newSection.department_id,
+          name: newSection.name,
+          created_at: newSection.created_at,
+          updated_at: newSection.updated_at,
+        })
+      ).catch((err) => console.error('Supabase insert section error:', err));
+    }
+
     return newSection;
+  }
+
+  updateSection(id: string, name: string): Section | null {
+    const sections = this.getSections();
+    const index = sections.findIndex((s) => s.id === id);
+    if (index === -1) return null;
+
+    const now = new Date().toISOString();
+    sections[index] = {
+      ...sections[index],
+      name: name.trim(),
+      updated_at: now,
+    };
+    localStorage.setItem(STORAGE_KEYS.SECTIONS, JSON.stringify(sections));
+    this.broadcastUpdate();
+
+    if (supabase) {
+      Promise.resolve(
+        supabase.from('sections').update({ name: name.trim(), updated_at: now }).eq('id', id)
+      ).catch((err) => console.error('Supabase update section error:', err));
+    }
+
+    return sections[index];
+  }
+
+  async deleteSection(id: string): Promise<boolean> {
+    const sections = this.getSections();
+    const filteredSections = sections.filter((s) => s.id !== id);
+    localStorage.setItem(STORAGE_KEYS.SECTIONS, JSON.stringify(filteredSections));
+
+    // Cascade delete subsections under this section locally
+    const subs = this.getSubsections();
+    const filteredSubs = subs.filter((sub) => sub.section_id !== id);
+    localStorage.setItem(STORAGE_KEYS.SUBSECTIONS, JSON.stringify(filteredSubs));
+
+    // Unlink any KPIs assigned to this section
+    const kpis = this.getKPIs();
+    let kpiChanged = false;
+    const updatedKpis = kpis.map((k) => {
+      if (k.section_id === id) {
+        kpiChanged = true;
+        return {
+          ...k,
+          section_id: undefined,
+          subsection_id: undefined,
+          aligned_org_goal_level: (k.aligned_org_goal_level === 'section' || k.aligned_org_goal_level === 'subsection' ? 'department' : k.aligned_org_goal_level) as any,
+          aligned_org_goal_id: k.department_id,
+          updated_at: new Date().toISOString(),
+        };
+      }
+      return k;
+    });
+    if (kpiChanged) {
+      localStorage.setItem(STORAGE_KEYS.KPIS, JSON.stringify(updatedKpis));
+    }
+
+    this.broadcastUpdate();
+
+    if (supabase) {
+      try {
+        await supabase.from('subsections').delete().eq('section_id', id);
+        await supabase.from('sections').delete().eq('id', id);
+      } catch (err) {
+        console.error('Supabase delete section error:', err);
+      }
+    }
+
+    return true;
   }
 
   getSubsections(sectionId?: string): Subsection[] {
@@ -454,17 +548,98 @@ class DatabaseService {
     return subs;
   }
 
+  getSubsectionById(id: string): Subsection | undefined {
+    return this.getSubsections().find((s) => s.id === id);
+  }
+
   addSubsection(sectionId: string, name: string): Subsection {
     const subs = this.getSubsections();
+    const now = new Date().toISOString();
     const newSub: Subsection = {
-      id: `sub-${Date.now()}`,
+      id: `sub-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
       section_id: sectionId,
       name: name.trim(),
-      created_at: new Date().toISOString(),
+      created_at: now,
+      updated_at: now,
     };
     subs.push(newSub);
     localStorage.setItem(STORAGE_KEYS.SUBSECTIONS, JSON.stringify(subs));
+    this.broadcastUpdate();
+
+    if (supabase) {
+      Promise.resolve(
+        supabase.from('subsections').insert({
+          id: newSub.id,
+          section_id: newSub.section_id,
+          name: newSub.name,
+          created_at: newSub.created_at,
+          updated_at: newSub.updated_at,
+        })
+      ).catch((err) => console.error('Supabase insert subsection error:', err));
+    }
+
     return newSub;
+  }
+
+  updateSubsection(id: string, name: string): Subsection | null {
+    const subs = this.getSubsections();
+    const index = subs.findIndex((s) => s.id === id);
+    if (index === -1) return null;
+
+    const now = new Date().toISOString();
+    subs[index] = {
+      ...subs[index],
+      name: name.trim(),
+      updated_at: now,
+    };
+    localStorage.setItem(STORAGE_KEYS.SUBSECTIONS, JSON.stringify(subs));
+    this.broadcastUpdate();
+
+    if (supabase) {
+      Promise.resolve(
+        supabase.from('subsections').update({ name: name.trim(), updated_at: now }).eq('id', id)
+      ).catch((err) => console.error('Supabase update subsection error:', err));
+    }
+
+    return subs[index];
+  }
+
+  async deleteSubsection(id: string): Promise<boolean> {
+    const subs = this.getSubsections();
+    const filteredSubs = subs.filter((s) => s.id !== id);
+    localStorage.setItem(STORAGE_KEYS.SUBSECTIONS, JSON.stringify(filteredSubs));
+
+    // Unlink any KPIs assigned to this subsection
+    const kpis = this.getKPIs();
+    let kpiChanged = false;
+    const updatedKpis = kpis.map((k) => {
+      if (k.subsection_id === id) {
+        kpiChanged = true;
+        return {
+          ...k,
+          subsection_id: undefined,
+          aligned_org_goal_level: (k.aligned_org_goal_level === 'subsection' ? 'section' : k.aligned_org_goal_level) as any,
+          aligned_org_goal_id: k.section_id || k.department_id,
+          updated_at: new Date().toISOString(),
+        };
+      }
+      return k;
+    });
+    if (kpiChanged) {
+      localStorage.setItem(STORAGE_KEYS.KPIS, JSON.stringify(updatedKpis));
+    }
+
+    this.broadcastUpdate();
+
+    if (supabase) {
+      try {
+        await supabase.from('subsections').delete().eq('id', id);
+      } catch (err) {
+        console.error('Supabase delete subsection error:', err);
+      }
+    }
+
+    return true;
   }
 
   // --- KPIS ---
@@ -473,6 +648,7 @@ class DatabaseService {
     sectionId?: string;
     subsectionId?: string;
     perspective?: string;
+    level?: OrgGoalLevel | 'all';
     search?: string;
   }): KPI[] {
     this.initStorage();
@@ -488,6 +664,9 @@ class DatabaseService {
       }
       if (filter.subsectionId && filter.subsectionId !== 'all') {
         list = list.filter((k) => k.subsection_id === filter.subsectionId);
+      }
+      if (filter.level && filter.level !== 'all') {
+        list = list.filter((k) => k.aligned_org_goal_level === filter.level);
       }
       if (filter.perspective && filter.perspective !== 'all') {
         list = list.filter((k) => k.perspective === filter.perspective);
@@ -525,7 +704,7 @@ class DatabaseService {
 
   createKPI(
     kpiData: Omit<KPI, 'id' | 'kpi_code' | 'created_at' | 'updated_at'>,
-    actor?: { role: 'admin' | 'department'; identifier: string }
+    actor?: { role: UserRole; identifier: string }
   ): KPI {
     const kpis = this.getKPIs();
     const currentDeptAllocated = this.getDepartmentAllocatedWeight(kpiData.department_id);
@@ -586,7 +765,7 @@ class DatabaseService {
   updateKPI(
     id: string,
     updates: Partial<KPI>,
-    actor?: { role: 'admin' | 'department'; identifier: string }
+    actor?: { role: UserRole; identifier: string }
   ): KPI | null {
     const kpis = this.getKPIs();
     const index = kpis.findIndex((k) => k.id === id);
@@ -630,7 +809,7 @@ class DatabaseService {
 
   duplicateKPI(
     id: string,
-    actor?: { role: 'admin' | 'department'; identifier: string }
+    actor?: { role: UserRole; identifier: string }
   ): KPI | null {
     const original = this.getKPIById(id);
     if (!original) return null;
@@ -653,7 +832,7 @@ class DatabaseService {
 
   async deleteKPI(
     id: string,
-    actor?: { role: 'admin' | 'department'; identifier: string }
+    actor?: { role: UserRole; identifier: string }
   ): Promise<boolean> {
     const kpis = this.getKPIs();
     const kpi = kpis.find((k) => k.id === id);
@@ -763,7 +942,7 @@ class DatabaseService {
   }
 
   addAuditLog(
-    user_role: 'admin' | 'department',
+    user_role: UserRole,
     user_identifier: string,
     action: AuditLog['action'],
     entity_type: AuditLog['entity_type'],

@@ -12,7 +12,13 @@ export function getStoredSession(): UserSession | null {
   if (raw) {
     try {
       const parsed = JSON.parse(raw);
-      if (parsed && (parsed.role === 'admin' || parsed.role === 'department')) {
+      if (
+        parsed &&
+        (parsed.role === 'admin' ||
+          parsed.role === 'department' ||
+          parsed.role === 'section' ||
+          parsed.role === 'subsection')
+      ) {
         return parsed;
       }
     } catch {
@@ -91,6 +97,104 @@ export function loginAsDepartment(
     departmentId: dept.id,
     departmentName: dept.name,
     departmentCode: dept.short_code,
+  };
+
+  saveSession(session);
+  return { success: true, session };
+}
+
+export function loginAsSection(
+  departmentIdInput: string,
+  sectionIdInput: string,
+  deptCodeInput: string,
+  accessCodeInput: string
+): { success: boolean; session?: UserSession; error?: string } {
+  const departments = db.getDepartments();
+  const dept = departments.find((d) => d.id === departmentIdInput);
+
+  if (!dept) {
+    return { success: false, error: 'Selected department not found.' };
+  }
+
+  if (dept.status === 'disabled') {
+    return { success: false, error: 'This department account is currently disabled by administrator.' };
+  }
+
+  const section = db.getSectionById(sectionIdInput);
+  if (!section || section.department_id !== dept.id) {
+    return { success: false, error: 'Selected section not found in this department.' };
+  }
+
+  const cleanId = deptCodeInput.trim().toUpperCase();
+  const cleanCode = accessCodeInput.trim().toUpperCase();
+
+  const isIdMatch = dept.department_id.toUpperCase() === cleanId;
+  const isCodeMatch = dept.access_code.toUpperCase() === cleanCode;
+
+  if (!isIdMatch || !isCodeMatch) {
+    return { success: false, error: 'Invalid department credentials.' };
+  }
+
+  const session: UserSession = {
+    role: 'section',
+    departmentId: dept.id,
+    departmentName: dept.name,
+    departmentCode: dept.short_code,
+    sectionId: section.id,
+    sectionName: section.name,
+  };
+
+  saveSession(session);
+  return { success: true, session };
+}
+
+export function loginAsSubsection(
+  departmentIdInput: string,
+  sectionIdInput: string,
+  subsectionIdInput: string,
+  deptCodeInput: string,
+  accessCodeInput: string
+): { success: boolean; session?: UserSession; error?: string } {
+  const departments = db.getDepartments();
+  const dept = departments.find((d) => d.id === departmentIdInput);
+
+  if (!dept) {
+    return { success: false, error: 'Selected department not found.' };
+  }
+
+  if (dept.status === 'disabled') {
+    return { success: false, error: 'This department account is currently disabled by administrator.' };
+  }
+
+  const section = db.getSectionById(sectionIdInput);
+  if (!section || section.department_id !== dept.id) {
+    return { success: false, error: 'Selected section not found in this department.' };
+  }
+
+  const sub = db.getSubsectionById(subsectionIdInput);
+  if (!sub || sub.section_id !== section.id) {
+    return { success: false, error: 'Selected sub-section not found in this section.' };
+  }
+
+  const cleanId = deptCodeInput.trim().toUpperCase();
+  const cleanCode = accessCodeInput.trim().toUpperCase();
+
+  const isIdMatch = dept.department_id.toUpperCase() === cleanId;
+  const isCodeMatch = dept.access_code.toUpperCase() === cleanCode;
+
+  if (!isIdMatch || !isCodeMatch) {
+    return { success: false, error: 'Invalid department credentials.' };
+  }
+
+  const session: UserSession = {
+    role: 'subsection',
+    departmentId: dept.id,
+    departmentName: dept.name,
+    departmentCode: dept.short_code,
+    sectionId: section.id,
+    sectionName: section.name,
+    subsectionId: sub.id,
+    subsectionName: sub.name,
   };
 
   saveSession(session);

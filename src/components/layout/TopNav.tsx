@@ -30,6 +30,21 @@ export const TopNav: React.FC<TopNavProps> = ({
 }) => {
   const [userMenuOpen, setUserMenuOpen] = useState(false);
 
+  // Compute label and scope
+  const getRoleLabel = () => {
+    if (session.role === 'admin') return 'Administrator';
+    if (session.role === 'section') return session.sectionName ? `${session.sectionName} (Section)` : 'Section Head';
+    if (session.role === 'subsection') return session.subsectionName ? `${session.subsectionName} (Sub)` : 'Sub-section Head';
+    return session.departmentName || 'Department';
+  };
+
+  const getScopeLabel = () => {
+    if (session.role === 'admin') return 'Full Control';
+    if (session.role === 'section') return `${session.departmentCode} • Section Scope`;
+    if (session.role === 'subsection') return `${session.departmentCode} • Sub-section Scope`;
+    return `${session.departmentCode || 'DEP'} Scope`;
+  };
+
   return (
     <header className="sticky top-0 z-40 bg-white border-b border-neutral-200 shadow-xs">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -113,10 +128,10 @@ export const TopNav: React.FC<TopNavProps> = ({
               </div>
               <div className="hidden sm:block">
                 <div className="text-xs font-semibold text-neutral-900 leading-tight">
-                  {session.role === 'admin' ? 'Administrator' : session.departmentName || 'Department'}
+                  {getRoleLabel()}
                 </div>
                 <div className="text-[10px] text-neutral-600 leading-tight">
-                  {session.role === 'admin' ? 'Full Control' : `${session.departmentCode || 'DEP'} Scope`}
+                  {getScopeLabel()}
                 </div>
               </div>
               <ChevronDown className="w-3 h-3 text-neutral-600 ml-1" />
@@ -135,6 +150,10 @@ export const TopNav: React.FC<TopNavProps> = ({
                     <p className="font-semibold text-neutral-900 truncate">
                       {session.role === 'admin'
                         ? session.email || 'emdadul.karim@bitopibd.com'
+                        : session.role === 'subsection'
+                        ? `${session.subsectionName} • ${session.departmentCode}`
+                        : session.role === 'section'
+                        ? `${session.sectionName} • ${session.departmentCode}`
                         : `${session.departmentName} (${session.departmentCode})`}
                     </p>
                   </div>

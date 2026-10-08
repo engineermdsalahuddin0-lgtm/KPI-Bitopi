@@ -50,8 +50,18 @@ export const KPIRow: React.FC<KPIRowProps> = ({
   const [menuOpen, setMenuOpen] = useState(false);
 
   const isAdmin = session.role === 'admin';
-  const canEditMonthly = isAdmin || session.departmentId === kpi.department_id;
-  const canManageKPI = isAdmin || session.departmentId === kpi.department_id;
+  const matchesScope =
+    isAdmin ||
+    (session.role === 'department' && session.departmentId === kpi.department_id) ||
+    (session.role === 'section' &&
+      session.departmentId === kpi.department_id &&
+      (!kpi.section_id || kpi.section_id === session.sectionId)) ||
+    (session.role === 'subsection' &&
+      session.departmentId === kpi.department_id &&
+      (!kpi.subsection_id || kpi.subsection_id === session.subsectionId));
+
+  const canEditMonthly = matchesScope;
+  const canManageKPI = matchesScope;
 
   const currentDept = departments?.find((d) => d.id === kpi.department_id);
 

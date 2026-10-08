@@ -1,11 +1,15 @@
-export type UserRole = 'admin' | 'department';
+export type UserRole = 'admin' | 'department' | 'section' | 'subsection';
 
 export interface UserSession {
   role: UserRole;
   email?: string;
-  departmentId?: string; // If role is 'department', locked to this department UUID
+  departmentId?: string; // locked to this department UUID
   departmentName?: string;
   departmentCode?: string;
+  sectionId?: string;    // locked to this section UUID if role is section or subsection
+  sectionName?: string;
+  subsectionId?: string; // locked to this subsection UUID if role is subsection
+  subsectionName?: string;
 }
 
 export type UnitType = 'percentage' | 'number' | 'unit' | 'day' | 'currency_bdt';

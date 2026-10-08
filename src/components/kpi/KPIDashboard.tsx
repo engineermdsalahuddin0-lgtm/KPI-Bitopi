@@ -131,12 +131,18 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ session }) => {
     };
   }, []);
 
-  // Update target department if department session
+  // Update target department, section, and subsection based on session
   useEffect(() => {
     if (!isAdmin && session.departmentId) {
       setSelectedDepartmentId(session.departmentId);
+      if (session.role === 'section' && session.sectionId) {
+        setSelectedSectionId(session.sectionId);
+      } else if (session.role === 'subsection') {
+        if (session.sectionId) setSelectedSectionId(session.sectionId);
+        if (session.subsectionId) setSelectedSubsectionId(session.subsectionId);
+      }
     }
-  }, [isAdmin, session.departmentId]);
+  }, [isAdmin, session]);
 
   // Load Sections for the selected department
   useEffect(() => {
@@ -146,9 +152,12 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ session }) => {
     } else {
       setSections([]);
     }
-    setSelectedSectionId('all');
-    setSelectedSubsectionId('all');
-  }, [selectedDepartmentId]);
+    // Only reset if user is not locked to a specific section
+    if (session.role !== 'section' && session.role !== 'subsection') {
+      setSelectedSectionId('all');
+      setSelectedSubsectionId('all');
+    }
+  }, [selectedDepartmentId, session.role]);
 
   // Load Subsections for the selected section
   useEffect(() => {
@@ -158,8 +167,11 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ session }) => {
     } else {
       setSubsections([]);
     }
-    setSelectedSubsectionId('all');
-  }, [selectedSectionId]);
+    // Only reset if user is not locked to a specific subsection
+    if (session.role !== 'subsection') {
+      setSelectedSubsectionId('all');
+    }
+  }, [selectedSectionId, session.role]);
 
   // Selected Department Object
   const currentDepartment = departments.find((d) => d.id === selectedDepartmentId);
@@ -181,14 +193,28 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ session }) => {
   };
 
   const handleSaveKPI = (kpiData: Omit<KPI, 'id' | 'kpi_code' | 'created_at' | 'updated_at'>) => {
-    const actor: { role: 'admin' | 'department'; identifier: string } = {
+    const actor = {
       role: session.role,
-      identifier: session.role === 'admin' ? session.email || 'admin' : session.departmentCode || 'department',
+      identifier:
+        session.role === 'admin'
+          ? session.email || 'admin'
+          : session.role === 'subsection'
+          ? session.subsectionName || session.departmentCode || 'subsection'
+          : session.role === 'section'
+          ? session.sectionName || session.departmentCode || 'section'
+          : session.departmentCode || 'department',
     };
-    // Ensure department user always saves to their assigned department
-    const dataToSave = !isAdmin && session.departmentId
+    // Ensure department/section/subsection user always saves within their scope
+    let dataToSave = !isAdmin && session.departmentId
       ? { ...kpiData, department_id: session.departmentId }
       : kpiData;
+
+    if (session.role === 'section' && session.sectionId) {
+      dataToSave = { ...dataToSave, section_id: session.sectionId };
+    } else if (session.role === 'subsection') {
+      if (session.sectionId) dataToSave = { ...dataToSave, section_id: session.sectionId };
+      if (session.subsectionId) dataToSave = { ...dataToSave, subsection_id: session.subsectionId };
+    }
 
     if (editingKPI) {
       db.updateKPI(editingKPI.id, dataToSave, actor);
@@ -202,9 +228,16 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ session }) => {
 
   const handleDuplicateKPI = (kpi: KPI) => {
     try {
-      const actor: { role: 'admin' | 'department'; identifier: string } = {
+      const actor = {
         role: session.role,
-        identifier: session.role === 'admin' ? session.email || 'admin' : session.departmentCode || 'department',
+        identifier:
+          session.role === 'admin'
+            ? session.email || 'admin'
+            : session.role === 'subsection'
+            ? session.subsectionName || session.departmentCode || 'subsection'
+            : session.role === 'section'
+            ? session.sectionName || session.departmentCode || 'section'
+            : session.departmentCode || 'department',
       };
       db.duplicateKPI(kpi.id, actor);
       refreshKPIsAndEntries();
@@ -219,9 +252,16 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ session }) => {
 
   const handleConfirmDelete = async () => {
     if (deleteTargetKPI) {
-      const actor: { role: 'admin' | 'department'; identifier: string } = {
+      const actor = {
         role: session.role,
-        identifier: session.role === 'admin' ? session.email || 'admin' : session.departmentCode || 'department',
+        identifier:
+          session.role === 'admin'
+            ? session.email || 'admin'
+            : session.role === 'subsection'
+            ? session.subsectionName || session.departmentCode || 'subsection'
+            : session.role === 'section'
+            ? session.sectionName || session.departmentCode || 'section'
+            : session.departmentCode || 'department',
       };
       await db.deleteKPI(deleteTargetKPI.id, actor);
       setDeleteTargetKPI(null);
@@ -342,35 +382,48 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ session }) => {
             )}
 
             {/* Section Filter */}
-            {sections.length > 0 && (
-              <select
-                value={selectedSectionId}
-                onChange={(e) => setSelectedSectionId(e.target.value)}
-                className="px-2.5 py-1.5 rounded-md border border-neutral-300 bg-white text-xs text-neutral-800 focus:outline-hidden focus:ring-1 focus:ring-emerald-700 max-w-[170px] truncate"
-              >
-                <option value="all">All Sections</option>
-                {sections.map((s) => (
-                  <option key={s.id} value={s.id}>
-                    {s.name}
-                  </option>
-                ))}
-              </select>
+            {session.role === 'section' || session.role === 'subsection' ? (
+              <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-md bg-neutral-100 border border-neutral-300 text-xs font-medium text-neutral-800">
+                <Layers className="w-3.5 h-3.5 text-emerald-700" />
+                <span>Section: {session.sectionName || sections.find(s => s.id === session.sectionId)?.name || 'Current'}</span>
+              </div>
+            ) : (
+              sections.length > 0 && (
+                <select
+                  value={selectedSectionId}
+                  onChange={(e) => setSelectedSectionId(e.target.value)}
+                  className="px-2.5 py-1.5 rounded-md border border-neutral-300 bg-white text-xs text-neutral-800 focus:outline-hidden focus:ring-1 focus:ring-emerald-700 max-w-[170px] truncate"
+                >
+                  <option value="all">All Sections (সকল সেকশন)</option>
+                  {sections.map((s) => (
+                    <option key={s.id} value={s.id}>
+                      {s.name}
+                    </option>
+                  ))}
+                </select>
+              )
             )}
 
             {/* Subsection Filter */}
-            {subsections.length > 0 && (
-              <select
-                value={selectedSubsectionId}
-                onChange={(e) => setSelectedSubsectionId(e.target.value)}
-                className="px-2.5 py-1.5 rounded-md border border-neutral-300 bg-white text-xs text-neutral-800 focus:outline-hidden focus:ring-1 focus:ring-emerald-700 max-w-[170px] truncate"
-              >
-                <option value="all">All Sub-sections</option>
-                {subsections.map((sub) => (
-                  <option key={sub.id} value={sub.id}>
-                    {sub.name}
-                  </option>
-                ))}
-              </select>
+            {session.role === 'subsection' ? (
+              <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-md bg-neutral-100 border border-neutral-300 text-xs font-medium text-neutral-800">
+                <span>Sub: {session.subsectionName || subsections.find(sub => sub.id === session.subsectionId)?.name || 'Current'}</span>
+              </div>
+            ) : (
+              subsections.length > 0 && (
+                <select
+                  value={selectedSubsectionId}
+                  onChange={(e) => setSelectedSubsectionId(e.target.value)}
+                  className="px-2.5 py-1.5 rounded-md border border-neutral-300 bg-white text-xs text-neutral-800 focus:outline-hidden focus:ring-1 focus:ring-emerald-700 max-w-[170px] truncate"
+                >
+                  <option value="all">All Sub-sections (সকল সাব-সেকশন)</option>
+                  {subsections.map((sub) => (
+                    <option key={sub.id} value={sub.id}>
+                      {sub.name}
+                    </option>
+                  ))}
+                </select>
+              )
             )}
 
             {/* Perspective Filter */}
