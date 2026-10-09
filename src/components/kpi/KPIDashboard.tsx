@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import {
+  Unit,
   Department,
   Section,
   Subsection,
@@ -15,6 +16,8 @@ import { KPITable } from './KPITable';
 import { KPIWizard } from './KPIWizard';
 import { KPICellEditModal } from './KPICellEditModal';
 import { DeleteConfirmModal } from './DeleteConfirmModal';
+import { HierarchyJsonModal } from './HierarchyJsonModal';
+import { UnitManagementModal } from '../departments/UnitManagementModal';
 import {
   Plus,
   Search,
@@ -24,11 +27,14 @@ import {
   Building2,
   TableProperties,
   RefreshCw,
+  FileJson,
+  Factory,
 } from 'lucide-react';
 
 interface KPIDashboardProps {
   session: UserSession;
   onNavigateToDepartments?: () => void;
+  onNavigateToUnits?: () => void;
 }
 
 const MONTH_NAMES = [
@@ -36,12 +42,17 @@ const MONTH_NAMES = [
   'July', 'August', 'September', 'October', 'November', 'December'
 ];
 
-export const KPIDashboard: React.FC<KPIDashboardProps> = ({ session }) => {
+const cleanLabel = (text?: string): string => (text ? text.replace(/\s*\([^)]*\)/g, '').trim() : '');
+
+export const KPIDashboard: React.FC<KPIDashboardProps> = ({ session, onNavigateToUnits }) => {
   const isAdmin = session.role === 'admin';
 
   // Filters State (#14, #43, #44)
+  const [selectedUnitId, setSelectedUnitId] = useState<string>(
+    isAdmin ? 'all' : session.unitId || 'all'
+  );
   const [selectedDepartmentId, setSelectedDepartmentId] = useState<string>(
-    isAdmin ? 'all' : session.departmentId || 'dept-ie'
+    isAdmin || session.role === 'unit' ? 'all' : session.departmentId || 'all'
   );
   const [selectedSectionId, setSelectedSectionId] = useState<string>(
     session.role === 'section' || session.role === 'subsection' ? session.sectionId || 'all' : 'all'
@@ -56,9 +67,18 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ session }) => {
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [showAllMonths, setShowAllMonths] = useState<boolean>(true); // Default to full 12-month table (#16, #47)
   const [isSyncing, setIsSyncing] = useState<boolean>(false);
+  const [jsonModalOpen, setJsonModalOpen] = useState<boolean>(false);
+  const [unitModalOpen, setUnitModalOpen] = useState<boolean>(false);
 
-  // Data State
-  const [departments, setDepartments] = useState<Department[]>([]);
+  // Data State - initialize eagerly from db
+  const [units, setUnits] = useState<Unit[]>(() => db.getUnits());
+  const [departments, setDepartments] = useState<Department[]>(() =>
+    db.getDepartments(
+      (isAdmin ? 'all' : session.unitId || 'all') !== 'all'
+        ? (isAdmin ? 'all' : session.unitId || 'all')
+        : undefined
+    )
+  );
   const [sections, setSections] = useState<Section[]>([]);
   const [subsections, setSubsections] = useState<Subsection[]>([]);
   const [kpis, setKpis] = useState<KPI[]>([]);
@@ -78,15 +98,17 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ session }) => {
     entry?: KPIMonthlyEntry;
   }>({ open: false });
 
-  // Load Departments
-  const refreshDepartments = useCallback(() => {
-    const list = db.getDepartments();
+  // Load Units and Departments
+  const refreshUnitsAndDepartments = useCallback(() => {
+    setUnits(db.getUnits());
+    const list = db.getDepartments(selectedUnitId !== 'all' ? selectedUnitId : undefined);
     setDepartments(list);
-  }, []);
+  }, [selectedUnitId]);
 
   // Load KPIs and Monthly Entries dynamically with active filter parameters
   const refreshKPIsAndEntries = useCallback(() => {
     const fetchedKpis = db.getKPIs({
+      unitId: selectedUnitId,
       departmentId: selectedDepartmentId,
       sectionId: selectedSectionId,
       subsectionId: selectedSubsectionId,
@@ -100,6 +122,7 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ session }) => {
     const entries = db.getMonthlyEntriesForKPIs(kpiIds, selectedYear);
     setMonthlyEntries(entries);
   }, [
+    selectedUnitId,
     selectedDepartmentId,
     selectedSectionId,
     selectedSubsectionId,
@@ -109,7 +132,24 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ session }) => {
     selectedYear,
   ]);
 
+  // Dedicated reactive effect: Load departments whenever selectedUnitId changes
+  useEffect(() => {
+    const depts = db.getDepartments(selectedUnitId !== 'all' ? selectedUnitId : undefined);
+    setDepartments(depts);
+  }, [selectedUnitId]);
+
   // Synchronous filter change handlers to prevent stale hierarchy query bugs
+  const handleUnitChange = (newUnitId: string) => {
+    setSelectedUnitId(newUnitId);
+    setSelectedDepartmentId('all');
+    setSelectedSectionId('all');
+    setSelectedSubsectionId('all');
+    const depts = db.getDepartments(newUnitId !== 'all' ? newUnitId : undefined);
+    setDepartments(depts);
+    setSections([]);
+    setSubsections([]);
+  };
+
   const handleDepartmentChange = (newDeptId: string) => {
     setSelectedDepartmentId(newDeptId);
     if (session.role !== 'section' && session.role !== 'subsection') {
@@ -138,6 +178,10 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ session }) => {
     }
   };
 
+  const handleSubsectionChange = (newSubId: string) => {
+    setSelectedSubsectionId(newSubId);
+  };
+
   // Re-run filter query whenever ANY filter state changes
   useEffect(() => {
     refreshKPIsAndEntries();
@@ -147,23 +191,23 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ session }) => {
   const handleManualSync = async () => {
     setIsSyncing(true);
     await db.syncFromSupabase();
-    refreshDepartments();
+    refreshUnitsAndDepartments();
     refreshKPIsAndEntries();
     setTimeout(() => setIsSyncing(false), 400);
   };
 
   // Sync on Mount & Listeners
   useEffect(() => {
-    refreshDepartments();
+    refreshUnitsAndDepartments();
     refreshKPIsAndEntries();
 
     db.syncFromSupabase().then(() => {
-      refreshDepartments();
+      refreshUnitsAndDepartments();
       refreshKPIsAndEntries();
     });
 
     const unsubscribe = db.subscribe(() => {
-      refreshDepartments();
+      refreshUnitsAndDepartments();
       refreshKPIsAndEntries();
     });
 
@@ -178,7 +222,7 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ session }) => {
       unsubscribe();
       window.removeEventListener('focus', handleFocus);
     };
-  }, [refreshDepartments, refreshKPIsAndEntries]);
+  }, [refreshUnitsAndDepartments, refreshKPIsAndEntries]);
 
   // Update target department, section, and subsection based on session
   useEffect(() => {
@@ -244,22 +288,42 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ session }) => {
       identifier:
         session.role === 'admin'
           ? session.email || 'admin'
+          : session.role === 'unit'
+          ? session.unitName || session.unitCode || 'unit'
           : session.role === 'subsection'
           ? session.subsectionName || session.departmentCode || 'subsection'
           : session.role === 'section'
           ? session.sectionName || session.departmentCode || 'section'
           : session.departmentCode || 'department',
     };
-    // Ensure department/section/subsection user always saves within their scope
-    let dataToSave = !isAdmin && session.departmentId
-      ? { ...kpiData, department_id: session.departmentId }
-      : kpiData;
 
-    if (session.role === 'section' && session.sectionId) {
-      dataToSave = { ...dataToSave, section_id: session.sectionId };
+    let dataToSave = { ...kpiData };
+    if (session.role === 'unit' && session.unitId) {
+      dataToSave.unit_id = session.unitId;
+    } else if (session.role === 'department') {
+      if (session.unitId) dataToSave.unit_id = session.unitId;
+      if (session.departmentId) dataToSave.department_id = session.departmentId;
+    } else if (session.role === 'section') {
+      if (session.unitId) dataToSave.unit_id = session.unitId;
+      if (session.departmentId) dataToSave.department_id = session.departmentId;
+      if (session.sectionId) dataToSave.section_id = session.sectionId;
     } else if (session.role === 'subsection') {
-      if (session.sectionId) dataToSave = { ...dataToSave, section_id: session.sectionId };
-      if (session.subsectionId) dataToSave = { ...dataToSave, subsection_id: session.subsectionId };
+      if (session.unitId) dataToSave.unit_id = session.unitId;
+      if (session.departmentId) dataToSave.department_id = session.departmentId;
+      if (session.sectionId) dataToSave.section_id = session.sectionId;
+      if (session.subsectionId) dataToSave.subsection_id = session.subsectionId;
+    }
+
+    // Auto-resolve unit_id from department_id if missing
+    if (dataToSave.department_id && !dataToSave.unit_id) {
+      const d = db.getDepartmentById(dataToSave.department_id);
+      if (d?.unit_id) dataToSave.unit_id = d.unit_id;
+    }
+    if (!dataToSave.unit_id && session.unitId) {
+      dataToSave.unit_id = session.unitId;
+    }
+    if (!dataToSave.unit_id) {
+      dataToSave.unit_id = 'unit-bgl';
     }
 
     if (editingKPI) {
@@ -402,8 +466,37 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ session }) => {
       {/* 1. FILTERS BAR (#14, #43, #44) */}
       <div className="bg-white border border-neutral-200/90 rounded-lg p-3 sm:p-3.5 mb-3 shadow-2xs">
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3">
-          {/* Left: Department Scope & Hierarchy Selectors */}
+          {/* Left: Unit, Department Scope & Hierarchy Selectors */}
           <div className="flex flex-wrap items-center gap-2 flex-1">
+            {/* Unit Filter (Top Organizational Scope) */}
+            {isAdmin && (
+              <div className="flex items-center gap-1.5">
+                <Factory className="w-3.5 h-3.5 text-neutral-500" />
+                <select
+                  value={selectedUnitId}
+                  onChange={(e) => handleUnitChange(e.target.value)}
+                  className="px-2.5 py-1.5 rounded-md border border-neutral-300 bg-white text-xs font-semibold text-neutral-900 focus:outline-hidden focus:ring-1 focus:ring-emerald-700 max-w-[190px] truncate"
+                  title="Filter by Business Unit"
+                >
+                  <option value="all">🏭 All Units</option>
+                  {units.map((u) => (
+                    <option key={u.id} value={u.id}>
+                      {cleanLabel(u.name)}
+                    </option>
+                  ))}
+                </select>
+                <button
+                  type="button"
+                  onClick={() => (onNavigateToUnits ? onNavigateToUnits() : setUnitModalOpen(true))}
+                  className="px-2 py-1.5 rounded-md border border-neutral-300 bg-white hover:bg-neutral-50 text-neutral-700 text-xs font-semibold flex items-center gap-1 transition-colors shadow-2xs"
+                  title="Manage Business Units (Add / Edit / Delete)"
+                >
+                  <Plus className="w-3.5 h-3.5 text-emerald-700" />
+                  <span>Units</span>
+                </button>
+              </div>
+            )}
+
             {isAdmin ? (
               <div className="flex items-center gap-1.5">
                 <Building2 className="w-3.5 h-3.5 text-neutral-500" />
@@ -412,21 +505,51 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ session }) => {
                   onChange={(e) => handleDepartmentChange(e.target.value)}
                   className="px-2.5 py-1.5 rounded-md border border-neutral-300 bg-white text-xs font-semibold text-neutral-900 focus:outline-hidden focus:ring-1 focus:ring-emerald-700 min-w-[210px]"
                 >
-                  <option value="all">🏢 All Departments (সকল ডিপার্টমেন্ট)</option>
-                  <optgroup label="Individual Departments">
+                  <option value="all">
+                    {selectedUnitId === 'all'
+                      ? '🏢 All Departments'
+                      : `🏢 All ${cleanLabel(units.find((u) => u.id === selectedUnitId)?.name || 'Unit')} Departments (${departments.length})`}
+                  </option>
+                  <optgroup label={selectedUnitId === 'all' ? 'All Departments' : `${cleanLabel(units.find((u) => u.id === selectedUnitId)?.name || 'Unit')} Departments`}>
                     {departments.map((dept) => (
                       <option key={dept.id} value={dept.id}>
-                        {dept.name} ({dept.short_code})
+                        {cleanLabel(dept.name)}
                       </option>
                     ))}
                   </optgroup>
                 </select>
               </div>
+            ) : session.role === 'unit' ? (
+              <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-md bg-emerald-50/80 border border-emerald-200 text-xs font-semibold text-emerald-950">
+                  <Factory className="w-3.5 h-3.5 text-emerald-700" />
+                  <span>Unit: {cleanLabel(session.unitName)}</span>
+                </div>
+                <select
+                  value={selectedDepartmentId}
+                  onChange={(e) => handleDepartmentChange(e.target.value)}
+                  className="px-2.5 py-1.5 rounded-md border border-neutral-300 bg-white text-xs font-semibold text-neutral-900 focus:outline-hidden focus:ring-1 focus:ring-emerald-700"
+                >
+                  <option value="all">🏢 All Unit Departments</option>
+                  {departments.map((dept) => (
+                    <option key={dept.id} value={dept.id}>
+                      {cleanLabel(dept.name)}
+                    </option>
+                  ))}
+                </select>
+              </div>
             ) : (
-              <div className="flex items-center gap-2 px-2.5 py-1.5 rounded-md bg-emerald-50/80 border border-emerald-200 text-xs font-semibold text-emerald-950">
-                <Building2 className="w-3.5 h-3.5 text-emerald-700" />
-                <span>Department: {session.departmentName || currentDepartment?.name}</span>
-                <span className="text-[10px] text-emerald-700 font-mono">({session.departmentCode})</span>
+              <div className="flex items-center gap-2">
+                {session.unitName && (
+                  <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-md bg-neutral-100 border border-neutral-300 text-xs font-semibold text-neutral-800">
+                    <Factory className="w-3.5 h-3.5 text-neutral-600" />
+                    <span>Unit: {cleanLabel(session.unitName)}</span>
+                  </div>
+                )}
+                <div className="flex items-center gap-2 px-2.5 py-1.5 rounded-md bg-emerald-50/80 border border-emerald-200 text-xs font-semibold text-emerald-950">
+                  <Building2 className="w-3.5 h-3.5 text-emerald-700" />
+                  <span>Department: {cleanLabel(session.departmentName || currentDepartment?.name)}</span>
+                </div>
               </div>
             )}
 
@@ -462,7 +585,7 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ session }) => {
               subsections.length > 0 && (
                 <select
                   value={selectedSubsectionId}
-                  onChange={(e) => setSelectedSubsectionId(e.target.value)}
+                  onChange={(e) => handleSubsectionChange(e.target.value)}
                   className="px-2.5 py-1.5 rounded-md border border-neutral-300 bg-white text-xs text-neutral-800 focus:outline-hidden focus:ring-1 focus:ring-emerald-700 max-w-[170px] truncate"
                 >
                   <option value="all">All Sub-sections (সকল সাব-সেকশন)</option>
@@ -475,7 +598,7 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ session }) => {
               )
             )}
 
-            {/* Level Filter */}
+            {/* Level Filter (All 4 Node Tiers) */}
             <select
               value={selectedLevel}
               onChange={(e) => setSelectedLevel(e.target.value as any)}
@@ -483,9 +606,10 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ session }) => {
               title="Filter by organizational hierarchy level"
             >
               <option value="all">All Levels (সকল লেভেল)</option>
-              <option value="department">🏢 Dept Level</option>
-              <option value="section">📂 Section Level</option>
-              <option value="subsection">📄 Sub-sec Level</option>
+              <option value="unit">🏭 Unit Level (ইউনিট হেড)</option>
+              <option value="department">🏢 Dept Level (ডিপার্টমেন্ট হেড)</option>
+              <option value="section">📂 Section Level (সেকশন ইনচার্জ)</option>
+              <option value="subsection">📄 Sub-sec Level (সাব-সেকশন লিড)</option>
             </select>
 
             {/* Perspective Filter */}
@@ -585,6 +709,18 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ session }) => {
               <span className="hidden sm:inline">{isSyncing ? 'Syncing...' : 'Sync'}</span>
             </button>
 
+            {/* Company Hierarchy & KPI JSON Importer Modal Button */}
+            {isAdmin && (
+              <button
+                onClick={() => setJsonModalOpen(true)}
+                className="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs font-semibold rounded-md border border-emerald-300 bg-emerald-50/80 hover:bg-emerald-100/90 text-emerald-900 transition-colors shadow-2xs"
+                title="Import or format Unit, Department, Section & Subsection hierarchy via JSON"
+              >
+                <FileJson className="w-3.5 h-3.5 text-emerald-700" />
+                <span>Company JSON</span>
+              </button>
+            )}
+
             {/* Add KPI Action: Accessible to Admin and Department User */}
             <button
               onClick={handleOpenAddWizard}
@@ -595,6 +731,54 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ session }) => {
               <span>{isAdmin ? 'Add KPI' : 'Add Department KPI'}</span>
             </button>
           </div>
+        </div>
+      </div>
+
+      {/* ACTIVE HIERARCHY NODE SCOPE INDICATOR */}
+      <div className="flex flex-wrap items-center justify-between gap-2 px-3.5 py-2 mb-3 bg-white border border-neutral-200/90 rounded-lg text-xs shadow-2xs">
+        <div className="flex items-center gap-1.5 flex-wrap text-neutral-600">
+          <span className="font-semibold text-neutral-800 flex items-center gap-1">
+            <Layers className="w-3.5 h-3.5 text-emerald-700" />
+            Active Filter Scope:
+          </span>
+          <span className="px-2 py-0.5 rounded bg-neutral-100 font-medium text-neutral-800 border border-neutral-200">
+            {selectedUnitId === 'all' ? '🏭 All Units' : units.find((u) => u.id === selectedUnitId)?.name || selectedUnitId}
+          </span>
+          <span>→</span>
+          <span className="px-2 py-0.5 rounded bg-neutral-100 font-medium text-neutral-800 border border-neutral-200">
+            {selectedDepartmentId === 'all' ? '🏢 All Departments' : currentDepartment?.name || selectedDepartmentId}
+          </span>
+          {selectedSectionId !== 'all' && (
+            <>
+              <span>→</span>
+              <span className="px-2 py-0.5 rounded bg-sky-50 text-sky-900 border border-sky-200 font-medium">
+                📂 {sections.find((s) => s.id === selectedSectionId)?.name || selectedSectionId}
+              </span>
+            </>
+          )}
+          {selectedSubsectionId !== 'all' && (
+            <>
+              <span>→</span>
+              <span className="px-2 py-0.5 rounded bg-amber-50 text-amber-900 border border-amber-200 font-medium">
+                📄 {subsections.find((sub) => sub.id === selectedSubsectionId)?.name || selectedSubsectionId}
+              </span>
+            </>
+          )}
+          {selectedLevel !== 'all' && (
+            <span className="ml-1 px-1.5 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-950 border border-emerald-300 uppercase">
+              {selectedLevel} Level
+            </span>
+          )}
+        </div>
+
+        <div className="flex items-center gap-2">
+          <span className="text-[11px] text-neutral-500">
+            Showing <strong className="text-neutral-900">{kpis.length}</strong> matching KPIs
+          </span>
+          <span className="text-neutral-300">|</span>
+          <span className="text-[11px] text-neutral-500">
+            Total Weight: <strong className="text-emerald-800 font-mono">{kpis.reduce((acc, k) => acc + (k.weight || 0), 0)}%</strong>
+          </span>
         </div>
       </div>
 
@@ -614,7 +798,7 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ session }) => {
         focusedMonth={selectedMonth}
         showAllMonths={showAllMonths}
         session={session}
-        departments={departments}
+        departments={db.getDepartments()}
         onEditKPI={handleOpenEditWizard}
         onDuplicateKPI={handleDuplicateKPI}
         onDeleteKPI={handleDeleteKPI}
@@ -625,10 +809,11 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ session }) => {
       {/* KPI 5-Step Creation / Edit Wizard Modal (#20) */}
       {wizardOpen && (
         <KPIWizard
+          initialUnitId={
+            selectedUnitId !== 'all' ? selectedUnitId : (session.unitId || undefined)
+          }
           initialDepartmentId={
-            isAdmin
-              ? (selectedDepartmentId === 'all' ? departments[0]?.id || 'dept-ie' : selectedDepartmentId)
-              : (session.departmentId || selectedDepartmentId)
+            selectedDepartmentId !== 'all' ? selectedDepartmentId : (session.departmentId || undefined)
           }
           initialSectionId={
             session.role === 'section' || session.role === 'subsection'
@@ -645,9 +830,9 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ session }) => {
               : undefined
           }
           session={session}
-          departments={departments}
+          departments={db.getDepartments()}
           editingKPI={editingKPI}
-          lockDepartment={!isAdmin}
+          lockDepartment={!isAdmin && session.role !== 'unit'}
           onSave={handleSaveKPI}
           onClose={() => setWizardOpen(false)}
         />
@@ -673,6 +858,28 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ session }) => {
           kpi={deleteTargetKPI}
           onConfirm={handleConfirmDelete}
           onCancel={() => setDeleteTargetKPI(null)}
+        />
+      )}
+
+      {/* Company JSON Import / Export Modal */}
+      <HierarchyJsonModal
+        isOpen={jsonModalOpen}
+        onClose={() => setJsonModalOpen(false)}
+        onImportSuccess={() => {
+          refreshUnitsAndDepartments();
+          refreshKPIsAndEntries();
+        }}
+      />
+
+      {/* Admin Business Unit Management Modal */}
+      {isAdmin && (
+        <UnitManagementModal
+          isOpen={unitModalOpen}
+          onClose={() => setUnitModalOpen(false)}
+          onUnitsChanged={() => {
+            refreshUnitsAndDepartments();
+            refreshKPIsAndEntries();
+          }}
         />
       )}
     </div>

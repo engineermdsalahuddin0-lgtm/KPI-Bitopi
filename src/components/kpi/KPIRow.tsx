@@ -52,6 +52,7 @@ export const KPIRow: React.FC<KPIRowProps> = ({
   const isAdmin = session.role === 'admin';
   const matchesScope =
     isAdmin ||
+    (session.role === 'unit' && session.unitId === kpi.unit_id) ||
     (session.role === 'department' && session.departmentId === kpi.department_id) ||
     (session.role === 'section' &&
       session.departmentId === kpi.department_id &&
@@ -95,12 +96,19 @@ export const KPIRow: React.FC<KPIRowProps> = ({
             {currentDept && (
               <span
                 className="px-1.5 py-0.5 rounded text-[9px] font-bold bg-neutral-100 text-neutral-700 border border-neutral-200 tracking-wider"
-                title={`Department: ${currentDept.name} (${currentDept.short_code})`}
+                title={`Department: ${currentDept.name.replace(/\s*\([^)]*\)/g, '').trim()}`}
               >
                 {currentDept.short_code}
               </span>
             )}
-            {kpi.aligned_org_goal_level === 'subsection' || kpi.subsection_id ? (
+            {kpi.aligned_org_goal_level === 'unit' ? (
+              <span
+                className="px-1.5 py-0.5 rounded text-[9px] font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200 tracking-tight"
+                title={`Unit Level: ${kpi.aligned_org_goal_label || 'Unit'}`}
+              >
+                Unit
+              </span>
+            ) : kpi.aligned_org_goal_level === 'subsection' || kpi.subsection_id ? (
               <span
                 className="px-1.5 py-0.5 rounded text-[9px] font-semibold bg-amber-50 text-amber-800 border border-amber-200 tracking-tight"
                 title={`Sub-section: ${kpi.aligned_org_goal_label || 'Sub-section'}`}

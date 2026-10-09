@@ -15,6 +15,7 @@ export function getStoredSession(): UserSession | null {
       if (
         parsed &&
         (parsed.role === 'admin' ||
+          parsed.role === 'unit' ||
           parsed.role === 'department' ||
           parsed.role === 'section' ||
           parsed.role === 'subsection')
@@ -92,10 +93,16 @@ export function loginAsDepartment(
     return { success: false, error: 'Invalid department credentials.' };
   }
 
+  const unit = dept.unit_id ? db.getUnitById(dept.unit_id) : undefined;
+  const cleanName = (text?: string) => (text ? text.replace(/\s*\([^)]*\)/g, '').trim() : '');
+
   const session: UserSession = {
     role: 'department',
+    unitId: unit?.id || dept.unit_id || 'unit-bgl',
+    unitName: cleanName(unit?.name) || 'Bitopi Garments Ltd.',
+    unitCode: unit?.code || 'BGL',
     departmentId: dept.id,
-    departmentName: dept.name,
+    departmentName: cleanName(dept.name),
     departmentCode: dept.short_code,
   };
 
@@ -135,10 +142,16 @@ export function loginAsSection(
     return { success: false, error: 'Invalid department credentials.' };
   }
 
+  const unit = dept.unit_id ? db.getUnitById(dept.unit_id) : undefined;
+  const cleanName = (text?: string) => (text ? text.replace(/\s*\([^)]*\)/g, '').trim() : '');
+
   const session: UserSession = {
     role: 'section',
+    unitId: unit?.id || dept.unit_id || 'unit-bgl',
+    unitName: cleanName(unit?.name) || 'Bitopi Garments Ltd.',
+    unitCode: unit?.code || 'BGL',
     departmentId: dept.id,
-    departmentName: dept.name,
+    departmentName: cleanName(dept.name),
     departmentCode: dept.short_code,
     sectionId: section.id,
     sectionName: section.name,
@@ -186,15 +199,53 @@ export function loginAsSubsection(
     return { success: false, error: 'Invalid department credentials.' };
   }
 
+  const unit = dept.unit_id ? db.getUnitById(dept.unit_id) : undefined;
+  const cleanName = (text?: string) => (text ? text.replace(/\s*\([^)]*\)/g, '').trim() : '');
+
   const session: UserSession = {
     role: 'subsection',
+    unitId: unit?.id || dept.unit_id || 'unit-bgl',
+    unitName: cleanName(unit?.name) || 'Bitopi Garments Ltd.',
+    unitCode: unit?.code || 'BGL',
     departmentId: dept.id,
-    departmentName: dept.name,
+    departmentName: cleanName(dept.name),
     departmentCode: dept.short_code,
     sectionId: section.id,
     sectionName: section.name,
     subsectionId: sub.id,
     subsectionName: sub.name,
+  };
+
+  saveSession(session);
+  return { success: true, session };
+}
+
+export function loginAsUnit(
+  unitIdInput: string,
+  accessCodeInput: string
+): { success: boolean; session?: UserSession; error?: string } {
+  const units = db.getUnits();
+  const unit = units.find((u) => u.id === unitIdInput || u.code === unitIdInput);
+
+  if (!unit) {
+    return { success: false, error: 'Selected business unit not found.' };
+  }
+
+  if (unit.status === 'disabled') {
+    return { success: false, error: 'This unit account is currently disabled.' };
+  }
+
+  const cleanCode = accessCodeInput.trim().toUpperCase();
+  if (unit.access_code && unit.access_code.toUpperCase() !== cleanCode) {
+    return { success: false, error: 'Invalid unit access code.' };
+  }
+
+  const cleanName = (text?: string) => (text ? text.replace(/\s*\([^)]*\)/g, '').trim() : '');
+  const session: UserSession = {
+    role: 'unit',
+    unitId: unit.id,
+    unitName: cleanName(unit.name) || unit.name,
+    unitCode: unit.code,
   };
 
   saveSession(session);

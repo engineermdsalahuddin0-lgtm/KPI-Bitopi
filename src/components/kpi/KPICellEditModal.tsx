@@ -248,21 +248,6 @@ export const KPICellEditModal: React.FC<KPICellEditModalProps> = ({
             </div>
           </div>
 
-          {/* Remarks (#30, #37) */}
-          <div>
-            <label className="block text-[11px] font-semibold text-neutral-700 mb-1">
-              Remarks & Root Cause Analysis (RCA)
-            </label>
-            <textarea
-              rows={2}
-              disabled={!canEdit}
-              value={remarks}
-              onChange={(e) => setRemarks(e.target.value)}
-              placeholder="Provide comments, delay reasons, or operational notes..."
-              className="w-full px-2.5 py-1.5 rounded-md border border-neutral-300 bg-white text-xs text-neutral-900 focus:outline-hidden focus:ring-1 focus:ring-emerald-700 disabled:bg-neutral-100 resize-none"
-            />
-          </div>
-
           {/* Action Buttons */}
           <div className="flex items-center justify-end gap-2 pt-2 border-t border-neutral-100">
             <button

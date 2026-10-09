@@ -10,12 +10,13 @@ import { db } from './services/db';
 import { TopNav } from './components/layout/TopNav';
 import { KPIDashboard } from './components/kpi/KPIDashboard';
 import { DepartmentManagement } from './components/departments/DepartmentManagement';
+import { UnitManagement } from './components/units/UnitManagement';
 import { ReportsDashboard } from './components/reports/ReportsDashboard';
 import { LoginView } from './components/auth/LoginView';
 
 export default function App() {
   const [session, setSession] = useState<UserSession | null>(null);
-  const [currentTab, setCurrentTab] = useState<'dashboard' | 'reports' | 'departments'>('dashboard');
+  const [currentTab, setCurrentTab] = useState<'dashboard' | 'reports' | 'departments' | 'units'>('dashboard');
   const [key, setKey] = useState<number>(0);
 
   // Initialize session on mount (#7: Admin lands directly on KPI Dashboard)
@@ -71,10 +72,11 @@ export default function App() {
           <KPIDashboard
             session={session}
             onNavigateToDepartments={() => setCurrentTab('departments')}
+            onNavigateToUnits={() => setCurrentTab('units')}
           />
         )}
 
-        {currentTab === 'reports' && (
+        {currentTab === 'reports' && (session.role === 'admin' || session.role === 'department') && (
           <ReportsDashboard
             onSelectDepartment={(deptId) => {
               setCurrentTab('dashboard');
@@ -89,6 +91,14 @@ export default function App() {
             }}
           />
         )}
+
+        {currentTab === 'units' && session.role === 'admin' && (
+          <UnitManagement
+            onNavigateToDepartments={(unitId) => {
+              setCurrentTab('departments');
+            }}
+          />
+        )}
       </main>
 
       {/* Footer Notice */}
@@ -97,7 +107,7 @@ export default function App() {
           <div className="flex items-center gap-2">
             <span className="font-semibold text-neutral-700">BITOPI GROUP</span>
             <span>·</span>
-            <span>Industry KPI Management System</span>
+            <span>KPI tracker</span>
           </div>
           <div className="text-[11px] text-neutral-600">
             Internal Governance & Enterprise Performance Tracking

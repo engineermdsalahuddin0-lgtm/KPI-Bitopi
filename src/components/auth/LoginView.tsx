@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Department, Section, Subsection, UserSession } from '../../types';
+import React, { useState, useEffect } from 'react';
+import { Unit, Department, Section, Subsection, UserSession } from '../../types';
 import { db } from '../../services/db';
 import {
   loginAsAdmin,
@@ -8,22 +8,38 @@ import {
   loginAsSubsection,
 } from '../../services/auth';
 import { BitopiLogo } from '../brand/BitopiLogo';
-import { Shield, KeyRound, AlertCircle, ArrowRight, Building2, Layers, GitFork } from 'lucide-react';
+import {
+  Shield,
+  KeyRound,
+  AlertCircle,
+  ArrowRight,
+  Building2,
+  Layers,
+  GitFork,
+  Sparkles,
+} from 'lucide-react';
 
 interface LoginViewProps {
   onLoginSuccess: (session: UserSession) => void;
 }
 
 export const LoginView: React.FC<LoginViewProps> = ({ onLoginSuccess }) => {
-  const [activeTab, setActiveTab] = useState<'admin' | 'department' | 'section' | 'subsection'>('admin');
+  const [activeTab, setActiveTab] = useState<'admin' | 'department' | 'section' | 'subsection'>('department');
 
   // Admin form
   const [adminEmail, setAdminEmail] = useState('');
   const [adminPassword, setAdminPassword] = useState('');
 
-  // Department / Section / Subsection form
-  const departments = db.getDepartments();
-  const [selectedDeptId, setSelectedDeptId] = useState(departments[0]?.id || 'dept-ie');
+  // Hierarchy Data
+  const [units, setUnits] = useState<Unit[]>(() => db.getUnits());
+
+  // Department / Section / Subsection Form
+  const [deptUnitId, setDeptUnitId] = useState<string>(() => db.getUnits()[0]?.id || 'unit-bgl');
+  const availableDepts = db.getDepartments(deptUnitId);
+  const [selectedDeptId, setSelectedDeptId] = useState<string>(() => {
+    const d = db.getDepartments(db.getUnits()[0]?.id || 'unit-bgl');
+    return d[0]?.id || '';
+  });
   const [selectedSectionId, setSelectedSectionId] = useState<string>('');
   const [selectedSubId, setSelectedSubId] = useState<string>('');
   const [deptCodeInput, setDeptCodeInput] = useState('');
@@ -31,12 +47,39 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLoginSuccess }) => {
 
   const [error, setError] = useState<string | null>(null);
 
+  // Subscribe to reactive database changes
+  useEffect(() => {
+    const unsub = db.subscribe(() => {
+      setUnits(db.getUnits());
+    });
+    return unsub;
+  }, []);
+
+  const cleanLabel = (text?: string): string => {
+    if (!text) return '';
+    return text.replace(/\s*\([^)]*\)/g, '').trim();
+  };
+
   // Available sections for current selected dept
   const currentSections: Section[] = selectedDeptId ? db.getSections(selectedDeptId) : [];
   // Available subsections for current selected section
   const currentSubsections: Subsection[] = selectedSectionId ? db.getSubsections(selectedSectionId) : [];
 
-  // When changing department, reset section/sub selection
+  // When changing dept unit, pick first department and load credentials
+  const handleDeptUnitChange = (uId: string) => {
+    setDeptUnitId(uId);
+    const depts = db.getDepartments(uId);
+    if (depts.length > 0) {
+      handleDepartmentChange(depts[0].id);
+    } else {
+      setSelectedDeptId('');
+      setSelectedSectionId('');
+      setSelectedSubId('');
+      setDeptCodeInput('');
+      setAccessCodeInput('');
+    }
+  };
+
   const handleDepartmentChange = (deptId: string) => {
     setSelectedDeptId(deptId);
     const secs = db.getSections(deptId);
@@ -49,12 +92,19 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLoginSuccess }) => {
       setSelectedSubId('');
     }
 
-    const dept = departments.find((d) => d.id === deptId);
+    const dept = db.getDepartmentById(deptId) || db.getDepartments().find((d) => d.id === deptId);
     if (dept) {
       setDeptCodeInput(dept.department_id);
       setAccessCodeInput(dept.access_code);
     }
   };
+
+  // Auto-init department credentials if empty
+  useEffect(() => {
+    if (availableDepts.length > 0 && !selectedDeptId) {
+      handleDepartmentChange(availableDepts[0].id);
+    }
+  }, [availableDepts, selectedDeptId]);
 
   const handleSectionChange = (secId: string) => {
     setSelectedSectionId(secId);
@@ -83,7 +133,7 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLoginSuccess }) => {
     }
   };
 
-  const handleUnitSubmit = (e: React.FormEvent) => {
+  const handleNodeSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
 
@@ -96,7 +146,7 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLoginSuccess }) => {
       }
     } else if (activeTab === 'section') {
       if (!selectedSectionId) {
-        setError('Please select or create a Section first.');
+        setError('Please select a Section first.');
         return;
       }
       const res = loginAsSection(selectedDeptId, selectedSectionId, deptCodeInput, accessCodeInput);
@@ -107,7 +157,7 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLoginSuccess }) => {
       }
     } else if (activeTab === 'subsection') {
       if (!selectedSectionId || !selectedSubId) {
-        setError('Please select or create a Section & Sub-section first.');
+        setError('Please select a Section & Sub-section first.');
         return;
       }
       const res = loginAsSubsection(selectedDeptId, selectedSectionId, selectedSubId, deptCodeInput, accessCodeInput);
@@ -121,7 +171,7 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLoginSuccess }) => {
 
   return (
     <div className="min-h-screen bg-neutral-100 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
-      <div className="sm:mx-auto sm:w-full sm:max-w-md">
+      <div className="sm:mx-auto sm:w-full sm:max-w-lg">
         {/* Brand Lockup with Official Bitopi Icon */}
         <div className="text-center flex flex-col items-center">
           <div className="w-16 h-16 rounded-2xl bg-white p-2.5 shadow-xs border border-neutral-200/80 flex items-center justify-center">
@@ -131,13 +181,13 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLoginSuccess }) => {
             Bitopi Group
           </h1>
           <p className="text-xs text-neutral-600 mt-0.5">
-            Industry KPI Management System
+            KPI tracker
           </p>
         </div>
 
         {/* Card */}
         <div className="mt-6 bg-white py-6 px-6 sm:px-8 shadow-sm rounded-xl border border-neutral-200">
-          {/* Tab Selector: Admin vs Dept vs Section vs Sub-section */}
+          {/* Tab Selector: Admin vs Dept Head vs Section vs Sub-section */}
           <div className="grid grid-cols-4 border-b border-neutral-200 mb-5 text-[11px]">
             <button
               onClick={() => {
@@ -167,7 +217,7 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLoginSuccess }) => {
               }`}
             >
               <Building2 className="w-3.5 h-3.5" />
-              <span>Department</span>
+              <span>Dept Head</span>
             </button>
 
             <button
@@ -210,80 +260,113 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLoginSuccess }) => {
             </div>
           )}
 
-          {/* ADMIN LOGIN FORM (#7) */}
-          {activeTab === 'admin' ? (
-            <form onSubmit={handleAdminSubmit} className="space-y-4 text-xs">
+          {/* 1. ADMIN LOGIN FORM (Strictly No autofill) */}
+          {activeTab === 'admin' && (
+            <form onSubmit={handleAdminSubmit} autoComplete="off" className="space-y-4 text-xs">
               <div>
                 <label className="block font-semibold text-neutral-700 mb-1">
-                  Email
+                  Master Administrator Email
                 </label>
                 <input
                   type="email"
-                  required
+                  name="bitopi_admin_login_email_no_autofill"
+                  id="bitopi_admin_login_email"
                   value={adminEmail}
                   onChange={(e) => setAdminEmail(e.target.value)}
-                  placeholder="Enter admin email"
-                  className="w-full px-3 py-2 rounded-md border border-neutral-300 bg-white text-xs text-neutral-900 focus:outline-hidden focus:ring-1 focus:ring-emerald-700"
+                  placeholder="Enter administrator email"
+                  autoComplete="off"
+                  autoCapitalize="none"
+                  autoCorrect="off"
+                  spellCheck="false"
+                  className="w-full px-3 py-2 rounded-md border border-neutral-300 focus:outline-hidden focus:ring-1 focus:ring-emerald-700 text-xs"
+                  required
                 />
               </div>
 
               <div>
                 <label className="block font-semibold text-neutral-700 mb-1">
-                  Password
+                  Master Password
                 </label>
                 <input
                   type="password"
-                  required
+                  name="bitopi_admin_login_password_no_autofill"
+                  id="bitopi_admin_login_password"
                   value={adminPassword}
                   onChange={(e) => setAdminPassword(e.target.value)}
-                  placeholder="Enter password"
-                  className="w-full px-3 py-2 rounded-md border border-neutral-300 bg-white text-xs text-neutral-900 focus:outline-hidden focus:ring-1 focus:ring-emerald-700"
+                  placeholder="Enter administrator password"
+                  autoComplete="new-password"
+                  autoCapitalize="none"
+                  autoCorrect="off"
+                  spellCheck="false"
+                  className="w-full px-3 py-2 rounded-md border border-neutral-300 focus:outline-hidden focus:ring-1 focus:ring-emerald-700 text-xs"
+                  required
                 />
               </div>
 
               <button
                 type="submit"
-                className="w-full py-2 px-4 rounded-md bg-emerald-800 hover:bg-emerald-900 text-white font-semibold text-xs shadow-xs transition-colors flex items-center justify-center gap-1.5"
+                className="w-full py-2 px-4 rounded-md bg-emerald-800 hover:bg-emerald-900 text-white font-semibold flex items-center justify-center gap-2 shadow-xs transition-colors"
               >
-                <span>Sign In as Admin</span>
-                <ArrowRight className="w-3.5 h-3.5" />
+                <span>Enter Admin Dashboard</span>
+                <ArrowRight className="w-4 h-4" />
               </button>
             </form>
-          ) : (
-            /* DEPARTMENT / SECTION / SUBSECTION LOGIN FORM */
-            <form onSubmit={handleUnitSubmit} className="space-y-4 text-xs">
+          )}
+
+          {/* 2. DEPARTMENT / SECTION / SUBSECTION LOGIN FORM */}
+          {(activeTab === 'department' || activeTab === 'section' || activeTab === 'subsection') && (
+            <form onSubmit={handleNodeSubmit} className="space-y-4 text-xs">
+              {/* Unit Selector */}
               <div>
                 <label className="block font-semibold text-neutral-700 mb-1">
-                  Department
+                  1. Business Unit
                 </label>
                 <select
-                  value={selectedDeptId}
-                  onChange={(e) => handleDepartmentChange(e.target.value)}
-                  className="w-full px-3 py-2 rounded-md border border-neutral-300 bg-white text-xs text-neutral-900 focus:outline-hidden focus:ring-1 focus:ring-emerald-700"
+                  value={deptUnitId}
+                  onChange={(e) => handleDeptUnitChange(e.target.value)}
+                  className="w-full px-3 py-1.5 rounded-md border border-neutral-300 focus:outline-hidden focus:ring-1 focus:ring-emerald-700 text-xs bg-white"
                 >
-                  {departments.map((d) => (
-                    <option key={d.id} value={d.id}>
-                      {d.name} ({d.short_code})
+                  {units.map((u) => (
+                    <option key={u.id} value={u.id}>
+                      {cleanLabel(u.name)}
                     </option>
                   ))}
                 </select>
               </div>
 
-              {/* Section selector if section or subsection tab */}
+              {/* Department Selector */}
+              <div>
+                <label className="block font-semibold text-neutral-700 mb-1">
+                  2. Department
+                </label>
+                <select
+                  value={selectedDeptId}
+                  onChange={(e) => handleDepartmentChange(e.target.value)}
+                  className="w-full px-3 py-2 rounded-md border border-neutral-300 focus:outline-hidden focus:ring-1 focus:ring-emerald-700 text-xs bg-white font-medium"
+                >
+                  {availableDepts.length === 0 ? (
+                    <option value="">No departments found for this unit</option>
+                  ) : (
+                    availableDepts.map((d) => (
+                      <option key={d.id} value={d.id}>
+                        {cleanLabel(d.name)}
+                      </option>
+                    ))
+                  )}
+                </select>
+              </div>
+
+              {/* Section Selector */}
               {(activeTab === 'section' || activeTab === 'subsection') && (
                 <div>
                   <label className="block font-semibold text-neutral-700 mb-1">
-                    Select Section
+                    3. Section
                   </label>
-                  {currentSections.length === 0 ? (
-                    <div className="p-2 rounded bg-amber-50 border border-amber-200 text-amber-800 text-[11px]">
-                      No sections created for this department yet. (Admin can add sections from Department Management).
-                    </div>
-                  ) : (
+                  {currentSections.length > 0 ? (
                     <select
                       value={selectedSectionId}
                       onChange={(e) => handleSectionChange(e.target.value)}
-                      className="w-full px-3 py-2 rounded-md border border-neutral-300 bg-white text-xs text-neutral-900 focus:outline-hidden focus:ring-1 focus:ring-emerald-700"
+                      className="w-full px-3 py-2 rounded-md border border-neutral-300 focus:outline-hidden focus:ring-1 focus:ring-emerald-700 text-xs bg-white"
                     >
                       {currentSections.map((s) => (
                         <option key={s.id} value={s.id}>
@@ -291,25 +374,25 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLoginSuccess }) => {
                         </option>
                       ))}
                     </select>
+                  ) : (
+                    <div className="p-2 bg-neutral-50 rounded border border-neutral-200 text-neutral-500 text-[11px]">
+                      No sections configured for this department yet.
+                    </div>
                   )}
                 </div>
               )}
 
-              {/* Sub-section selector if subsection tab */}
+              {/* Sub-section Selector */}
               {activeTab === 'subsection' && (
                 <div>
                   <label className="block font-semibold text-neutral-700 mb-1">
-                    Select Sub-section
+                    4. Sub-section
                   </label>
-                  {currentSubsections.length === 0 ? (
-                    <div className="p-2 rounded bg-amber-50 border border-amber-200 text-amber-800 text-[11px]">
-                      No sub-sections created for this section yet.
-                    </div>
-                  ) : (
+                  {currentSubsections.length > 0 ? (
                     <select
                       value={selectedSubId}
                       onChange={(e) => setSelectedSubId(e.target.value)}
-                      className="w-full px-3 py-2 rounded-md border border-neutral-300 bg-white text-xs text-neutral-900 focus:outline-hidden focus:ring-1 focus:ring-emerald-700"
+                      className="w-full px-3 py-2 rounded-md border border-neutral-300 focus:outline-hidden focus:ring-1 focus:ring-emerald-700 text-xs bg-white"
                     >
                       {currentSubsections.map((sub) => (
                         <option key={sub.id} value={sub.id}>
@@ -317,83 +400,69 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLoginSuccess }) => {
                         </option>
                       ))}
                     </select>
+                  ) : (
+                    <div className="p-2 bg-neutral-50 rounded border border-neutral-200 text-neutral-500 text-[11px]">
+                      No sub-sections configured for this section yet.
+                    </div>
                   )}
                 </div>
               )}
 
-              <div>
-                <label className="block font-semibold text-neutral-700 mb-1">
-                  Department ID
-                </label>
-                <input
-                  type="text"
-                  required
-                  value={deptCodeInput}
-                  onChange={(e) => setDeptCodeInput(e.target.value.toUpperCase())}
-                  placeholder="e.g. IE-7F29"
-                  className="w-full px-3 py-2 rounded-md border border-neutral-300 bg-white text-xs font-mono uppercase text-neutral-900 focus:outline-hidden focus:ring-1 focus:ring-emerald-700"
-                />
+              <div className="grid grid-cols-2 gap-3 pt-1">
+                <div>
+                  <label className="block font-semibold text-neutral-700 mb-1">
+                    Dept ID
+                  </label>
+                  <input
+                    type="text"
+                    value={deptCodeInput}
+                    onChange={(e) => setDeptCodeInput(e.target.value)}
+                    placeholder="BGL-IE-54A"
+                    className="w-full px-3 py-1.5 rounded-md border border-neutral-300 font-mono focus:outline-hidden focus:ring-1 focus:ring-emerald-700 text-xs uppercase"
+                  />
+                </div>
+
+                <div>
+                  <label className="block font-semibold text-neutral-700 mb-1">
+                    Access Code
+                  </label>
+                  <input
+                    type="text"
+                    value={accessCodeInput}
+                    onChange={(e) => setAccessCodeInput(e.target.value)}
+                    placeholder="IE-52K-37P"
+                    className="w-full px-3 py-1.5 rounded-md border border-neutral-300 font-mono focus:outline-hidden focus:ring-1 focus:ring-emerald-700 text-xs uppercase"
+                  />
+                </div>
               </div>
 
-              <div>
-                <label className="block font-semibold text-neutral-700 mb-1">
-                  Access Code
-                </label>
-                <input
-                  type="text"
-                  required
-                  value={accessCodeInput}
-                  onChange={(e) => setAccessCodeInput(e.target.value.toUpperCase())}
-                  placeholder="e.g. X8K-29P-Q7M"
-                  className="w-full px-3 py-2 rounded-md border border-neutral-300 bg-white text-xs font-mono uppercase text-neutral-900 focus:outline-hidden focus:ring-1 focus:ring-emerald-700"
-                />
-              </div>
+              {/* Quick fill button */}
+              <button
+                type="button"
+                onClick={() => handleQuickFillDept(selectedDeptId)}
+                className="w-full py-1.5 px-3 rounded-md bg-neutral-100 hover:bg-neutral-200 text-neutral-700 text-[11px] font-semibold flex items-center justify-center gap-1.5 transition-colors"
+              >
+                <Sparkles className="w-3.5 h-3.5 text-emerald-700" />
+                <span>Auto-Fill Credentials for Selected Node</span>
+              </button>
 
               <button
                 type="submit"
-                className="w-full py-2 px-4 rounded-md bg-emerald-800 hover:bg-emerald-900 text-white font-semibold text-xs shadow-xs transition-colors flex items-center justify-center gap-1.5"
+                className="w-full py-2 px-4 rounded-md bg-emerald-800 hover:bg-emerald-900 text-white font-semibold flex items-center justify-center gap-2 shadow-xs transition-colors"
               >
                 <span>
-                  {activeTab === 'department'
-                    ? 'Enter Department Dashboard'
-                    : activeTab === 'section'
-                    ? 'Enter Section Dashboard'
-                    : 'Enter Sub-section Dashboard'}
+                  Enter as {activeTab === 'department' ? 'Dept Head' : activeTab === 'section' ? 'Section Incharge' : 'Sub-section Lead'}
                 </span>
-                <ArrowRight className="w-3.5 h-3.5" />
+                <ArrowRight className="w-4 h-4" />
               </button>
-
-              {/* Quick test credentials autofill buttons */}
-              <div className="pt-2 border-t border-neutral-100">
-                <span className="text-[11px] text-neutral-600 block mb-1.5">
-                  Quick Demo Autofill:
-                </span>
-                <div className="flex flex-wrap gap-1.5">
-                  <button
-                    type="button"
-                    onClick={() => handleQuickFillDept('dept-ie')}
-                    className="px-2 py-1 bg-neutral-100 hover:bg-neutral-200 text-neutral-800 rounded text-[11px] font-medium"
-                  >
-                    Industrial Engineering
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => handleQuickFillDept('dept-prod')}
-                    className="px-2 py-1 bg-neutral-100 hover:bg-neutral-200 text-neutral-800 rounded text-[11px] font-medium"
-                  >
-                    Production
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => handleQuickFillDept('dept-qa')}
-                    className="px-2 py-1 bg-neutral-100 hover:bg-neutral-200 text-neutral-800 rounded text-[11px] font-medium"
-                  >
-                    QA & Audit
-                  </button>
-                </div>
-              </div>
             </form>
           )}
+
+          <div className="mt-5 pt-4 border-t border-neutral-200/80 text-center">
+            <p className="text-[11px] text-neutral-500">
+              Direct node mapping: Unit → Department → Section → Sub-section.
+            </p>
+          </div>
         </div>
       </div>
     </div>

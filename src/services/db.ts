@@ -1,4 +1,5 @@
 import {
+  Unit,
   Department,
   Section,
   Subsection,
@@ -9,14 +10,21 @@ import {
   OrgGoalLevel,
 } from '../types';
 import { supabase } from './supabase';
+import {
+  INITIAL_UNITS,
+  INITIAL_DEPARTMENTS,
+  INITIAL_SECTIONS,
+  INITIAL_SUBSECTIONS,
+} from './seedData';
 
 const STORAGE_KEYS = {
-  DEPARTMENTS: 'bitopi_kpi_departments_v4',
-  SECTIONS: 'bitopi_kpi_sections_v4',
-  SUBSECTIONS: 'bitopi_kpi_subsections_v4',
-  KPIS: 'bitopi_kpi_kpis_v4',
-  MONTHLY_ENTRIES: 'bitopi_kpi_monthly_entries_v4',
-  AUDIT_LOGS: 'bitopi_kpi_audit_logs_v4',
+  UNITS: 'bitopi_kpi_units_v9',
+  DEPARTMENTS: 'bitopi_kpi_departments_v9',
+  SECTIONS: 'bitopi_kpi_sections_v9',
+  SUBSECTIONS: 'bitopi_kpi_subsections_v9',
+  KPIS: 'bitopi_kpi_kpis_v9',
+  MONTHLY_ENTRIES: 'bitopi_kpi_monthly_entries_v9',
+  AUDIT_LOGS: 'bitopi_kpi_audit_logs_v9',
 };
 
 // Generate random code in format XXX-XXX-XXX
@@ -50,58 +58,6 @@ export function generateNextKPICode(existingKpis: KPI[]): string {
   return `KPI-${next.toString().padStart(3, '0')}`;
 }
 
-// Seed initial 21 departments from Section 12
-const INITIAL_DEPARTMENTS: Omit<Department, 'created_at' | 'updated_at'>[] = [
-  { id: 'dept-ie', name: 'Industrial Engineering', short_code: 'IE', department_id: 'IE-7F29', access_code: 'X8K-29P-Q7M', status: 'active' },
-  { id: 'dept-hr', name: 'HR & Admin', short_code: 'HR', department_id: 'HR-2K81', access_code: 'M4P-82W-R1B', status: 'active' },
-  { id: 'dept-cad', name: 'CAD & Sample', short_code: 'CAD', department_id: 'CAD-3M19', access_code: 'Q9T-44L-Z2N', status: 'active' },
-  { id: 'dept-com', name: 'Commercial', short_code: 'COM', department_id: 'COM-5P82', access_code: 'V3R-91K-C8H', status: 'active' },
-  { id: 'dept-eng', name: 'Engineering & Services', short_code: 'ENG', department_id: 'ENG-6W41', access_code: 'L7D-25X-J4P', status: 'active' },
-  { id: 'dept-it', name: 'ERP & IT', short_code: 'IT', department_id: 'IT-8K12', access_code: 'F2W-68Y-K9T', status: 'active' },
-  { id: 'dept-fin', name: 'Finance & Accounts', short_code: 'FIN', department_id: 'FIN-9P22', access_code: 'T5N-73D-W8K', status: 'active' },
-  { id: 'dept-gen', name: 'General', short_code: 'GEN', department_id: 'GEN-1A44', access_code: 'H8C-19M-P6L', status: 'active' },
-  { id: 'dept-hrc', name: 'HR, Admin & Compliance', short_code: 'HRC', department_id: 'HRC-4B77', access_code: 'Z6K-32V-N5X', status: 'active' },
-  { id: 'dept-mis', name: 'MIS & Internal Audit', short_code: 'MIS', department_id: 'MIS-7C90', access_code: 'R1Y-84P-G3D', status: 'active' },
-  { id: 'dept-prod', name: 'Production', short_code: 'PROD', department_id: 'PROD-2D33', access_code: 'E9M-57T-K2W', status: 'active' },
-  { id: 'dept-ppc', name: 'Production Planning & Control', short_code: 'PPC', department_id: 'PPC-5E66', access_code: 'C3X-71R-J8M', status: 'active' },
-  { id: 'dept-qa', name: 'QA, Audit & Technical', short_code: 'QA', department_id: 'QA-8F11', access_code: 'B7T-94K-L1P', status: 'active' },
-  { id: 'dept-stw', name: 'Store & Warehouse', short_code: 'STW', department_id: 'STW-3G55', access_code: 'W4N-62D-P9H', status: 'active' },
-  { id: 'dept-tech', name: 'Technical', short_code: 'TECH', department_id: 'TECH-6H88', access_code: 'Y8L-35V-M4C', status: 'active' },
-  { id: 'dept-wash', name: 'Washing', short_code: 'WASH', department_id: 'WASH-9J22', access_code: 'K2R-81W-T7F', status: 'active' },
-  { id: 'dept-dpd', name: 'Design & Product Development', short_code: 'DPD', department_id: 'DPD-1K44', access_code: 'P6D-49X-C3K', status: 'active' },
-  { id: 'dept-esg', name: 'ESG', short_code: 'ESG', department_id: 'ESG-4L77', access_code: 'G1T-73M-R8B', status: 'active' },
-  { id: 'dept-mm', name: 'Marketing & Merchandising', short_code: 'MM', department_id: 'MM-7N00', access_code: 'N5K-26P-W2Y', status: 'active' },
-  { id: 'dept-scm', name: 'Supply Chain', short_code: 'SCM', department_id: 'SCM-2P33', access_code: 'D9W-58L-J4T', status: 'active' },
-  { id: 'dept-ie2', name: 'IE Special Projects', short_code: 'IES', department_id: 'IES-9R66', access_code: 'X3M-89K-Q1V', status: 'active' },
-];
-
-const INITIAL_SECTIONS: Omit<Section, 'created_at'>[] = [
-  // IE
-  { id: 'sec-ie-1', department_id: 'dept-ie', name: 'Line Optimization & Work Study' },
-  { id: 'sec-ie-2', department_id: 'dept-ie', name: 'Method Engineering & Layout' },
-  { id: 'sec-ie-3', department_id: 'dept-ie', name: 'Cost Reduction & SMV Analysis' },
-  // Production
-  { id: 'sec-prod-1', department_id: 'dept-prod', name: 'Sewing Assembly Lines' },
-  { id: 'sec-prod-2', department_id: 'dept-prod', name: 'Automated Cutting Division' },
-  // QA
-  { id: 'sec-qa-1', department_id: 'dept-qa', name: 'In-Line Process Audits' },
-  { id: 'sec-qa-2', department_id: 'dept-qa', name: 'Final Inspection & AQL' },
-  // Finance
-  { id: 'sec-fin-1', department_id: 'dept-fin', name: 'Cost Accounting & SMV Rates' },
-  { id: 'sec-fin-2', department_id: 'dept-fin', name: 'Working Capital & Audits' },
-  // HR
-  { id: 'sec-hr-1', department_id: 'dept-hr', name: 'Skill Training & Operator Onboarding' },
-  { id: 'sec-hr-2', department_id: 'dept-hr', name: 'Attendance & Employee Retention' },
-];
-
-const INITIAL_SUBSECTIONS: Omit<Subsection, 'created_at'>[] = [
-  { id: 'sub-ie-1a', section_id: 'sec-ie-1', name: 'High-Speed Sewing Floors' },
-  { id: 'sub-ie-1b', section_id: 'sec-ie-1', name: 'Finishing & Packing Flow' },
-  { id: 'sub-ie-2a', section_id: 'sec-ie-2', name: 'SMV Benchmarking Lab' },
-  { id: 'sub-prod-1a', section_id: 'sec-prod-1', name: 'Unit 1 Modular Lines' },
-  { id: 'sub-qa-1a', section_id: 'sec-qa-1', name: 'Traffic Light Quality Cell' },
-];
-
 const INITIAL_KPIS: Omit<KPI, 'created_at' | 'updated_at'>[] = [];
 
 const INITIAL_MONTHLY_ENTRIES: Omit<KPIMonthlyEntry, 'created_at' | 'updated_at'>[] = [];
@@ -111,6 +67,7 @@ class DatabaseService {
   private broadcastChannel: BroadcastChannel | null = null;
   private isRealtimeSubscribed = false;
   private isInitialized = false;
+  private unsupportedKpiColumns = new Set<string>();
 
   subscribe(listener: () => void): () => void {
     this.listeners.add(listener);
@@ -143,7 +100,8 @@ class DatabaseService {
   async syncFromSupabase(): Promise<void> {
     if (!supabase) return;
     try {
-      const [kpisRes, entriesRes, deptsRes, sectionsRes, subsRes] = await Promise.all([
+      const [unitsRes, kpisRes, entriesRes, deptsRes, sectionsRes, subsRes] = await Promise.all([
+        supabase.from('units').select('*'),
         supabase.from('kpis').select('*'),
         supabase.from('kpi_monthly_entries').select('*'),
         supabase.from('departments').select('*'),
@@ -153,35 +111,53 @@ class DatabaseService {
 
       let changed = false;
 
-      // Note: Must unconditionally update if data is returned (even empty array [])
-      if (kpisRes.data !== null && Array.isArray(kpisRes.data)) {
-        const prev = localStorage.getItem(STORAGE_KEYS.KPIS);
-        const next = JSON.stringify(kpisRes.data);
-        if (prev !== next) {
-          localStorage.setItem(STORAGE_KEYS.KPIS, next);
-          changed = true;
-        }
+      // Auto-seed Supabase if tables are empty
+      if (!unitsRes.data || unitsRes.data.length === 0) {
+        await supabase.from('units').upsert(INITIAL_UNITS);
+      }
+      if (!deptsRes.data || deptsRes.data.length === 0) {
+        await supabase.from('departments').upsert(INITIAL_DEPARTMENTS);
+      }
+      if (!sectionsRes.data || sectionsRes.data.length === 0) {
+        await supabase.from('sections').upsert(INITIAL_SECTIONS);
+      }
+      if (!subsRes.data || subsRes.data.length === 0) {
+        await supabase.from('subsections').upsert(INITIAL_SUBSECTIONS);
       }
 
-      if (entriesRes.data !== null && Array.isArray(entriesRes.data)) {
-        const prev = localStorage.getItem(STORAGE_KEYS.MONTHLY_ENTRIES);
-        const next = JSON.stringify(entriesRes.data);
+      if (unitsRes.data !== null && Array.isArray(unitsRes.data) && unitsRes.data.length > 0) {
+        const prev = localStorage.getItem(STORAGE_KEYS.UNITS);
+        const supabaseUnits = unitsRes.data as Unit[];
+        const currentStored: Unit[] = prev ? JSON.parse(prev) : [];
+        const map = new Map<string, Unit>();
+        (INITIAL_UNITS as Unit[]).forEach((u) => map.set(u.id, u as Unit));
+        currentStored.forEach((u) => map.set(u.id, u));
+        supabaseUnits.forEach((u) => map.set(u.id, { ...map.get(u.id), ...u }));
+        const mergedUnits = Array.from(map.values());
+        const next = JSON.stringify(mergedUnits);
         if (prev !== next) {
-          localStorage.setItem(STORAGE_KEYS.MONTHLY_ENTRIES, next);
+          localStorage.setItem(STORAGE_KEYS.UNITS, next);
           changed = true;
         }
       }
 
       if (deptsRes.data !== null && Array.isArray(deptsRes.data) && deptsRes.data.length > 0) {
         const prev = localStorage.getItem(STORAGE_KEYS.DEPARTMENTS);
-        const next = JSON.stringify(deptsRes.data);
+        const supabaseDepts = deptsRes.data as Department[];
+        const currentStored: Department[] = prev ? JSON.parse(prev) : [];
+        const map = new Map<string, Department>();
+        (INITIAL_DEPARTMENTS as Department[]).forEach((d) => map.set(d.id, d as Department));
+        currentStored.forEach((d) => map.set(d.id, d));
+        supabaseDepts.forEach((d) => map.set(d.id, { ...map.get(d.id), ...d }));
+        const mergedDepts = Array.from(map.values());
+        const next = JSON.stringify(mergedDepts);
         if (prev !== next) {
           localStorage.setItem(STORAGE_KEYS.DEPARTMENTS, next);
           changed = true;
         }
       }
 
-      if (sectionsRes.data !== null && Array.isArray(sectionsRes.data)) {
+      if (sectionsRes.data !== null && Array.isArray(sectionsRes.data) && sectionsRes.data.length > 0) {
         const prev = localStorage.getItem(STORAGE_KEYS.SECTIONS);
         const next = JSON.stringify(sectionsRes.data);
         if (prev !== next) {
@@ -190,12 +166,63 @@ class DatabaseService {
         }
       }
 
-      if (subsRes.data !== null && Array.isArray(subsRes.data)) {
+      if (subsRes.data !== null && Array.isArray(subsRes.data) && subsRes.data.length > 0) {
         const prev = localStorage.getItem(STORAGE_KEYS.SUBSECTIONS);
         const next = JSON.stringify(subsRes.data);
         if (prev !== next) {
           localStorage.setItem(STORAGE_KEYS.SUBSECTIONS, next);
           changed = true;
+        }
+      }
+
+      // KPIs: Never wipe local KPIs with empty array! Merge and push missing to Supabase
+      const localKpisRaw = localStorage.getItem(STORAGE_KEYS.KPIS);
+      const localKpis: KPI[] = localKpisRaw ? JSON.parse(localKpisRaw) : [];
+
+      if (kpisRes.data !== null && Array.isArray(kpisRes.data)) {
+        const supabaseKpis = kpisRes.data as KPI[];
+        if (supabaseKpis.length > 0) {
+          const kpiMap = new Map<string, KPI>();
+          localKpis.forEach((k) => kpiMap.set(k.id, k));
+          supabaseKpis.forEach((k) => kpiMap.set(k.id, k));
+          const merged = Array.from(kpiMap.values());
+          const next = JSON.stringify(merged);
+          if (localKpisRaw !== next) {
+            localStorage.setItem(STORAGE_KEYS.KPIS, next);
+            changed = true;
+          }
+          // Push any local KPIs that Supabase doesn't have yet
+          for (const lk of localKpis) {
+            if (!supabaseKpis.some((sk) => sk.id === lk.id)) {
+              this.syncKPIToSupabase(lk);
+            }
+          }
+        } else if (localKpis.length > 0) {
+          // Supabase has 0 KPIs but localStorage has user-created KPIs: push them up!
+          for (const lk of localKpis) {
+            this.syncKPIToSupabase(lk);
+          }
+        }
+      }
+
+      // Monthly Entries: Merge without data loss
+      const localEntriesRaw = localStorage.getItem(STORAGE_KEYS.MONTHLY_ENTRIES);
+      const localEntries: KPIMonthlyEntry[] = localEntriesRaw ? JSON.parse(localEntriesRaw) : [];
+
+      if (entriesRes.data !== null && Array.isArray(entriesRes.data)) {
+        const supabaseEntries = entriesRes.data as KPIMonthlyEntry[];
+        if (supabaseEntries.length > 0) {
+          const entryMap = new Map<string, KPIMonthlyEntry>();
+          localEntries.forEach((e) => entryMap.set(`${e.kpi_id}-${e.year}-${e.month}`, e));
+          supabaseEntries.forEach((e) => entryMap.set(`${e.kpi_id}-${e.year}-${e.month}`, e));
+          const merged = Array.from(entryMap.values());
+          const next = JSON.stringify(merged);
+          if (localEntriesRaw !== next) {
+            localStorage.setItem(STORAGE_KEYS.MONTHLY_ENTRIES, next);
+            changed = true;
+          }
+        } else if (localEntries.length > 0) {
+          await supabase.from('kpi_monthly_entries').upsert(localEntries);
         }
       }
 
@@ -207,29 +234,253 @@ class DatabaseService {
     }
   }
 
+  /**
+   * Resilient sync of a KPI, ensuring its parent unit & department exist in Supabase
+   */
+  async syncKPIToSupabase(kpi: KPI): Promise<void> {
+    if (!supabase) return;
+    try {
+      // 1. Ensure parent unit exists in Supabase
+      if (kpi.unit_id) {
+        const u = this.getUnitById(kpi.unit_id);
+        if (u) {
+          await supabase.from('units').upsert({
+            id: u.id,
+            name: u.name,
+            code: u.code,
+            location: u.location || null,
+            access_code: u.access_code || null,
+            status: u.status,
+            created_at: u.created_at,
+            updated_at: u.updated_at || u.created_at,
+          });
+        }
+      }
+
+      // 2. Ensure parent department exists in Supabase
+      if (kpi.department_id) {
+        const d = this.getDepartmentById(kpi.department_id);
+        if (d) {
+          await supabase.from('departments').upsert({
+            id: d.id,
+            unit_id: d.unit_id || null,
+            name: d.name,
+            short_code: d.short_code,
+            department_id: d.department_id,
+            access_code: d.access_code,
+            status: d.status,
+            created_at: d.created_at,
+            updated_at: d.updated_at || d.created_at,
+          });
+        }
+      }
+
+      // 3. Ensure parent section exists in Supabase if present
+      if (kpi.section_id) {
+        const s = this.getSectionById(kpi.section_id);
+        if (s) {
+          await supabase.from('sections').upsert({
+            id: s.id,
+            department_id: s.department_id,
+            name: s.name,
+            created_at: s.created_at,
+            updated_at: s.updated_at || s.created_at,
+          });
+        }
+      }
+
+      // 4. Ensure parent subsection exists in Supabase if present
+      if (kpi.subsection_id) {
+        const sub = this.getSubsectionById(kpi.subsection_id);
+        if (sub) {
+          await supabase.from('subsections').upsert({
+            id: sub.id,
+            section_id: sub.section_id,
+            name: sub.name,
+            created_at: sub.created_at,
+            updated_at: sub.updated_at || sub.created_at,
+          });
+        }
+      }
+
+      // 5. Clean and prepare KPI payload matching table schema
+      const kpiPayload: Record<string, any> = {
+        id: kpi.id,
+        kpi_code: kpi.kpi_code,
+        department_id: kpi.department_id || null,
+        section_id: kpi.section_id || null,
+        subsection_id: kpi.subsection_id || null,
+        kra: kpi.kra,
+        major_objective: kpi.major_objective,
+        aligned_org_goal_level: kpi.aligned_org_goal_level,
+        aligned_org_goal_id: kpi.aligned_org_goal_id,
+        aligned_org_goal_label: kpi.aligned_org_goal_label || null,
+        smart_kpi_text: kpi.smart_kpi_text,
+        specific_s: kpi.specific_s || null,
+        measure_m: kpi.measure_m || null,
+        achievable_a: kpi.achievable_a ?? true,
+        relevant_r: kpi.relevant_r ?? true,
+        time_t: kpi.time_t || null,
+        perspective: kpi.perspective,
+        responsible_concern: kpi.responsible_concern || [],
+        requirements: kpi.requirements || '',
+        datasource: kpi.datasource || '',
+        weight: Number(kpi.weight),
+        baseline_value: Number(kpi.baseline_value),
+        baseline_unit: kpi.baseline_unit,
+        target_value: Number(kpi.target_value),
+        target_unit: kpi.target_unit,
+        target_policy: kpi.target_policy || 'fixed',
+        created_at: kpi.created_at,
+        updated_at: kpi.updated_at,
+      };
+
+      if (kpi.unit_id && !this.unsupportedKpiColumns.has('unit_id')) {
+        kpiPayload.unit_id = kpi.unit_id;
+      }
+
+      // Strip any previously detected unsupported columns
+      for (const col of this.unsupportedKpiColumns) {
+        delete kpiPayload[col];
+      }
+
+      let res = await supabase.from('kpis').upsert(kpiPayload);
+
+      // Dynamically recover from PGRST204 (column missing from schema cache, e.g. 'unit_id')
+      while (res.error && res.error.code === 'PGRST204') {
+        const match = res.error.message?.match(/Could not find the '([^']+)' column/);
+        if (match && match[1] && match[1] in kpiPayload) {
+          const missingCol = match[1];
+          console.warn(`Supabase 'kpis' table schema missing '${missingCol}', omitting column and retrying...`);
+          this.unsupportedKpiColumns.add(missingCol);
+          delete kpiPayload[missingCol];
+          res = await supabase.from('kpis').upsert(kpiPayload);
+        } else {
+          break;
+        }
+      }
+
+      if (res.error) {
+        console.error('Supabase upsert KPI error:', res.error);
+        return; // Halt: Do not attempt monthly entries if the KPI was not saved
+      }
+
+      // 6. Upsert pre-seeded monthly entries for this KPI (only when parent KPI successfully exists)
+      const entries = this.getAllMonthlyEntries().filter((e) => e.kpi_id === kpi.id);
+      if (entries.length > 0) {
+        let entriesRes = await supabase.from('kpi_monthly_entries').upsert(entries);
+        if (entriesRes.error && entriesRes.error.code === 'PGRST204') {
+          const match = entriesRes.error.message?.match(/Could not find the '([^']+)' column/);
+          if (match && match[1]) {
+            const sanitized = entries.map((e) => {
+              const copy = { ...e };
+              delete (copy as any)[match[1]];
+              return copy;
+            });
+            entriesRes = await supabase.from('kpi_monthly_entries').upsert(sanitized);
+          }
+        }
+        if (entriesRes.error) {
+          console.error('Supabase upsert entries error:', entriesRes.error);
+        }
+      }
+    } catch (err) {
+      console.error('Supabase syncKPIToSupabase caught exception:', err);
+    }
+  }
+
   private initStorage() {
     if (typeof window === 'undefined') return;
 
     // Purge legacy storage keys from previous versions
     [
-      'bitopi_kpi_departments_v1', 'bitopi_kpi_departments_v2', 'bitopi_kpi_departments_v3',
-      'bitopi_kpi_sections_v1', 'bitopi_kpi_sections_v2', 'bitopi_kpi_sections_v3',
-      'bitopi_kpi_subsections_v1', 'bitopi_kpi_subsections_v2', 'bitopi_kpi_subsections_v3',
-      'bitopi_kpi_kpis_v1', 'bitopi_kpi_kpis_v2', 'bitopi_kpi_kpis_v3',
-      'bitopi_kpi_monthly_entries_v1', 'bitopi_kpi_monthly_entries_v2', 'bitopi_kpi_monthly_entries_v3',
+      'bitopi_kpi_departments_v1', 'bitopi_kpi_departments_v2', 'bitopi_kpi_departments_v3', 'bitopi_kpi_departments_v4', 'bitopi_kpi_departments_v5', 'bitopi_kpi_departments_v6', 'bitopi_kpi_departments_v7',
+      'bitopi_kpi_sections_v1', 'bitopi_kpi_sections_v2', 'bitopi_kpi_sections_v3', 'bitopi_kpi_sections_v4', 'bitopi_kpi_sections_v5', 'bitopi_kpi_sections_v6', 'bitopi_kpi_sections_v7',
+      'bitopi_kpi_subsections_v1', 'bitopi_kpi_subsections_v2', 'bitopi_kpi_subsections_v3', 'bitopi_kpi_subsections_v4', 'bitopi_kpi_subsections_v5', 'bitopi_kpi_subsections_v6', 'bitopi_kpi_subsections_v7',
+      'bitopi_kpi_units_v1', 'bitopi_kpi_units_v2', 'bitopi_kpi_units_v3', 'bitopi_kpi_units_v4', 'bitopi_kpi_units_v5', 'bitopi_kpi_units_v6', 'bitopi_kpi_units_v7',
     ].forEach((k) => localStorage.removeItem(k));
 
-    if (!localStorage.getItem(STORAGE_KEYS.DEPARTMENTS)) {
-      const now = new Date().toISOString();
-      const departments: Department[] = INITIAL_DEPARTMENTS.map((d) => ({
-        ...d,
-        created_at: now,
-        updated_at: now,
-      }));
-      localStorage.setItem(STORAGE_KEYS.DEPARTMENTS, JSON.stringify(departments));
+    // Migrate previous user KPIs and monthly entries to prevent data loss
+    if (!localStorage.getItem(STORAGE_KEYS.KPIS)) {
+      const prevKpis = localStorage.getItem('bitopi_kpi_kpis_v8') || localStorage.getItem('bitopi_kpi_kpis_v7') || localStorage.getItem('bitopi_kpi_kpis_v6');
+      if (prevKpis) {
+        try {
+          const parsed = JSON.parse(prevKpis);
+          if (Array.isArray(parsed)) {
+            localStorage.setItem(STORAGE_KEYS.KPIS, JSON.stringify(parsed));
+          }
+        } catch {}
+      }
+    }
+    if (!localStorage.getItem(STORAGE_KEYS.MONTHLY_ENTRIES)) {
+      const prevEntries = localStorage.getItem('bitopi_kpi_monthly_entries_v8') || localStorage.getItem('bitopi_kpi_monthly_entries_v7') || localStorage.getItem('bitopi_kpi_monthly_entries_v6');
+      if (prevEntries) {
+        try {
+          const parsed = JSON.parse(prevEntries);
+          if (Array.isArray(parsed)) {
+            localStorage.setItem(STORAGE_KEYS.MONTHLY_ENTRIES, JSON.stringify(parsed));
+          }
+        } catch {}
+      }
     }
 
-    if (!localStorage.getItem(STORAGE_KEYS.SECTIONS)) {
+    const now = new Date().toISOString();
+
+    // 1. Units - guarantee all initial units plus any custom units
+    const storedUnitsRaw = localStorage.getItem(STORAGE_KEYS.UNITS);
+    let storedUnits: Unit[] = [];
+    try {
+      storedUnits = storedUnitsRaw ? JSON.parse(storedUnitsRaw) : [];
+    } catch {
+      storedUnits = [];
+    }
+    const unitMap = new Map<string, Unit>();
+    (INITIAL_UNITS as Unit[]).forEach((u) => {
+      unitMap.set(u.id, { ...u, created_at: now, updated_at: now });
+    });
+    storedUnits.forEach((u) => {
+      unitMap.set(u.id, u);
+    });
+    const finalUnits = Array.from(unitMap.values());
+    localStorage.setItem(STORAGE_KEYS.UNITS, JSON.stringify(finalUnits));
+
+    // 2. Departments (Guaranteed to have all departments with valid unit_id for all units)
+    const storedDeptsRaw = localStorage.getItem(STORAGE_KEYS.DEPARTMENTS);
+    let storedDepts: Department[] = [];
+    try {
+      storedDepts = storedDeptsRaw ? JSON.parse(storedDeptsRaw) : [];
+    } catch {
+      storedDepts = [];
+    }
+    const deptMap = new Map<string, Department>();
+    (INITIAL_DEPARTMENTS as Department[]).forEach((d) => {
+      deptMap.set(d.id, { ...d, created_at: now, updated_at: now });
+    });
+    storedDepts.forEach((d) => {
+      deptMap.set(d.id, d);
+    });
+    const finalDepts = Array.from(deptMap.values()).map((d) => {
+      if (!d.unit_id) {
+        const seedMatch = INITIAL_DEPARTMENTS.find(
+          (sd) => sd.id === d.id || sd.short_code === d.short_code || sd.name.toLowerCase() === d.name.toLowerCase()
+        );
+        if (seedMatch?.unit_id) {
+          return { ...d, unit_id: seedMatch.unit_id };
+        }
+      }
+      return d;
+    });
+    localStorage.setItem(STORAGE_KEYS.DEPARTMENTS, JSON.stringify(finalDepts));
+
+    // 3. Sections
+    const storedSectionsRaw = localStorage.getItem(STORAGE_KEYS.SECTIONS);
+    let storedSections: Section[] = [];
+    try {
+      storedSections = storedSectionsRaw ? JSON.parse(storedSectionsRaw) : [];
+    } catch {
+      storedSections = [];
+    }
+    if (storedSections.length < INITIAL_SECTIONS.length || storedSections.some((s) => !s.department_id)) {
       const now = new Date().toISOString();
       const sections: Section[] = INITIAL_SECTIONS.map((s) => ({
         ...s,
@@ -238,7 +489,15 @@ class DatabaseService {
       localStorage.setItem(STORAGE_KEYS.SECTIONS, JSON.stringify(sections));
     }
 
-    if (!localStorage.getItem(STORAGE_KEYS.SUBSECTIONS)) {
+    // 4. Subsections
+    const storedSubsRaw = localStorage.getItem(STORAGE_KEYS.SUBSECTIONS);
+    let storedSubs: Subsection[] = [];
+    try {
+      storedSubs = storedSubsRaw ? JSON.parse(storedSubsRaw) : [];
+    } catch {
+      storedSubs = [];
+    }
+    if (storedSubs.length < INITIAL_SUBSECTIONS.length || storedSubs.some((sub) => !sub.section_id)) {
       const now = new Date().toISOString();
       const subsections: Subsection[] = INITIAL_SUBSECTIONS.map((sub) => ({
         ...sub,
@@ -355,18 +614,162 @@ class DatabaseService {
     this.initStorage();
   }
 
+  // --- UNITS ---
+  getUnits(): Unit[] {
+    this.initStorage();
+    const data = localStorage.getItem(STORAGE_KEYS.UNITS);
+    return data ? JSON.parse(data) : [];
+  }
+
+  getUnitById(id: string): Unit | undefined {
+    return this.getUnits().find((u) => u.id === id || u.code === id);
+  }
+
+  createUnit(
+    name: string,
+    code: string,
+    location?: string,
+    access_code?: string,
+    status: 'active' | 'disabled' = 'active'
+  ): Unit {
+    const units = this.getUnits();
+    const cleanCode = (code || 'UNT').toUpperCase().replace(/[^A-Z0-9-]/g, '').slice(0, 10);
+    const cleanName = (name || '').replace(/\s*\([^)]*\)/g, '').trim();
+    const now = new Date().toISOString();
+    const newUnit: Unit = {
+      id: `unit-${Date.now()}`,
+      name: cleanName,
+      code: cleanCode,
+      location: location?.trim() || '',
+      access_code: access_code?.trim() || `${cleanCode}-991-A1B`,
+      status: status || 'active',
+      created_at: now,
+      updated_at: now,
+    };
+    units.push(newUnit);
+    localStorage.setItem(STORAGE_KEYS.UNITS, JSON.stringify(units));
+    this.broadcastUpdate();
+    if (supabase) {
+      Promise.resolve(supabase.from('units').upsert(newUnit)).catch(() => {});
+    }
+    return newUnit;
+  }
+
+  deleteUnit(unitId: string): { success: boolean; error?: string } {
+    const units = this.getUnits();
+    const index = units.findIndex((u) => u.id === unitId || u.code === unitId);
+    if (index === -1) {
+      return { success: false, error: 'Business Unit not found.' };
+    }
+    const unitToDelete = units[index];
+
+    // Remove unit
+    units.splice(index, 1);
+    localStorage.setItem(STORAGE_KEYS.UNITS, JSON.stringify(units));
+
+    // Also notify/delete from Supabase
+    if (supabase) {
+      Promise.resolve(supabase.from('units').delete().eq('id', unitToDelete.id)).catch(() => {});
+    }
+
+    this.addAuditLog(
+      'admin',
+      'admin',
+      'create_department' as any,
+      'department',
+      unitToDelete.id,
+      `Deleted Business Unit: ${unitToDelete.name} (${unitToDelete.code})`
+    );
+
+    this.broadcastUpdate();
+    return { success: true };
+  }
+
+  updateUnit(unitId: string, updates: Partial<Unit>): Unit | null {
+    const units = this.getUnits();
+    const index = units.findIndex((u) => u.id === unitId || u.code === unitId);
+    if (index === -1) return null;
+    const now = new Date().toISOString();
+    const cleanName = updates.name ? updates.name.replace(/\s*\([^)]*\)/g, '').trim() : units[index].name;
+    const updated = {
+      ...units[index],
+      ...updates,
+      name: cleanName,
+      updated_at: now,
+    };
+    units[index] = updated;
+    localStorage.setItem(STORAGE_KEYS.UNITS, JSON.stringify(units));
+    this.broadcastUpdate();
+    if (supabase) {
+      Promise.resolve(supabase.from('units').upsert(updated)).catch(() => {});
+    }
+    return updated;
+  }
+
   // --- DEPARTMENTS ---
-  getDepartments(): Department[] {
+  getDepartments(unitId?: string): Department[] {
     this.initStorage();
     const data = localStorage.getItem(STORAGE_KEYS.DEPARTMENTS);
-    return data ? JSON.parse(data) : [];
+    let list: Department[] = data ? JSON.parse(data) : [];
+
+    // Safety fallback
+    if (!list || list.length === 0) {
+      list = INITIAL_DEPARTMENTS as Department[];
+    }
+
+    // Unconditionally repair any department missing unit_id
+    let repaired = false;
+    list = list.map((d) => {
+      if (!d.unit_id) {
+        const seedMatch = INITIAL_DEPARTMENTS.find(
+          (sd) => sd.id === d.id || sd.short_code === d.short_code || sd.name.toLowerCase() === d.name.toLowerCase()
+        );
+        if (seedMatch?.unit_id) {
+          repaired = true;
+          return { ...d, unit_id: seedMatch.unit_id };
+        }
+      }
+      return d;
+    });
+    if (repaired && typeof localStorage !== 'undefined') {
+      localStorage.setItem(STORAGE_KEYS.DEPARTMENTS, JSON.stringify(list));
+    }
+
+    if (unitId && unitId !== 'all') {
+      const cleanUnitId = unitId.toLowerCase().trim();
+      const targetUnit = this.getUnitById(unitId);
+      const targetCode = targetUnit?.code?.toLowerCase()?.trim();
+      const normalize = (id: string) => id.toLowerCase().trim().replace(/^unit-/, '');
+      const normClean = normalize(cleanUnitId);
+
+      const isMatch = (dUnitId?: string) => {
+        if (!dUnitId) return false;
+        const normD = normalize(dUnitId);
+        return (
+          dUnitId.toLowerCase().trim() === cleanUnitId ||
+          normD === normClean ||
+          (targetCode ? normD === targetCode || dUnitId.toLowerCase().trim() === targetCode : false) ||
+          (targetUnit ? dUnitId === targetUnit.id || normD === normalize(targetUnit.id) : false)
+        );
+      };
+
+      let filtered = list.filter((d) => isMatch(d.unit_id));
+
+      if (filtered.length === 0) {
+        // Robust fallback: if nothing matched in storage, filter from INITIAL_DEPARTMENTS directly
+        filtered = (INITIAL_DEPARTMENTS as Department[]).filter((d) => isMatch(d.unit_id));
+      }
+
+      return filtered;
+    }
+    return list;
   }
 
   getDepartmentById(id: string): Department | undefined {
     return this.getDepartments().find((d) => d.id === id || d.department_id === id);
   }
 
-  createDepartment(name: string, shortCode: string): Department {
+  createDepartment(name: string, shortCode: string, unitId?: string): Department {
     const departments = this.getDepartments();
     const cleanCode = (shortCode || 'DEP').toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 4);
 
@@ -381,6 +784,7 @@ class DatabaseService {
 
     const newDept: Department = {
       id: `dept-${Date.now()}`,
+      unit_id: unitId || 'unit-bgl',
       name: name.trim(),
       short_code: cleanCode,
       department_id: deptId,
@@ -439,9 +843,16 @@ class DatabaseService {
   getSections(deptId?: string): Section[] {
     this.initStorage();
     const data = localStorage.getItem(STORAGE_KEYS.SECTIONS);
-    const sections: Section[] = data ? JSON.parse(data) : [];
+    let sections: Section[] = data ? JSON.parse(data) : [];
+    if (!sections || sections.length === 0) {
+      sections = INITIAL_SECTIONS as Section[];
+    }
     if (deptId && deptId !== 'all') {
-      return sections.filter((s) => s.department_id === deptId);
+      const filtered = sections.filter((s) => s.department_id === deptId);
+      if (filtered.length === 0) {
+        return (INITIAL_SECTIONS as Section[]).filter((s) => s.department_id === deptId);
+      }
+      return filtered;
     }
     return sections;
   }
@@ -653,6 +1064,7 @@ class DatabaseService {
 
   // --- KPIS ---
   getKPIs(filter?: {
+    unitId?: string;
     departmentId?: string;
     sectionId?: string;
     subsectionId?: string;
@@ -665,21 +1077,42 @@ class DatabaseService {
     let list: KPI[] = data ? JSON.parse(data) : [];
 
     if (filter) {
+      // 1. Unit Filter:
+      if (filter.unitId && filter.unitId !== 'all') {
+        const deptsInUnit = this.getDepartments(filter.unitId).map((d) => d.id);
+        list = list.filter(
+          (k) =>
+            k.unit_id === filter.unitId ||
+            (k.department_id && deptsInUnit.includes(k.department_id))
+        );
+      }
+
+      // 2. Department Filter: STRICT MATCH
       if (filter.departmentId && filter.departmentId !== 'all') {
         list = list.filter((k) => k.department_id === filter.departmentId);
       }
+
+      // 3. Section Filter: STRICT MATCH
       if (filter.sectionId && filter.sectionId !== 'all') {
         list = list.filter((k) => k.section_id === filter.sectionId);
       }
+
+      // 4. Subsection Filter: STRICT MATCH
       if (filter.subsectionId && filter.subsectionId !== 'all') {
         list = list.filter((k) => k.subsection_id === filter.subsectionId);
       }
+
+      // 5. Goal Level Filter:
       if (filter.level && filter.level !== 'all') {
         list = list.filter((k) => k.aligned_org_goal_level === filter.level);
       }
+
+      // 6. Perspective Filter:
       if (filter.perspective && filter.perspective !== 'all') {
         list = list.filter((k) => k.perspective === filter.perspective);
       }
+
+      // 7. Search Filter:
       if (filter.search && filter.search.trim()) {
         const q = filter.search.toLowerCase().trim();
         list = list.filter(
@@ -702,13 +1135,46 @@ class DatabaseService {
   }
 
   /**
-   * Get already allocated weight for a department, excluding a specific KPI if editing
+   * Get already allocated weight for any node in the hierarchy
    */
-  getDepartmentAllocatedWeight(departmentId: string, excludeKpiId?: string): number {
-    const kpis = this.getKPIs({ departmentId });
+  getNodeAllocatedWeight(
+    node: {
+      level: OrgGoalLevel;
+      unitId?: string;
+      departmentId?: string;
+      sectionId?: string;
+      subsectionId?: string;
+    },
+    excludeKpiId?: string
+  ): number {
+    let kpis: KPI[] = [];
+    if (node.level === 'unit' && node.unitId) {
+      kpis = this.getKPIs({ unitId: node.unitId, level: 'unit' });
+    } else if (node.level === 'department' && node.departmentId) {
+      kpis = this.getKPIs({ departmentId: node.departmentId, level: 'department' });
+    } else if (node.level === 'section' && node.sectionId) {
+      kpis = this.getKPIs({ sectionId: node.sectionId, level: 'section' });
+    } else if (node.level === 'subsection' && node.subsectionId) {
+      kpis = this.getKPIs({ subsectionId: node.subsectionId, level: 'subsection' });
+    } else if (node.departmentId) {
+      kpis = this.getKPIs({ departmentId: node.departmentId });
+    }
+
     return kpis
       .filter((k) => !excludeKpiId || k.id !== excludeKpiId)
       .reduce((sum, k) => sum + (k.weight || 0), 0);
+  }
+
+  /**
+   * Legacy helpers for backward compatibility
+   */
+  getUnitAllocatedWeight(unitId: string, excludeKpiId?: string): number {
+    return this.getNodeAllocatedWeight({ level: 'unit', unitId }, excludeKpiId);
+  }
+
+  getDepartmentAllocatedWeight(departmentId?: string, excludeKpiId?: string): number {
+    if (!departmentId) return 0;
+    return this.getNodeAllocatedWeight({ level: 'department', departmentId }, excludeKpiId);
   }
 
   createKPI(
@@ -716,20 +1182,40 @@ class DatabaseService {
     actor?: { role: UserRole; identifier: string }
   ): KPI {
     const kpis = this.getKPIs();
-    const currentDeptAllocated = this.getDepartmentAllocatedWeight(kpiData.department_id);
+    const currentAllocated = this.getNodeAllocatedWeight({
+      level: kpiData.aligned_org_goal_level,
+      unitId: kpiData.unit_id,
+      departmentId: kpiData.department_id,
+      sectionId: kpiData.section_id,
+      subsectionId: kpiData.subsection_id,
+    });
 
-    // Validate weight allocation rule #24
-    if (currentDeptAllocated + kpiData.weight > 100.01) {
+    // Validate weight allocation rule #24 (Max 100% per node)
+    if (currentAllocated + kpiData.weight > 100.01) {
       throw new Error(
-        `Weight exceeds remaining allocation. Remaining: ${Math.round((100 - currentDeptAllocated) * 10) / 10}%, Entered: ${kpiData.weight}%`
+        `Weight exceeds remaining allocation for this node. Remaining: ${Math.max(0, Math.round((100 - currentAllocated) * 10) / 10)}%, Entered: ${kpiData.weight}%`
       );
     }
 
     const nextCode = generateNextKPICode(kpis);
     const now = new Date().toISOString();
 
+    // Ensure unit_id is always resolved and stored for the KPI
+    let resolvedUnitId = kpiData.unit_id;
+    if (!resolvedUnitId && kpiData.department_id) {
+      const dept = this.getDepartmentById(kpiData.department_id);
+      if (dept?.unit_id) {
+        resolvedUnitId = dept.unit_id;
+      }
+    }
+    if (!resolvedUnitId) {
+      resolvedUnitId = 'unit-bgl';
+    }
+
     const newKpi: KPI = {
       ...kpiData,
+      unit_id: resolvedUnitId,
+      target_policy: kpiData.target_policy || 'fixed',
       id: `kpi-${Date.now()}`,
       kpi_code: nextCode,
       created_at: now,
@@ -765,7 +1251,9 @@ class DatabaseService {
     this.broadcastUpdate();
 
     if (supabase) {
-      Promise.resolve(supabase.from('kpis').insert(newKpi)).catch(() => {});
+      this.syncKPIToSupabase(newKpi).catch((err) =>
+        console.error('Failed to sync new KPI to Supabase:', err)
+      );
     }
 
     return newKpi;
@@ -781,19 +1269,36 @@ class DatabaseService {
     if (index === -1) return null;
 
     const currentKpi = kpis[index];
-    const deptId = updates.department_id || currentKpi.department_id;
     const newWeight = updates.weight !== undefined ? updates.weight : currentKpi.weight;
 
-    const allocatedOthers = this.getDepartmentAllocatedWeight(deptId, id);
+    let finalUpdates = { ...updates };
+    if (finalUpdates.department_id && !finalUpdates.unit_id) {
+      const dept = this.getDepartmentById(finalUpdates.department_id);
+      if (dept?.unit_id) {
+        finalUpdates.unit_id = dept.unit_id;
+      }
+    }
+
+    const allocatedOthers = this.getNodeAllocatedWeight(
+      {
+        level: (finalUpdates.aligned_org_goal_level || currentKpi.aligned_org_goal_level) as OrgGoalLevel,
+        unitId: finalUpdates.unit_id || currentKpi.unit_id,
+        departmentId: finalUpdates.department_id || currentKpi.department_id,
+        sectionId: finalUpdates.section_id || currentKpi.section_id,
+        subsectionId: finalUpdates.subsection_id || currentKpi.subsection_id,
+      },
+      id
+    );
+
     if (allocatedOthers + newWeight > 100.01) {
       throw new Error(
-        `Weight exceeds remaining allocation. Remaining: ${Math.round((100 - allocatedOthers) * 10) / 10}%, Entered: ${newWeight}%`
+        `Weight exceeds remaining allocation for this node. Remaining: ${Math.max(0, Math.round((100 - allocatedOthers) * 10) / 10)}%, Entered: ${newWeight}%`
       );
     }
 
     kpis[index] = {
       ...currentKpi,
-      ...updates,
+      ...finalUpdates,
       updated_at: new Date().toISOString(),
     };
 
@@ -810,7 +1315,9 @@ class DatabaseService {
     this.broadcastUpdate();
 
     if (supabase) {
-      Promise.resolve(supabase.from('kpis').update(kpis[index]).eq('id', id)).catch(() => {});
+      this.syncKPIToSupabase(kpis[index]).catch((err) =>
+        console.error('Failed to update KPI in Supabase:', err)
+      );
     }
 
     return kpis[index];
@@ -911,14 +1418,12 @@ class DatabaseService {
     const entries = this.getAllMonthlyEntries();
     const now = new Date().toISOString();
 
-    if (supabase) {
-      Promise.resolve(supabase.from('kpi_monthly_entries').upsert(entry)).catch(() => {});
-    }
-
     // Check unique constraint: UNIQUE(kpi_id, year, month) (#29)
     const existingIndex = entries.findIndex(
       (e) => e.kpi_id === entry.kpi_id && e.year === entry.year && e.month === entry.month
     );
+
+    let savedEntry: KPIMonthlyEntry;
 
     if (existingIndex >= 0) {
       entries[existingIndex] = {
@@ -926,9 +1431,9 @@ class DatabaseService {
         ...entry,
         updated_at: now,
       };
+      savedEntry = entries[existingIndex];
       localStorage.setItem(STORAGE_KEYS.MONTHLY_ENTRIES, JSON.stringify(entries));
       this.broadcastUpdate();
-      return entries[existingIndex];
     } else {
       const newEntry: KPIMonthlyEntry = {
         ...entry,
@@ -937,10 +1442,18 @@ class DatabaseService {
         updated_at: now,
       };
       entries.push(newEntry);
+      savedEntry = newEntry;
       localStorage.setItem(STORAGE_KEYS.MONTHLY_ENTRIES, JSON.stringify(entries));
       this.broadcastUpdate();
-      return newEntry;
     }
+
+    if (supabase) {
+      Promise.resolve(supabase.from('kpi_monthly_entries').upsert(savedEntry)).catch((err) =>
+        console.error('Supabase upsert entry error:', err)
+      );
+    }
+
+    return savedEntry;
   }
 
   // --- AUDIT LOGS ---
@@ -976,6 +1489,7 @@ class DatabaseService {
 
   // Reset to initial seed data
   resetToSeedData() {
+    localStorage.removeItem(STORAGE_KEYS.UNITS);
     localStorage.removeItem(STORAGE_KEYS.DEPARTMENTS);
     localStorage.removeItem(STORAGE_KEYS.SECTIONS);
     localStorage.removeItem(STORAGE_KEYS.SUBSECTIONS);
@@ -983,6 +1497,198 @@ class DatabaseService {
     localStorage.removeItem(STORAGE_KEYS.MONTHLY_ENTRIES);
     localStorage.removeItem(STORAGE_KEYS.AUDIT_LOGS);
     this.initStorage();
+  }
+
+  // --- HIERARCHY & KPI JSON IMPORT / EXPORT (#User Request) ---
+  exportHierarchyAndKPIs(): any {
+    return {
+      version: '1.0',
+      exported_at: new Date().toISOString(),
+      units: this.getUnits(),
+      departments: this.getDepartments(),
+      sections: this.initStorage(), // loads storage
+      all_sections: JSON.parse(localStorage.getItem(STORAGE_KEYS.SECTIONS) || '[]'),
+      all_subsections: JSON.parse(localStorage.getItem(STORAGE_KEYS.SUBSECTIONS) || '[]'),
+      kpis: this.getKPIs(),
+    };
+  }
+
+  importHierarchyAndKPIs(data: any): {
+    success: boolean;
+    message: string;
+    counts: { units: number; departments: number; sections: number; subsections: number; kpis: number };
+  } {
+    try {
+      this.initStorage();
+      let importedUnits = 0;
+      let importedDepts = 0;
+      let importedSections = 0;
+      let importedSubsections = 0;
+      let importedKPIs = 0;
+
+      const currentUnits = this.getUnits();
+      const currentDepts = this.getDepartments();
+      const currentSections: Section[] = JSON.parse(localStorage.getItem(STORAGE_KEYS.SECTIONS) || '[]');
+      const currentSubsections: Subsection[] = JSON.parse(localStorage.getItem(STORAGE_KEYS.SUBSECTIONS) || '[]');
+      const currentKPIs = this.getKPIs();
+
+      // Case 1: Nested structure (Units -> Departments -> Sections -> Subsections -> KPIs)
+      if (Array.isArray(data?.units) || Array.isArray(data)) {
+        const unitsArray = Array.isArray(data?.units) ? data.units : Array.isArray(data) ? data : [];
+        for (const u of unitsArray) {
+          if (!u.name) continue;
+          let unitObj = currentUnits.find((existing) => existing.code === u.code || existing.id === u.id);
+          if (!unitObj) {
+            unitObj = {
+              id: u.id || `unit-${Date.now()}-${Math.random().toString(36).substr(2, 4)}`,
+              name: u.name,
+              code: (u.code || u.name.substring(0, 4)).toUpperCase(),
+              location: u.location || '',
+              status: u.status || 'active',
+              created_at: new Date().toISOString(),
+              updated_at: new Date().toISOString(),
+            };
+            currentUnits.push(unitObj);
+            importedUnits++;
+          }
+
+          if (Array.isArray(u.departments)) {
+            for (const d of u.departments) {
+              if (!d.name) continue;
+              let deptObj = currentDepts.find((existing) => existing.short_code === d.short_code || existing.id === d.id);
+              if (!deptObj) {
+                const cleanCode = (d.short_code || d.name.substring(0, 3)).toUpperCase();
+                deptObj = {
+                  id: d.id || `dept-${Date.now()}-${Math.random().toString(36).substr(2, 4)}`,
+                  unit_id: unitObj.id,
+                  name: d.name,
+                  short_code: cleanCode,
+                  department_id: d.department_id || generateDepartmentId(cleanCode),
+                  access_code: d.access_code || generateAccessCode(),
+                  status: d.status || 'active',
+                  created_at: new Date().toISOString(),
+                  updated_at: new Date().toISOString(),
+                };
+                currentDepts.push(deptObj);
+                importedDepts++;
+              } else if (!deptObj.unit_id) {
+                deptObj.unit_id = unitObj.id;
+              }
+
+              if (Array.isArray(d.sections)) {
+                for (const s of d.sections) {
+                  if (!s.name) continue;
+                  let secObj = currentSections.find((existing) => existing.name === s.name && existing.department_id === deptObj.id);
+                  if (!secObj) {
+                    secObj = {
+                      id: s.id || `sec-${Date.now()}-${Math.random().toString(36).substr(2, 4)}`,
+                      department_id: deptObj.id,
+                      name: s.name,
+                      created_at: new Date().toISOString(),
+                    };
+                    currentSections.push(secObj);
+                    importedSections++;
+                  }
+
+                  if (Array.isArray(s.subsections)) {
+                    for (const sub of s.subsections) {
+                      if (!sub.name) continue;
+                      let subObj = currentSubsections.find((existing) => existing.name === sub.name && existing.section_id === secObj.id);
+                      if (!subObj) {
+                        subObj = {
+                          id: sub.id || `sub-${Date.now()}-${Math.random().toString(36).substr(2, 4)}`,
+                          section_id: secObj.id,
+                          name: sub.name,
+                          created_at: new Date().toISOString(),
+                        };
+                        currentSubsections.push(subObj);
+                        importedSubsections++;
+                      }
+                    }
+                  }
+                }
+              }
+
+              if (Array.isArray(d.kpis)) {
+                for (const k of d.kpis) {
+                  if (!k.kra && !k.smart_kpi_text) continue;
+                  currentKPIs.push({
+                    id: k.id || `kpi-${Date.now()}-${Math.random().toString(36).substr(2, 5)}`,
+                    kpi_code: k.kpi_code || generateNextKPICode(currentKPIs),
+                    unit_id: unitObj.id,
+                    department_id: deptObj.id,
+                    section_id: k.section_id,
+                    subsection_id: k.subsection_id,
+                    kra: k.kra || 'Key Result Area',
+                    major_objective: k.major_objective || 'Major Objective',
+                    aligned_org_goal_level: k.aligned_org_goal_level || 'department',
+                    aligned_org_goal_id: k.aligned_org_goal_id || deptObj.id,
+                    aligned_org_goal_label: k.aligned_org_goal_label || deptObj.name,
+                    smart_kpi_text: k.smart_kpi_text || k.name || 'KPI statement',
+                    perspective: k.perspective || 'Process',
+                    responsible_concern: Array.isArray(k.responsible_concern) ? k.responsible_concern : ['Concern'],
+                    requirements: k.requirements || '',
+                    datasource: k.datasource || 'Report',
+                    weight: Number(k.weight || 10),
+                    baseline_value: Number(k.baseline_value || 0),
+                    baseline_unit: k.baseline_unit || 'percentage',
+                    target_value: Number(k.target_value || 100),
+                    target_unit: k.target_unit || 'percentage',
+                    target_policy: k.target_policy || 'fixed',
+                    created_at: new Date().toISOString(),
+                    updated_at: new Date().toISOString(),
+                  });
+                  importedKPIs++;
+                }
+              }
+            }
+          }
+        }
+      }
+
+      // Save updated data
+      localStorage.setItem(STORAGE_KEYS.UNITS, JSON.stringify(currentUnits));
+      localStorage.setItem(STORAGE_KEYS.DEPARTMENTS, JSON.stringify(currentDepts));
+      localStorage.setItem(STORAGE_KEYS.SECTIONS, JSON.stringify(currentSections));
+      localStorage.setItem(STORAGE_KEYS.SUBSECTIONS, JSON.stringify(currentSubsections));
+      localStorage.setItem(STORAGE_KEYS.KPIS, JSON.stringify(currentKPIs));
+
+      this.broadcastUpdate();
+
+      // Sync to Supabase in background
+      if (supabase) {
+        Promise.all([
+          supabase.from('units').upsert(currentUnits),
+          supabase.from('departments').upsert(currentDepts),
+          supabase.from('sections').upsert(currentSections),
+          supabase.from('subsections').upsert(currentSubsections),
+        ])
+          .then(async () => {
+            for (const k of currentKPIs) {
+              await this.syncKPIToSupabase(k);
+            }
+          })
+          .catch(() => {});
+      }
+
+      return {
+        success: true,
+        message: `Successfully imported hierarchy and KPIs!`,
+        counts: {
+          units: importedUnits,
+          departments: importedDepts,
+          sections: importedSections,
+          subsections: importedSubsections,
+          kpis: importedKPIs,
+        },
+      };
+    } catch (err: any) {
+      return {
+        success: false,
+        message: err?.message || 'Failed to parse hierarchy JSON',
+        counts: { units: 0, departments: 0, sections: 0, subsections: 0, kpis: 0 },
+      };
+    }
   }
 }
 

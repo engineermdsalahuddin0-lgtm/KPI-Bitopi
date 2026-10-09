@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Department, Section, Subsection } from '../../types';
+import { Department, Section, Subsection, Unit } from '../../types';
 import { db } from '../../services/db';
+import { UnitManagementModal } from './UnitManagementModal';
 import {
   Building2,
   Plus,
@@ -18,6 +19,7 @@ import {
   Edit2,
   Trash2,
   Save,
+  Factory,
 } from 'lucide-react';
 
 interface DepartmentManagementProps {
@@ -27,15 +29,19 @@ interface DepartmentManagementProps {
 export const DepartmentManagement: React.FC<DepartmentManagementProps> = ({
   onSelectDepartmentForKPI,
 }) => {
+  const [units, setUnits] = useState<Unit[]>(() => db.getUnits());
+  const [selectedUnitId, setSelectedUnitId] = useState<string>('all');
   const [departments, setDepartments] = useState<Department[]>([]);
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [revealedCodes, setRevealedCodes] = useState<Record<string, boolean>>({});
 
   // Modals State
   const [addModalOpen, setAddModalOpen] = useState<boolean>(false);
+  const [unitModalOpen, setUnitModalOpen] = useState<boolean>(false);
   const [hierarchyModalDept, setHierarchyModalDept] = useState<Department | null>(null);
 
   // Add Department Form State
+  const [newDeptUnitId, setNewDeptUnitId] = useState<string>(() => db.getUnits()[0]?.id || 'unit-bgl');
   const [newDeptName, setNewDeptName] = useState<string>('');
   const [newDeptCode, setNewDeptCode] = useState<string>('');
   const [addError, setAddError] = useState<string | null>(null);
@@ -44,6 +50,16 @@ export const DepartmentManagement: React.FC<DepartmentManagementProps> = ({
     departmentId: string;
     accessCode: string;
   } | null>(null);
+
+  const cleanLabel = (text?: string): string => (text ? text.replace(/\s*\([^)]*\)/g, '').trim() : '');
+
+  // Subscribe to reactive database changes
+  useEffect(() => {
+    const unsub = db.subscribe(() => {
+      setUnits(db.getUnits());
+    });
+    return unsub;
+  }, []);
 
   // Hierarchy Form State
   const [deptSections, setDeptSections] = useState<Section[]>([]);
@@ -59,12 +75,12 @@ export const DepartmentManagement: React.FC<DepartmentManagementProps> = ({
   const [editingSubName, setEditingSubName] = useState<string>('');
 
   const refreshList = () => {
-    setDepartments(db.getDepartments());
+    setDepartments(db.getDepartments(selectedUnitId !== 'all' ? selectedUnitId : undefined));
   };
 
   useEffect(() => {
     refreshList();
-  }, []);
+  }, [selectedUnitId]);
 
   const filteredDepartments = departments.filter(
     (d) =>
@@ -110,7 +126,7 @@ export const DepartmentManagement: React.FC<DepartmentManagementProps> = ({
     }
 
     try {
-      const created = db.createDepartment(newDeptName, newDeptCode);
+      const created = db.createDepartment(newDeptName, newDeptCode, newDeptUnitId);
       setCreatedCredentials({
         name: created.name,
         departmentId: created.department_id,
@@ -224,31 +240,55 @@ export const DepartmentManagement: React.FC<DepartmentManagementProps> = ({
           </p>
         </div>
 
-        <button
-          onClick={() => {
-            setCreatedCredentials(null);
-            setAddModalOpen(true);
-          }}
-          className="inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold rounded-md bg-emerald-800 hover:bg-emerald-900 text-white shadow-xs transition-colors self-start sm:self-auto"
-        >
-          <Plus className="w-3.5 h-3.5" />
-          <span>Add Department</span>
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setUnitModalOpen(true)}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-md border border-neutral-300 bg-white hover:bg-neutral-50 text-neutral-800 shadow-2xs transition-colors self-start sm:self-auto"
+          >
+            <Factory className="w-3.5 h-3.5 text-emerald-800" />
+            <span>Manage Units</span>
+          </button>
+          <button
+            onClick={() => {
+              setCreatedCredentials(null);
+              setAddModalOpen(true);
+            }}
+            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold rounded-md bg-emerald-800 hover:bg-emerald-900 text-white shadow-xs transition-colors self-start sm:self-auto"
+          >
+            <Plus className="w-3.5 h-3.5" />
+            <span>Add Department</span>
+          </button>
+        </div>
       </div>
 
-      {/* Search Bar */}
-      <div className="bg-white border border-neutral-200/90 rounded-lg p-3 mb-4 shadow-2xs flex items-center justify-between">
-        <div className="relative w-full max-w-sm">
-          <Search className="w-3.5 h-3.5 text-neutral-400 absolute left-2.5 top-1/2 -translate-y-1/2" />
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search departments by name or short code..."
-            className="w-full pl-8 pr-3 py-1.5 rounded-md border border-neutral-300 bg-white text-xs text-neutral-900 focus:outline-hidden focus:ring-1 focus:ring-emerald-700"
-          />
+      {/* Search Bar & Unit Filter */}
+      <div className="bg-white border border-neutral-200/90 rounded-lg p-3 mb-4 shadow-2xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div className="flex flex-wrap items-center gap-2 flex-1">
+          <div className="relative w-full max-w-xs">
+            <Search className="w-3.5 h-3.5 text-neutral-400 absolute left-2.5 top-1/2 -translate-y-1/2" />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search departments by name or code..."
+              className="w-full pl-8 pr-3 py-1.5 rounded-md border border-neutral-300 bg-white text-xs text-neutral-900 focus:outline-hidden focus:ring-1 focus:ring-emerald-700"
+            />
+          </div>
+
+          <select
+            value={selectedUnitId}
+            onChange={(e) => setSelectedUnitId(e.target.value)}
+            className="px-2.5 py-1.5 rounded-md border border-neutral-300 bg-white text-xs font-semibold text-neutral-800 focus:outline-hidden focus:ring-1 focus:ring-emerald-700"
+          >
+            <option value="all">🏭 All Units</option>
+            {units.map((u) => (
+              <option key={u.id} value={u.id}>
+                {cleanLabel(u.name)}
+              </option>
+            ))}
+          </select>
         </div>
-        <div className="text-xs text-neutral-500">
+        <div className="text-xs text-neutral-500 shrink-0">
           Showing <strong>{filteredDepartments.length}</strong> of {departments.length} departments
         </div>
       </div>
@@ -260,6 +300,7 @@ export const DepartmentManagement: React.FC<DepartmentManagementProps> = ({
             <thead className="bg-neutral-50 border-b border-neutral-200 font-semibold text-neutral-600 uppercase tracking-wider text-[11px]">
               <tr>
                 <th className="py-2.5 px-4">Department</th>
+                <th className="py-2.5 px-3">Unit</th>
                 <th className="py-2.5 px-3">Code</th>
                 <th className="py-2.5 px-3">Department ID</th>
                 <th className="py-2.5 px-3">Access Code</th>
@@ -270,6 +311,7 @@ export const DepartmentManagement: React.FC<DepartmentManagementProps> = ({
             <tbody className="divide-y divide-neutral-200/70">
               {filteredDepartments.map((dept) => {
                 const isRevealed = !!revealedCodes[dept.id];
+                const deptUnit = units.find((u) => u.id === dept.unit_id);
                 return (
                   <tr
                     key={dept.id}
@@ -277,6 +319,11 @@ export const DepartmentManagement: React.FC<DepartmentManagementProps> = ({
                   >
                     <td className="py-2.5 px-4 font-semibold text-neutral-900">
                       {dept.name}
+                    </td>
+                    <td className="py-2.5 px-3">
+                      <span className="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200">
+                        {deptUnit?.code || dept.unit_id || 'BGL'}
+                      </span>
                     </td>
                     <td className="py-2.5 px-3 font-mono font-medium text-neutral-700">
                       {dept.short_code}
@@ -427,6 +474,23 @@ export const DepartmentManagement: React.FC<DepartmentManagementProps> = ({
                     <span>{addError}</span>
                   </div>
                 )}
+
+                <div>
+                  <label className="block font-semibold text-neutral-800 mb-1">
+                    Business Unit
+                  </label>
+                  <select
+                    value={newDeptUnitId}
+                    onChange={(e) => setNewDeptUnitId(e.target.value)}
+                    className="w-full px-2.5 py-1.5 rounded border border-neutral-300 bg-white text-xs text-neutral-900 focus:outline-hidden focus:ring-1 focus:ring-emerald-700"
+                  >
+                    {units.map((u) => (
+                      <option key={u.id} value={u.id}>
+                        {cleanLabel(u.name)}
+                      </option>
+                    ))}
+                  </select>
+                </div>
 
                 <div>
                   <label className="block font-semibold text-neutral-800 mb-1">
@@ -695,6 +759,16 @@ export const DepartmentManagement: React.FC<DepartmentManagementProps> = ({
           </div>
         </div>
       )}
+
+      {/* Unit Management Modal */}
+      <UnitManagementModal
+        isOpen={unitModalOpen}
+        onClose={() => setUnitModalOpen(false)}
+        onUnitsChanged={() => {
+          setUnits(db.getUnits());
+          refreshList();
+        }}
+      />
     </div>
   );
 };

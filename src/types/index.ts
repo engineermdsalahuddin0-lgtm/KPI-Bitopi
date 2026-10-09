@@ -1,8 +1,11 @@
-export type UserRole = 'admin' | 'department' | 'section' | 'subsection';
+export type UserRole = 'admin' | 'unit' | 'department' | 'section' | 'subsection';
 
 export interface UserSession {
   role: UserRole;
   email?: string;
+  unitId?: string;       // locked to this unit UUID if role is unit, dept, section or subsection
+  unitName?: string;
+  unitCode?: string;
   departmentId?: string; // locked to this department UUID
   departmentName?: string;
   departmentCode?: string;
@@ -20,10 +23,22 @@ export type PerspectiveType = 'Process' | 'Account' | 'Learning & Development' |
 
 export type TargetPolicyType = 'fixed' | 'workload_adjusted';
 
-export type OrgGoalLevel = 'department' | 'section' | 'subsection';
+export type OrgGoalLevel = 'unit' | 'department' | 'section' | 'subsection';
+
+export interface Unit {
+  id: string; // UUID
+  name: string; // e.g. "Bitopi Garments Ltd. (BGL)"
+  code: string; // e.g. "BGL"
+  location?: string;
+  access_code?: string;
+  status: 'active' | 'disabled';
+  created_at: string;
+  updated_at?: string;
+}
 
 export interface Department {
   id: string; // UUID
+  unit_id?: string; // Belongs to a business unit
   name: string;
   short_code: string;
   department_id: string; // e.g. IE-7F29
@@ -52,7 +67,8 @@ export interface Subsection {
 export interface KPI {
   id: string; // UUID
   kpi_code: string; // e.g. KPI-001
-  department_id: string;
+  unit_id?: string;
+  department_id?: string;
   section_id?: string;
   subsection_id?: string;
 

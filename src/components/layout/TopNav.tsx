@@ -10,11 +10,12 @@ import {
   ChevronDown,
   Shield,
   KeyRound,
+  Factory,
 } from 'lucide-react';
 
 interface TopNavProps {
-  currentTab: 'dashboard' | 'reports' | 'departments';
-  onSelectTab: (tab: 'dashboard' | 'reports' | 'departments') => void;
+  currentTab: 'dashboard' | 'reports' | 'departments' | 'units';
+  onSelectTab: (tab: 'dashboard' | 'reports' | 'departments' | 'units') => void;
   session: UserSession;
   onLogout: () => void;
   onSwitchRole: (targetRole: 'admin' | 'department') => void;
@@ -30,16 +31,20 @@ export const TopNav: React.FC<TopNavProps> = ({
 }) => {
   const [userMenuOpen, setUserMenuOpen] = useState(false);
 
+  const cleanLabel = (text?: string) => (text ? text.replace(/\s*\([^)]*\)/g, '').trim() : '');
+
   // Compute label and scope
   const getRoleLabel = () => {
     if (session.role === 'admin') return 'Administrator';
-    if (session.role === 'section') return session.sectionName ? `${session.sectionName} (Section)` : 'Section Head';
-    if (session.role === 'subsection') return session.subsectionName ? `${session.subsectionName} (Sub)` : 'Sub-section Head';
-    return session.departmentName || 'Department';
+    if (session.role === 'unit') return session.unitName ? `${cleanLabel(session.unitName)} - Unit Head` : 'Unit Head';
+    if (session.role === 'section') return session.sectionName ? `${cleanLabel(session.sectionName)} - Section` : 'Section Head';
+    if (session.role === 'subsection') return session.subsectionName ? `${cleanLabel(session.subsectionName)} - Sub-section` : 'Sub-section Head';
+    return cleanLabel(session.departmentName) || 'Department Head';
   };
 
   const getScopeLabel = () => {
-    if (session.role === 'admin') return 'Full Control';
+    if (session.role === 'admin') return 'Full Enterprise Control';
+    if (session.role === 'unit') return `${session.unitCode || 'UNIT'} • Unit Scope`;
     if (session.role === 'section') return `${session.departmentCode} • Section Scope`;
     if (session.role === 'subsection') return `${session.departmentCode} • Sub-section Scope`;
     return `${session.departmentCode || 'DEP'} Scope`;
@@ -58,7 +63,7 @@ export const TopNav: React.FC<TopNavProps> = ({
                   Bitopi Group
                 </span>
                 <span className="text-[11px] text-neutral-600 font-normal leading-tight mt-0.5">
-                  Industry KPI System
+                  KPI tracker
                 </span>
               </div>
             </div>
@@ -78,19 +83,23 @@ export const TopNav: React.FC<TopNavProps> = ({
               <span>KPI Dashboard</span>
             </button>
 
-            <button
-              onClick={() => onSelectTab('reports')}
-              className={`inline-flex items-center gap-2 px-3.5 py-1.5 text-xs font-medium rounded-md transition-colors ${
-                currentTab === 'reports'
-                  ? 'bg-emerald-50 text-emerald-900 border border-emerald-200/80 font-semibold shadow-2xs'
-                  : 'text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100'
-              }`}
-            >
-              <BarChart3 className="w-3.5 h-3.5" />
-              <span>Reports</span>
-            </button>
+            {/* Reports: ONLY Admin and Department Head can see/access */}
+            {(session.role === 'admin' || session.role === 'department') && (
+              <button
+                onClick={() => onSelectTab('reports')}
+                className={`inline-flex items-center gap-2 px-3.5 py-1.5 text-xs font-medium rounded-md transition-colors ${
+                  currentTab === 'reports'
+                    ? 'bg-emerald-50 text-emerald-900 border border-emerald-200/80 font-semibold shadow-2xs'
+                    : 'text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100'
+                }`}
+              >
+                <BarChart3 className="w-3.5 h-3.5" />
+                <span>Reports</span>
+              </button>
+            )}
 
-            {session.role === 'admin' ? (
+            {/* Departments: Admin only */}
+            {session.role === 'admin' && (
               <button
                 onClick={() => onSelectTab('departments')}
                 className={`inline-flex items-center gap-2 px-3.5 py-1.5 text-xs font-medium rounded-md transition-colors ${
@@ -102,14 +111,21 @@ export const TopNav: React.FC<TopNavProps> = ({
                 <Building2 className="w-3.5 h-3.5" />
                 <span>Departments</span>
               </button>
-            ) : (
-              <span
-                title="Only Administrator can manage department configurations"
-                className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 text-xs text-neutral-500 cursor-not-allowed select-none"
+            )}
+
+            {/* Units: Admin only (In the exact circled red spot in topbar) */}
+            {session.role === 'admin' && (
+              <button
+                onClick={() => onSelectTab('units')}
+                className={`inline-flex items-center gap-2 px-3.5 py-1.5 text-xs font-medium rounded-md transition-colors ${
+                  currentTab === 'units'
+                    ? 'bg-emerald-50 text-emerald-900 border border-emerald-200/80 font-semibold shadow-2xs'
+                    : 'text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100'
+                }`}
               >
-                <Building2 className="w-3.5 h-3.5 opacity-60" />
-                <span>Departments (Admin only)</span>
-              </span>
+                <Factory className="w-3.5 h-3.5" />
+                <span>Units</span>
+              </button>
             )}
           </nav>
 
@@ -150,6 +166,8 @@ export const TopNav: React.FC<TopNavProps> = ({
                     <p className="font-semibold text-neutral-900 truncate">
                       {session.role === 'admin'
                         ? session.email || 'emdadul.karim@bitopibd.com'
+                        : session.role === 'unit'
+                        ? `${session.unitName} (${session.unitCode})`
                         : session.role === 'subsection'
                         ? `${session.subsectionName} • ${session.departmentCode}`
                         : session.role === 'section'
