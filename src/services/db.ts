@@ -145,11 +145,7 @@ class DatabaseService {
         const prev = localStorage.getItem(STORAGE_KEYS.DEPARTMENTS);
         const supabaseDepts = deptsRes.data as Department[];
         const currentStored: Department[] = prev ? JSON.parse(prev) : [];
-        const map = new Map<string, Department>();
-        (INITIAL_DEPARTMENTS as Department[]).forEach((d) => map.set(d.id, d as Department));
-        currentStored.forEach((d) => map.set(d.id, d));
-        supabaseDepts.forEach((d) => map.set(d.id, { ...map.get(d.id), ...d }));
-        const mergedDepts = Array.from(map.values());
+        const mergedDepts = this.sanitizeAndDeduplicateDepartments([...currentStored, ...supabaseDepts]);
         const next = JSON.stringify(mergedDepts);
         if (prev !== next) {
           localStorage.setItem(STORAGE_KEYS.DEPARTMENTS, next);
@@ -453,71 +449,10 @@ class DatabaseService {
       storedDepts = [];
     }
 
-    const officialDepts = INITIAL_DEPARTMENTS as Department[];
-    const officialIdSet = new Set(officialDepts.map((d) => d.id));
-    const officialCodeSet = new Set(officialDepts.map((d) => d.department_id));
-
-    // Map official departments by unitId::normalizedName for duplicate matching
-    const officialMap = new Map<string, Department>();
-    officialDepts.forEach((d) => {
-      const key = `${d.unit_id || ''}::${d.name.trim().toLowerCase()}`;
-      officialMap.set(key, d);
-    });
-
-    // Check if any legacy stored department duplicates an official department
-    const validDepts: Department[] = [...officialDepts];
-    const obsoleteDeptIdsToDelete: string[] = [];
-
-    // Also load KPIs to migrate any KPIs pointing to obsolete duplicates
-    const storedKpisRaw = localStorage.getItem(STORAGE_KEYS.KPIS);
-    let storedKpis: KPI[] = [];
-    try {
-      storedKpis = storedKpisRaw ? JSON.parse(storedKpisRaw) : [];
-    } catch {
-      storedKpis = [];
-    }
-    let kpisModified = false;
-
-    storedDepts.forEach((d) => {
-      if (officialIdSet.has(d.id) || officialCodeSet.has(d.department_id)) {
-        // Already part of official seeds
-        return;
-      }
-
-      // Check if this is an unofficial duplicate of an official department
-      const matchKeyWithUnit = `${d.unit_id || ''}::${d.name.trim().toLowerCase()}`;
-      const officialMatch = officialMap.get(matchKeyWithUnit);
-
-      if (officialMatch) {
-        // This is a test duplicate like ESG-4L77 matching TAL-ESG-24C7!
-        obsoleteDeptIdsToDelete.push(d.id);
-        // Migrate any KPIs that were accidentally assigned to this duplicate
-        storedKpis.forEach((k) => {
-          if (k.department_id === d.id || k.department_id === d.department_id) {
-            k.department_id = officialMatch.id;
-            k.unit_id = officialMatch.unit_id || k.unit_id;
-            kpisModified = true;
-          }
-        });
-      } else {
-        // Genuine custom department added by admin
-        validDepts.push(d);
-      }
-    });
-
-    if (kpisModified) {
-      localStorage.setItem(STORAGE_KEYS.KPIS, JSON.stringify(storedKpis));
-    }
-
+    const validDepts = this.sanitizeAndDeduplicateDepartments(
+      storedDepts.length > 0 ? storedDepts : (INITIAL_DEPARTMENTS as Department[])
+    );
     localStorage.setItem(STORAGE_KEYS.DEPARTMENTS, JSON.stringify(validDepts));
-
-    // Clean obsolete duplicates from Supabase in background
-    if (obsoleteDeptIdsToDelete.length > 0 && supabase) {
-      const client = supabase;
-      obsoleteDeptIdsToDelete.forEach((obsoleteId) => {
-        Promise.resolve(client.from('departments').delete().eq('id', obsoleteId)).catch(() => {});
-      });
-    }
 
     // 3. Sections
     const storedSectionsRaw = localStorage.getItem(STORAGE_KEYS.SECTIONS);
@@ -753,6 +688,137 @@ class DatabaseService {
     return updated;
   }
 
+  private sanitizeAndDeduplicateDepartments(depts: Department[]): Department[] {
+    const officialDepts = INITIAL_DEPARTMENTS as Department[];
+    const officialIdSet = new Set(officialDepts.map((d) => d.id));
+    const officialCodeSet = new Set(officialDepts.map((d) => d.department_id));
+
+    // Map official departments:
+    // 1) Unit-normalized + normalized name (e.g. "tal::esg")
+    // 2) Department name only (e.g. "esg", "supply chain")
+    const officialByUnitAndName = new Map<string, Department>();
+    const officialByNameOnly = new Map<string, Department>();
+
+    officialDepts.forEach((d) => {
+      const normUnit = (d.unit_id || '').toLowerCase().replace(/^unit-/, '');
+      const normName = d.name.trim().toLowerCase();
+      officialByUnitAndName.set(`${normUnit}::${normName}`, d);
+      if (!officialByNameOnly.has(normName)) {
+        officialByNameOnly.set(normName, d);
+      }
+    });
+
+    const validDepts: Department[] = [];
+    const obsoleteDeptIdsToDelete: string[] = [];
+    const obsoleteDeptCodesToDelete: string[] = [];
+
+    // Also load KPIs and Sections to migrate any records pointing to obsolete duplicates
+    const storedKpisRaw = typeof localStorage !== 'undefined' ? localStorage.getItem(STORAGE_KEYS.KPIS) : null;
+    let storedKpis: KPI[] = [];
+    try {
+      storedKpis = storedKpisRaw ? JSON.parse(storedKpisRaw) : [];
+    } catch {
+      storedKpis = [];
+    }
+    let kpisModified = false;
+
+    const storedSectionsRaw = typeof localStorage !== 'undefined' ? localStorage.getItem(STORAGE_KEYS.SECTIONS) : null;
+    let storedSections: Section[] = [];
+    try {
+      storedSections = storedSectionsRaw ? JSON.parse(storedSectionsRaw) : [];
+    } catch {
+      storedSections = [];
+    }
+    let sectionsModified = false;
+
+    const seenDeptKey = new Set<string>();
+
+    // 1. Seed all official departments first
+    officialDepts.forEach((od) => {
+      const normUnit = (od.unit_id || '').toLowerCase().replace(/^unit-/, '');
+      const normName = od.name.trim().toLowerCase();
+      const key = `${normUnit}::${normName}`;
+      seenDeptKey.add(key);
+      validDepts.push(od);
+    });
+
+    // 2. Evaluate candidate departments
+    depts.forEach((d) => {
+      if (!d || !d.name) return;
+
+      // Already in official seeds
+      if (officialIdSet.has(d.id) || officialCodeSet.has(d.department_id)) {
+        return;
+      }
+
+      const normUnit = (d.unit_id || '').toLowerCase().replace(/^unit-/, '');
+      const normName = d.name.trim().toLowerCase();
+
+      // Check match with unit
+      let match = normUnit ? officialByUnitAndName.get(`${normUnit}::${normName}`) : null;
+      if (!match) {
+        match = officialByNameOnly.get(normName);
+      }
+      if (!match && d.short_code) {
+        const cleanShort = d.short_code.toUpperCase().replace(/^TAL-|^TFL-|^CDL-|^BGL-/, '');
+        match = officialDepts.find((od) => od.short_code.replace(/^[^-]+-/, '') === cleanShort);
+      }
+
+      // Check if code has the legacy format without unit prefix (e.g. ESG-4L77, SCM-8K92)
+      const isLegacyCodePattern = /^[A-Z]{2,4}-[A-Z0-9]{3,5}$/i.test(d.department_id);
+
+      if (match || isLegacyCodePattern) {
+        const targetOfficial = match || officialDepts[0];
+        obsoleteDeptIdsToDelete.push(d.id);
+        if (d.department_id) obsoleteDeptCodesToDelete.push(d.department_id);
+
+        // Migrate KPIs that referenced this duplicate
+        storedKpis.forEach((k) => {
+          if (k.department_id === d.id || k.department_id === d.department_id) {
+            k.department_id = targetOfficial.id;
+            k.unit_id = targetOfficial.unit_id || k.unit_id;
+            kpisModified = true;
+          }
+        });
+
+        // Migrate Sections that referenced this duplicate
+        storedSections.forEach((s) => {
+          if (s.department_id === d.id || s.department_id === d.department_id) {
+            s.department_id = targetOfficial.id;
+            sectionsModified = true;
+          }
+        });
+      } else {
+        // Genuine custom department added by admin
+        const key = `${normUnit}::${normName}`;
+        if (!seenDeptKey.has(key)) {
+          seenDeptKey.add(key);
+          validDepts.push(d);
+        }
+      }
+    });
+
+    if (kpisModified && typeof localStorage !== 'undefined') {
+      localStorage.setItem(STORAGE_KEYS.KPIS, JSON.stringify(storedKpis));
+    }
+    if (sectionsModified && typeof localStorage !== 'undefined') {
+      localStorage.setItem(STORAGE_KEYS.SECTIONS, JSON.stringify(storedSections));
+    }
+
+    // Clean obsolete duplicates from Supabase in background
+    if (supabase && (obsoleteDeptIdsToDelete.length > 0 || obsoleteDeptCodesToDelete.length > 0)) {
+      const client = supabase;
+      obsoleteDeptIdsToDelete.forEach((id) => {
+        Promise.resolve(client.from('departments').delete().eq('id', id)).catch(() => {});
+      });
+      obsoleteDeptCodesToDelete.forEach((code) => {
+        Promise.resolve(client.from('departments').delete().eq('department_id', code)).catch(() => {});
+      });
+    }
+
+    return validDepts;
+  }
+
   // --- DEPARTMENTS ---
   getDepartments(unitId?: string): Department[] {
     this.initStorage();
@@ -764,23 +830,7 @@ class DatabaseService {
       list = INITIAL_DEPARTMENTS as Department[];
     }
 
-    // Unconditionally repair any department missing unit_id
-    let repaired = false;
-    list = list.map((d) => {
-      if (!d.unit_id) {
-        const seedMatch = INITIAL_DEPARTMENTS.find(
-          (sd) => sd.id === d.id || sd.short_code === d.short_code || sd.name.toLowerCase() === d.name.toLowerCase()
-        );
-        if (seedMatch?.unit_id) {
-          repaired = true;
-          return { ...d, unit_id: seedMatch.unit_id };
-        }
-      }
-      return d;
-    });
-    if (repaired && typeof localStorage !== 'undefined') {
-      localStorage.setItem(STORAGE_KEYS.DEPARTMENTS, JSON.stringify(list));
-    }
+    list = this.sanitizeAndDeduplicateDepartments(list);
 
     if (unitId && unitId !== 'all') {
       const cleanUnitId = unitId.toLowerCase().trim();
@@ -918,6 +968,9 @@ class DatabaseService {
     if (supabase) {
       try {
         await supabase.from('departments').delete().eq('id', dept.id);
+        if (dept.department_id) {
+          await supabase.from('departments').delete().eq('department_id', dept.department_id);
+        }
       } catch (err) {
         console.error('Failed to delete department from Supabase:', err);
       }

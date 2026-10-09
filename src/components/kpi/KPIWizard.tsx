@@ -945,19 +945,6 @@ export const KPIWizard: React.FC<KPIWizardProps> = ({
                   className="w-full px-3 py-1.5 rounded-md border border-neutral-300 bg-white text-xs text-neutral-900 focus:outline-hidden focus:ring-1 focus:ring-emerald-700"
                 />
               </div>
-
-              <div>
-                <label className="block font-semibold text-neutral-800 mb-1">
-                  Requirements & Prerequisites
-                </label>
-                <textarea
-                  rows={2}
-                  value={requirements}
-                  onChange={(e) => setRequirements(e.target.value)}
-                  placeholder="Operational protocols, equipment preconditions, input dependencies..."
-                  className="w-full px-3 py-1.5 rounded-md border border-neutral-300 bg-white text-xs text-neutral-900 focus:outline-hidden focus:ring-1 focus:ring-emerald-700"
-                />
-              </div>
             </div>
           )}
 
