@@ -134,7 +134,7 @@ export interface AuditLog {
   id: string;
   user_role: UserRole;
   user_identifier: string;
-  action: 'create_kpi' | 'edit_kpi' | 'delete_kpi' | 'update_monthly' | 'create_department' | 'edit_department' | 'regenerate_code';
+  action: 'create_kpi' | 'edit_kpi' | 'delete_kpi' | 'update_monthly' | 'create_department' | 'edit_department' | 'delete_department' | 'regenerate_code';
   entity_type: 'kpi' | 'monthly_entry' | 'department' | 'section';
   entity_id: string;
   description: string;

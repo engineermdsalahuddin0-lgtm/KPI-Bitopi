@@ -112,6 +112,20 @@ export const DepartmentManagement: React.FC<DepartmentManagementProps> = ({
     refreshList();
   };
 
+  const handleDeleteDepartment = async (dept: Department) => {
+    const isConfirmed = window.confirm(
+      `Are you sure you want to delete department "${cleanLabel(dept.name)}" (${dept.department_id})?`
+    );
+    if (!isConfirmed) return;
+
+    const res = await db.deleteDepartment(dept.id);
+    if (res.success) {
+      refreshList();
+    } else {
+      alert(res.error || 'Failed to delete department.');
+    }
+  };
+
   const handleCreateDepartment = (e: React.FormEvent) => {
     e.preventDefault();
     setAddError(null);
@@ -400,6 +414,14 @@ export const DepartmentManagement: React.FC<DepartmentManagementProps> = ({
                           title={dept.status === 'active' ? 'Disable Department' : 'Enable Department'}
                         >
                           <Power className="w-3.5 h-3.5" />
+                        </button>
+
+                        <button
+                          onClick={() => handleDeleteDepartment(dept)}
+                          className="p-1 rounded text-neutral-400 hover:text-rose-600 hover:bg-rose-50 transition-colors"
+                          title="Delete Department"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
                         </button>
                       </div>
                     </td>
