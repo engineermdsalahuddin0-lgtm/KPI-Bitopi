@@ -57,9 +57,10 @@ export const DepartmentManagement: React.FC<DepartmentManagementProps> = ({
   useEffect(() => {
     const unsub = db.subscribe(() => {
       setUnits(db.getUnits());
+      refreshList();
     });
     return unsub;
-  }, []);
+  }, [selectedUnitId]);
 
   // Hierarchy Form State
   const [deptSections, setDeptSections] = useState<Section[]>([]);

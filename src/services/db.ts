@@ -68,6 +68,8 @@ class DatabaseService {
   private isRealtimeSubscribed = false;
   private isInitialized = false;
   private unsupportedKpiColumns = new Set<string>();
+  private unsupportedDeptColumns = new Set<string>();
+  private hasUnitsTable: boolean | null = null;
 
   subscribe(listener: () => void): () => void {
     this.listeners.add(listener);
@@ -100,8 +102,23 @@ class DatabaseService {
   async syncFromSupabase(): Promise<void> {
     if (!supabase) return;
     try {
-      const [unitsRes, kpisRes, entriesRes, deptsRes, sectionsRes, subsRes] = await Promise.all([
-        supabase.from('units').select('*'),
+      // 1. Fetch tables safely (units may or may not exist in Supabase yet)
+      let unitsRes: any = { data: null };
+      if (this.hasUnitsTable !== false) {
+        try {
+          unitsRes = await supabase.from('units').select('*');
+          if (unitsRes.error && unitsRes.error.code === 'PGRST205') {
+            this.hasUnitsTable = false;
+            unitsRes = { data: null };
+          } else if (!unitsRes.error) {
+            this.hasUnitsTable = true;
+          }
+        } catch {
+          this.hasUnitsTable = false;
+        }
+      }
+
+      const [kpisRes, entriesRes, deptsRes, sectionsRes, subsRes] = await Promise.all([
         supabase.from('kpis').select('*'),
         supabase.from('kpi_monthly_entries').select('*'),
         supabase.from('departments').select('*'),
@@ -112,11 +129,25 @@ class DatabaseService {
       let changed = false;
 
       // Auto-seed Supabase if tables are empty
-      if (!unitsRes.data || unitsRes.data.length === 0) {
-        await supabase.from('units').upsert(INITIAL_UNITS);
+      if (this.hasUnitsTable && (!unitsRes.data || unitsRes.data.length === 0)) {
+        try {
+          await supabase.from('units').upsert(INITIAL_UNITS);
+        } catch {
+          // units table might be disabled or missing
+        }
       }
       if (!deptsRes.data || deptsRes.data.length === 0) {
-        await supabase.from('departments').upsert(INITIAL_DEPARTMENTS);
+        const cleanDepts = (INITIAL_DEPARTMENTS as any[]).map((d) => {
+          const copy = { ...d };
+          if (this.unsupportedDeptColumns.has('unit_id')) delete copy.unit_id;
+          return copy;
+        });
+        let dRes = await supabase.from('departments').upsert(cleanDepts);
+        if (dRes.error && dRes.error.code === 'PGRST204') {
+          this.unsupportedDeptColumns.add('unit_id');
+          const stripped = cleanDepts.map(({ unit_id, ...rest }: any) => rest);
+          await supabase.from('departments').upsert(stripped);
+        }
       }
       if (!sectionsRes.data || sectionsRes.data.length === 0) {
         await supabase.from('sections').upsert(INITIAL_SECTIONS);
@@ -145,7 +176,27 @@ class DatabaseService {
         const prev = localStorage.getItem(STORAGE_KEYS.DEPARTMENTS);
         const supabaseDepts = deptsRes.data as Department[];
         const currentStored: Department[] = prev ? JSON.parse(prev) : [];
-        const mergedDepts = this.sanitizeAndDeduplicateDepartments([...currentStored, ...supabaseDepts]);
+        // Map currentStored and merge with Supabase data, preserving unit_id when missing in Supabase schema
+        const localMap = new Map<string, Department>();
+        currentStored.forEach((d) => {
+          if (d.id) localMap.set(d.id, d);
+          if (d.department_id) localMap.set(d.department_id, d);
+        });
+        const combined: Department[] = supabaseDepts.map((sd) => {
+          const local = localMap.get(sd.id) || localMap.get(sd.department_id);
+          return {
+            ...local,
+            ...sd,
+            unit_id: sd.unit_id || local?.unit_id,
+          } as Department;
+        });
+        // Include any local departments not yet in Supabase
+        currentStored.forEach((cd) => {
+          if (!combined.some((c) => c.id === cd.id || c.department_id === cd.department_id)) {
+            combined.push(cd);
+          }
+        });
+        const mergedDepts = this.sanitizeAndDeduplicateDepartments(combined);
         const next = JSON.stringify(mergedDepts);
         if (prev !== next) {
           localStorage.setItem(STORAGE_KEYS.DEPARTMENTS, next);
@@ -236,30 +287,36 @@ class DatabaseService {
   async syncKPIToSupabase(kpi: KPI): Promise<void> {
     if (!supabase) return;
     try {
-      // 1. Ensure parent unit exists in Supabase
-      if (kpi.unit_id) {
+      // 1. Ensure parent unit exists in Supabase (if units table is present)
+      if (kpi.unit_id && this.hasUnitsTable !== false) {
         const u = this.getUnitById(kpi.unit_id);
         if (u) {
-          await supabase.from('units').upsert({
-            id: u.id,
-            name: u.name,
-            code: u.code,
-            location: u.location || null,
-            access_code: u.access_code || null,
-            status: u.status,
-            created_at: u.created_at,
-            updated_at: u.updated_at || u.created_at,
-          });
+          try {
+            const uRes = await supabase.from('units').upsert({
+              id: u.id,
+              name: u.name,
+              code: u.code,
+              location: u.location || null,
+              access_code: u.access_code || null,
+              status: u.status,
+              created_at: u.created_at,
+              updated_at: u.updated_at || u.created_at,
+            });
+            if (uRes.error && uRes.error.code === 'PGRST205') {
+              this.hasUnitsTable = false;
+            }
+          } catch {
+            this.hasUnitsTable = false;
+          }
         }
       }
 
-      // 2. Ensure parent department exists in Supabase
+      // 2. Ensure parent department exists in Supabase (safe for schema without unit_id)
       if (kpi.department_id) {
         const d = this.getDepartmentById(kpi.department_id);
         if (d) {
-          await supabase.from('departments').upsert({
+          const deptPayload: Record<string, any> = {
             id: d.id,
-            unit_id: d.unit_id || null,
             name: d.name,
             short_code: d.short_code,
             department_id: d.department_id,
@@ -267,7 +324,16 @@ class DatabaseService {
             status: d.status,
             created_at: d.created_at,
             updated_at: d.updated_at || d.created_at,
-          });
+          };
+          if (d.unit_id && !this.unsupportedDeptColumns.has('unit_id')) {
+            deptPayload.unit_id = d.unit_id;
+          }
+          let deptRes = await supabase.from('departments').upsert(deptPayload);
+          if (deptRes.error && deptRes.error.code === 'PGRST204') {
+            this.unsupportedDeptColumns.add('unit_id');
+            delete deptPayload.unit_id;
+            await supabase.from('departments').upsert(deptPayload);
+          }
         }
       }
 
@@ -306,26 +372,26 @@ class DatabaseService {
         department_id: kpi.department_id || null,
         section_id: kpi.section_id || null,
         subsection_id: kpi.subsection_id || null,
-        kra: kpi.kra,
-        major_objective: kpi.major_objective,
-        aligned_org_goal_level: kpi.aligned_org_goal_level,
-        aligned_org_goal_id: kpi.aligned_org_goal_id,
+        kra: kpi.kra || kpi.major_objective || 'Core Responsibility',
+        major_objective: kpi.major_objective || kpi.kra || 'Key Objective',
+        aligned_org_goal_level: kpi.aligned_org_goal_level || 'department',
+        aligned_org_goal_id: kpi.aligned_org_goal_id || kpi.department_id || 'general',
         aligned_org_goal_label: kpi.aligned_org_goal_label || null,
-        smart_kpi_text: kpi.smart_kpi_text,
+        smart_kpi_text: kpi.smart_kpi_text || 'KPI Indicator',
         specific_s: kpi.specific_s || null,
         measure_m: kpi.measure_m || null,
         achievable_a: kpi.achievable_a ?? true,
         relevant_r: kpi.relevant_r ?? true,
         time_t: kpi.time_t || null,
-        perspective: kpi.perspective,
+        perspective: kpi.perspective || 'Process',
         responsible_concern: kpi.responsible_concern || [],
         requirements: kpi.requirements || '',
-        datasource: kpi.datasource || '',
-        weight: Number(kpi.weight),
-        baseline_value: Number(kpi.baseline_value),
-        baseline_unit: kpi.baseline_unit,
-        target_value: Number(kpi.target_value),
-        target_unit: kpi.target_unit,
+        datasource: kpi.datasource || 'ERP / Operations Report',
+        weight: Number(kpi.weight) || 10,
+        baseline_value: isNaN(Number(kpi.baseline_value)) ? 0 : Number(kpi.baseline_value),
+        baseline_unit: kpi.baseline_unit || 'percentage',
+        target_value: isNaN(Number(kpi.target_value)) ? 100 : Number(kpi.target_value),
+        target_unit: kpi.target_unit || 'percentage',
         target_policy: kpi.target_policy || 'fixed',
         created_at: kpi.created_at,
         updated_at: kpi.updated_at,
@@ -732,14 +798,33 @@ class DatabaseService {
     let sectionsModified = false;
 
     const seenDeptKey = new Set<string>();
+    // Index incoming departments by ID and department_id to preserve user updates (e.g. status)
+    const storedById = new Map<string, Department>();
+    depts.forEach((d) => {
+      if (d?.id) storedById.set(d.id, d);
+      if (d?.department_id) storedById.set(d.department_id, d);
+    });
 
-    // 1. Seed all official departments first
+    // 1. Seed all official departments first, preserving updated status/fields
     officialDepts.forEach((od) => {
-      const normUnit = (od.unit_id || '').toLowerCase().replace(/^unit-/, '');
-      const normName = od.name.trim().toLowerCase();
+      const existing = storedById.get(od.id) || storedById.get(od.department_id);
+      const mergedOd: Department = existing
+        ? {
+            ...od,
+            ...existing,
+            id: od.id,
+            department_id: od.department_id,
+            unit_id: od.unit_id || existing.unit_id,
+            name: existing.name || od.name,
+            status: existing.status || od.status,
+          }
+        : od;
+
+      const normUnit = (mergedOd.unit_id || '').toLowerCase().replace(/^unit-/, '');
+      const normName = mergedOd.name.trim().toLowerCase();
       const key = `${normUnit}::${normName}`;
       seenDeptKey.add(key);
-      validDepts.push(od);
+      validDepts.push(mergedOd);
     });
 
     // 2. Evaluate candidate departments
@@ -895,13 +980,42 @@ class DatabaseService {
     localStorage.setItem(STORAGE_KEYS.DEPARTMENTS, JSON.stringify(departments));
 
     this.addAuditLog('admin', 'admin', 'create_department', 'department', newDept.id, `Created department ${newDept.name} (${newDept.department_id})`);
+    this.broadcastUpdate();
+    this.syncDepartmentToSupabase(newDept);
 
     return newDept;
   }
 
+  syncDepartmentToSupabase(dept: Department): void {
+    if (!supabase) return;
+    const client = supabase;
+    const payload: Record<string, any> = {
+      id: dept.id,
+      name: dept.name,
+      short_code: dept.short_code,
+      department_id: dept.department_id,
+      access_code: dept.access_code,
+      status: dept.status,
+      created_at: dept.created_at,
+      updated_at: dept.updated_at || dept.created_at,
+    };
+    if (dept.unit_id && !this.unsupportedDeptColumns.has('unit_id')) {
+      payload.unit_id = dept.unit_id;
+    }
+    Promise.resolve(client.from('departments').upsert(payload))
+      .then((res: any) => {
+        if (res?.error && res.error.code === 'PGRST204') {
+          this.unsupportedDeptColumns.add('unit_id');
+          delete payload.unit_id;
+          Promise.resolve(client.from('departments').upsert(payload)).catch(() => {});
+        }
+      })
+      .catch(() => {});
+  }
+
   updateDepartment(id: string, updates: Partial<Department>): Department | null {
     const departments = this.getDepartments();
-    const index = departments.findIndex((d) => d.id === id);
+    const index = departments.findIndex((d) => d.id === id || d.department_id === id);
     if (index === -1) return null;
 
     departments[index] = {
@@ -912,6 +1026,8 @@ class DatabaseService {
 
     localStorage.setItem(STORAGE_KEYS.DEPARTMENTS, JSON.stringify(departments));
     this.addAuditLog('admin', 'admin', 'edit_department', 'department', id, `Updated department ${departments[index].name}`);
+    this.broadcastUpdate();
+    this.syncDepartmentToSupabase(departments[index]);
     return departments[index];
   }
 
@@ -926,6 +1042,8 @@ class DatabaseService {
 
     localStorage.setItem(STORAGE_KEYS.DEPARTMENTS, JSON.stringify(departments));
     this.addAuditLog('admin', 'admin', 'regenerate_code', 'department', departments[index].id, `Regenerated access code for ${departments[index].name}`);
+    this.broadcastUpdate();
+    this.syncDepartmentToSupabase(departments[index]);
     return newCode;
   }
 
