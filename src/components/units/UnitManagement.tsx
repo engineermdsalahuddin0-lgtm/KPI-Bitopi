@@ -562,7 +562,7 @@ export const UnitManagement: React.FC<UnitManagementProps> = ({
                   type="text"
                   value={newUnitName}
                   onChange={(e) => setNewUnitName(e.target.value)}
-                  placeholder="e.g. Bitopi Garments Ltd."
+                  placeholder="e.g. Baridhi Garments Ltd."
                   className="w-full px-3 py-1.5 rounded-md border border-neutral-300 bg-white text-xs text-neutral-900 focus:outline-hidden focus:ring-1 focus:ring-emerald-700"
                   required
                 />

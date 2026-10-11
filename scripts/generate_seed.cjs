@@ -4,7 +4,7 @@ const hierarchy = JSON.parse(fs.readFileSync('extracted_hierarchy.json', 'utf8')
 
 // Unit details
 const unitMeta = {
-  BGL: { name: 'Bitopi Garments Ltd. (BGL)', location: 'Mirpur, Dhaka', access_code: 'BGL-992-K8P' },
+  BGL: { name: 'Baridhi Garments Ltd. (BGL)', location: 'Mirpur, Dhaka', access_code: 'BGL-992-K8P' },
   MGL: { name: 'Misami Garments Ltd. (MGL)', location: 'Comilla EPZ', access_code: 'MGL-441-R7T' },
   RHL: { name: 'Remi Holdings Ltd. (RHL)', location: 'Adamjee EPZ, Narayanganj', access_code: 'RHL-782-X2M' },
   SRSL: { name: 'Sheba Ready Made Solutions Ltd. (SRSL)', location: 'Corporate Studio, Dhaka', access_code: 'SRS-319-Q5L' },

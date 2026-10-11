@@ -99,7 +99,7 @@ export function loginAsDepartment(
   const session: UserSession = {
     role: 'department',
     unitId: unit?.id || dept.unit_id || 'unit-bgl',
-    unitName: cleanName(unit?.name) || 'Bitopi Garments Ltd.',
+    unitName: cleanName(unit?.name) || 'Baridhi Garments Ltd.',
     unitCode: unit?.code || 'BGL',
     departmentId: dept.id,
     departmentName: cleanName(dept.name),
@@ -148,7 +148,7 @@ export function loginAsSection(
   const session: UserSession = {
     role: 'section',
     unitId: unit?.id || dept.unit_id || 'unit-bgl',
-    unitName: cleanName(unit?.name) || 'Bitopi Garments Ltd.',
+    unitName: cleanName(unit?.name) || 'Baridhi Garments Ltd.',
     unitCode: unit?.code || 'BGL',
     departmentId: dept.id,
     departmentName: cleanName(dept.name),
@@ -205,7 +205,7 @@ export function loginAsSubsection(
   const session: UserSession = {
     role: 'subsection',
     unitId: unit?.id || dept.unit_id || 'unit-bgl',
-    unitName: cleanName(unit?.name) || 'Bitopi Garments Ltd.',
+    unitName: cleanName(unit?.name) || 'Baridhi Garments Ltd.',
     unitCode: unit?.code || 'BGL',
     departmentId: dept.id,
     departmentName: cleanName(dept.name),

@@ -19,7 +19,7 @@ export const INITIAL_UNITS: Omit<Unit, 'created_at' | 'updated_at'>[] = [
   },
   {
     "id": "unit-bgl",
-    "name": "Bitopi Garments Ltd.",
+    "name": "Baridhi Garments Ltd.",
     "code": "BGL",
     "location": "Mirpur, Dhaka",
     "access_code": "BGL-992-K8P",

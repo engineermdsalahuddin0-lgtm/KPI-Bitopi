@@ -18,13 +18,13 @@ import {
 } from './seedData';
 
 const STORAGE_KEYS = {
-  UNITS: 'bitopi_kpi_units_v13',
-  DEPARTMENTS: 'bitopi_kpi_departments_v13',
-  SECTIONS: 'bitopi_kpi_sections_v13',
-  SUBSECTIONS: 'bitopi_kpi_subsections_v13',
-  KPIS: 'bitopi_kpi_kpis_v13',
-  MONTHLY_ENTRIES: 'bitopi_kpi_monthly_entries_v13',
-  AUDIT_LOGS: 'bitopi_kpi_audit_logs_v13',
+  UNITS: 'bitopi_kpi_units_v14',
+  DEPARTMENTS: 'bitopi_kpi_departments_v14',
+  SECTIONS: 'bitopi_kpi_sections_v14',
+  SUBSECTIONS: 'bitopi_kpi_subsections_v14',
+  KPIS: 'bitopi_kpi_kpis_v14',
+  MONTHLY_ENTRIES: 'bitopi_kpi_monthly_entries_v14',
+  AUDIT_LOGS: 'bitopi_kpi_audit_logs_v14',
 };
 
 // Generate random code in format XXX-XXX-XXX
