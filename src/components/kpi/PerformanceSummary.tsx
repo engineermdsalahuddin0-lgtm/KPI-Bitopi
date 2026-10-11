@@ -47,7 +47,7 @@ export const PerformanceSummary: React.FC<PerformanceSummaryProps> = ({
         </div>
 
         {/* Right: 4 Compact Metrics Cards (#15, #34, #35) */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-3 flex-1 lg:max-w-3xl">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 sm:gap-3 flex-1 lg:max-w-2xl">
           {/* Card 1: Overall Performance */}
           <div className="bg-neutral-50/70 border border-neutral-200/70 rounded-md px-3 py-2 flex flex-col justify-center">
             <div className="text-[10px] font-medium text-neutral-500 flex items-center justify-between">
@@ -61,33 +61,7 @@ export const PerformanceSummary: React.FC<PerformanceSummaryProps> = ({
             </div>
           </div>
 
-          {/* Card 2: Coverage */}
-          <div className="bg-neutral-50/70 border border-neutral-200/70 rounded-md px-3 py-2 flex flex-col justify-center">
-            <div className="text-[10px] font-medium text-neutral-500 flex items-center gap-1">
-              <span>Coverage</span>
-              <span
-                title="Coverage = Scored Weight / Assigned Department Weight. Performance reflects only KPI weight with valid scored data."
-                className="cursor-help text-neutral-400 hover:text-neutral-600"
-              >
-                <HelpCircle className="w-2.5 h-2.5" />
-              </span>
-            </div>
-            <div className="flex items-baseline gap-1 mt-0.5">
-              <span
-                className={`text-xl font-bold font-mono tracking-tight tabular-nums ${
-                  metrics.coverage >= 90
-                    ? 'text-emerald-700'
-                    : metrics.coverage >= 70
-                    ? 'text-amber-700'
-                    : 'text-neutral-800'
-                }`}
-              >
-                {metrics.coverage}%
-              </span>
-            </div>
-          </div>
-
-          {/* Card 3: Assigned Weight */}
+          {/* Card 2: Assigned Weight */}
           <div className="bg-neutral-50/70 border border-neutral-200/70 rounded-md px-3 py-2 flex flex-col justify-center">
             <div className="text-[10px] font-medium text-neutral-500 flex items-center justify-between">
               <span>Assigned Weight</span>

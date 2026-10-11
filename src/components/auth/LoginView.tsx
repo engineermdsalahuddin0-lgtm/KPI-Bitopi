@@ -34,10 +34,10 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLoginSuccess }) => {
   const [units, setUnits] = useState<Unit[]>(() => db.getUnits());
 
   // Department / Section / Subsection Form
-  const [deptUnitId, setDeptUnitId] = useState<string>(() => db.getUnits()[0]?.id || 'unit-bgl');
+  const [deptUnitId, setDeptUnitId] = useState<string>(() => db.getUnits()[0]?.id || 'unit-corp');
   const availableDepts = db.getDepartments(deptUnitId);
   const [selectedDeptId, setSelectedDeptId] = useState<string>(() => {
-    const d = db.getDepartments(db.getUnits()[0]?.id || 'unit-bgl');
+    const d = db.getDepartments(db.getUnits()[0]?.id || 'unit-corp');
     return d[0]?.id || '';
   });
   const [selectedSectionId, setSelectedSectionId] = useState<string>('');

@@ -31,6 +31,12 @@ export const KPIExpandPanel: React.FC<KPIExpandPanelProps> = ({
             <Target className="w-3.5 h-3.5 text-emerald-700" />
             <span>Strategic Alignment & Scope</span>
           </div>
+          <div>
+            <span className="text-[11px] text-neutral-500 font-medium">Key Result Area (KRA):</span>
+            <div className="text-neutral-900 font-bold mt-0.5 px-2 py-1 bg-white rounded border border-emerald-200/80 text-emerald-950 inline-block shadow-2xs">
+              {kpi.kra || "—"}
+            </div>
+          </div>
 
           <div>
             <span className="text-[11px] text-neutral-500 font-medium">Aligned with ORG Goal:</span>

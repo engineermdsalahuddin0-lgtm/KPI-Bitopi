@@ -41,7 +41,7 @@ export const DepartmentManagement: React.FC<DepartmentManagementProps> = ({
   const [hierarchyModalDept, setHierarchyModalDept] = useState<Department | null>(null);
 
   // Add Department Form State
-  const [newDeptUnitId, setNewDeptUnitId] = useState<string>(() => db.getUnits()[0]?.id || 'unit-bgl');
+  const [newDeptUnitId, setNewDeptUnitId] = useState<string>(() => db.getUnits()[0]?.id || 'unit-corp');
   const [newDeptName, setNewDeptName] = useState<string>('');
   const [newDeptCode, setNewDeptCode] = useState<string>('');
   const [addError, setAddError] = useState<string | null>(null);

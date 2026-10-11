@@ -1,24 +1,40 @@
 {
   "units": [
     {
-      "id": "unit-bgl",
-      "name": "Bitopi Garments Ltd. (BGL)",
-      "code": "BGL",
-      "location": "Mirpur, Dhaka",
-      "access_code": "BGL-992-K8P",
+      "id": "unit-corp",
+      "name": "Corporate",
+      "code": "CORP",
+      "location": "Corporate Head Office, Dhaka",
+      "access_code": "CORP-919-C1P",
       "status": "active"
     },
     {
       "id": "unit-mgl",
-      "name": "Misami Garments Ltd. (MGL)",
+      "name": "Misami Garments Ltd.",
       "code": "MGL",
       "location": "Comilla EPZ",
       "access_code": "MGL-441-R7T",
       "status": "active"
     },
     {
+      "id": "unit-bgl",
+      "name": "Bitopi Garments Ltd.",
+      "code": "BGL",
+      "location": "Mirpur, Dhaka",
+      "access_code": "BGL-992-K8P",
+      "status": "active"
+    },
+    {
+      "id": "unit-tal",
+      "name": "Tarasima Apparels Ltd.",
+      "code": "TAL",
+      "location": "Kashimpur, Gazipur",
+      "access_code": "TAL-853-Z9W",
+      "status": "active"
+    },
+    {
       "id": "unit-rhl",
-      "name": "Rimpex Holdings Ltd. (RHL)",
+      "name": "Remi Holdings Ltd.",
       "code": "RHL",
       "location": "Adamjee EPZ, Narayanganj",
       "access_code": "RHL-782-X2M",
@@ -26,31 +42,14 @@
     },
     {
       "id": "unit-srsl",
-      "name": "Sheba Ready Made Solutions Ltd. (SRSL)",
+      "name": "Sheba Ready Made Solutions Ltd.",
       "code": "SRSL",
       "location": "Corporate Studio, Dhaka",
       "access_code": "SRS-319-Q5L",
       "status": "active"
-    },
-    {
-      "id": "unit-tal",
-      "name": "Tara Atire Ltd. (TAL)",
-      "code": "TAL",
-      "location": "Kashimpur, Gazipur",
-      "access_code": "TAL-853-Z9W",
-      "status": "active"
     }
   ],
   "departments": [
-    {
-      "id": "dept-bgl-hra-1",
-      "unit_id": "unit-bgl",
-      "name": "HR & Admin",
-      "short_code": "BGL-HRA",
-      "department_id": "BGL-HRA-1511",
-      "access_code": "HRA-61K-77P",
-      "status": "active"
-    },
     {
       "id": "dept-bgl-ie-2",
       "unit_id": "unit-bgl",
@@ -112,15 +111,6 @@
       "short_code": "BGL-GEN",
       "department_id": "BGL-GEN-1CA6",
       "access_code": "GEN-68K-75P",
-      "status": "active"
-    },
-    {
-      "id": "dept-bgl-hrc-9",
-      "unit_id": "unit-bgl",
-      "name": "HR, Admin & Compliance",
-      "short_code": "BGL-HRC",
-      "department_id": "BGL-HRC-14F3",
-      "access_code": "HRC-39K-95P",
       "status": "active"
     },
     {
@@ -196,12 +186,129 @@
       "status": "active"
     },
     {
+      "id": "dept-mgl-ie-m1",
+      "unit_id": "unit-mgl",
+      "name": "Industrial Engineering",
+      "short_code": "MGL-IE",
+      "department_id": "MGL-IE-1102",
+      "access_code": "IE-88K-12P",
+      "status": "active"
+    },
+    {
+      "id": "dept-mgl-prod-m2",
+      "unit_id": "unit-mgl",
+      "name": "Production",
+      "short_code": "MGL-PROD",
+      "department_id": "MGL-PROD-1205",
+      "access_code": "PROD-77K-23P",
+      "status": "active"
+    },
+    {
+      "id": "dept-mgl-ppc-m3",
+      "unit_id": "unit-mgl",
+      "name": "Production Planning & control",
+      "short_code": "MGL-PPC",
+      "department_id": "MGL-PPC-1308",
+      "access_code": "PPC-44K-81P",
+      "status": "active"
+    },
+    {
+      "id": "dept-mgl-qa-m4",
+      "unit_id": "unit-mgl",
+      "name": "QA, Audit & Technical",
+      "short_code": "MGL-QA",
+      "department_id": "MGL-QA-1411",
+      "access_code": "QA-99K-34P",
+      "status": "active"
+    },
+    {
+      "id": "dept-mgl-cad-m5",
+      "unit_id": "unit-mgl",
+      "name": "CAD & Sample",
+      "short_code": "MGL-CAD",
+      "department_id": "MGL-CAD-1514",
+      "access_code": "CAD-66K-45P",
+      "status": "active"
+    },
+    {
+      "id": "dept-mgl-com-m6",
+      "unit_id": "unit-mgl",
+      "name": "Commercial",
+      "short_code": "MGL-COM",
+      "department_id": "MGL-COM-1617",
+      "access_code": "COM-55K-56P",
+      "status": "active"
+    },
+    {
+      "id": "dept-mgl-it-m7",
+      "unit_id": "unit-mgl",
+      "name": "ERP & IT",
+      "short_code": "MGL-IT",
+      "department_id": "MGL-IT-1720",
+      "access_code": "IT-33K-67P",
+      "status": "active"
+    },
+    {
+      "id": "dept-mgl-fin-m8",
+      "unit_id": "unit-mgl",
+      "name": "Finance & Accounts",
+      "short_code": "MGL-FIN",
+      "department_id": "MGL-FIN-1823",
+      "access_code": "FIN-22K-78P",
+      "status": "active"
+    },
+    {
+      "id": "dept-mgl-stw-m9",
+      "unit_id": "unit-mgl",
+      "name": "Store & Warehouse",
+      "short_code": "MGL-STW",
+      "department_id": "MGL-STW-1926",
+      "access_code": "STW-11K-89P",
+      "status": "active"
+    },
+    {
+      "id": "dept-mgl-gen-m10",
+      "unit_id": "unit-mgl",
+      "name": "General",
+      "short_code": "MGL-GEN",
+      "department_id": "MGL-GEN-2029",
+      "access_code": "GEN-99K-90P",
+      "status": "active"
+    },
+    {
       "id": "dept-rhl-cad-18",
       "unit_id": "unit-rhl",
       "name": "CAD & Sample",
       "short_code": "RHL-CAD",
       "department_id": "RHL-CAD-1529",
       "access_code": "CAD-21K-15P",
+      "status": "active"
+    },
+    {
+      "id": "dept-tal-esg-41",
+      "unit_id": "unit-tal",
+      "name": "ESG",
+      "short_code": "TAL-ESG",
+      "department_id": "TAL-ESG-24C7",
+      "access_code": "ESG-37K-12P",
+      "status": "active"
+    },
+    {
+      "id": "dept-tal-fin-42",
+      "unit_id": "unit-tal",
+      "name": "Finance & Accounts",
+      "short_code": "TAL-FIN",
+      "department_id": "TAL-FIN-235F",
+      "access_code": "FIN-76K-42P",
+      "status": "active"
+    },
+    {
+      "id": "dept-bgl-hra-1",
+      "unit_id": "unit-bgl",
+      "name": "HR & Admin",
+      "short_code": "BGL-HRA",
+      "department_id": "BGL-HRA-1511",
+      "access_code": "HRA-61K-77P",
       "status": "active"
     },
     {
@@ -277,15 +384,6 @@
       "status": "active"
     },
     {
-      "id": "dept-rhl-hrc-27",
-      "unit_id": "unit-rhl",
-      "name": "HR, Admin & Compliance",
-      "short_code": "RHL-HRC",
-      "department_id": "RHL-HRC-CA1",
-      "access_code": "HRC-87K-21P",
-      "status": "active"
-    },
-    {
       "id": "dept-rhl-ie-28",
       "unit_id": "unit-rhl",
       "name": "Industrial Engineering",
@@ -358,6 +456,78 @@
       "status": "active"
     },
     {
+      "id": "dept-srsl-ie-s1",
+      "unit_id": "unit-srsl",
+      "name": "Industrial Engineering",
+      "short_code": "SRSL-IE",
+      "department_id": "SRSL-IE-2101",
+      "access_code": "IE-91K-22P",
+      "status": "active"
+    },
+    {
+      "id": "dept-srsl-prod-s2",
+      "unit_id": "unit-srsl",
+      "name": "Production",
+      "short_code": "SRSL-PROD",
+      "department_id": "SRSL-PROD-2202",
+      "access_code": "PROD-82K-33P",
+      "status": "active"
+    },
+    {
+      "id": "dept-srsl-qa-s3",
+      "unit_id": "unit-srsl",
+      "name": "QA, Audit & Technical",
+      "short_code": "SRSL-QA",
+      "department_id": "SRSL-QA-2303",
+      "access_code": "QA-73K-44P",
+      "status": "active"
+    },
+    {
+      "id": "dept-srsl-hra-s4",
+      "unit_id": "unit-srsl",
+      "name": "HR & Admin",
+      "short_code": "SRSL-HRA",
+      "department_id": "SRSL-HRA-2404",
+      "access_code": "HRA-64K-55P",
+      "status": "active"
+    },
+    {
+      "id": "dept-srsl-ppc-s5",
+      "unit_id": "unit-srsl",
+      "name": "Production Planning & control",
+      "short_code": "SRSL-PPC",
+      "department_id": "SRSL-PPC-2505",
+      "access_code": "PPC-55K-66P",
+      "status": "active"
+    },
+    {
+      "id": "dept-srsl-eng-s6",
+      "unit_id": "unit-srsl",
+      "name": "Engineering & Services",
+      "short_code": "SRSL-ENG",
+      "department_id": "SRSL-ENG-2606",
+      "access_code": "ENG-46K-77P",
+      "status": "active"
+    },
+    {
+      "id": "dept-srsl-it-s7",
+      "unit_id": "unit-srsl",
+      "name": "ERP & IT",
+      "short_code": "SRSL-IT",
+      "department_id": "SRSL-IT-2707",
+      "access_code": "IT-37K-88P",
+      "status": "active"
+    },
+    {
+      "id": "dept-srsl-stw-s8",
+      "unit_id": "unit-srsl",
+      "name": "Store & Warehouse",
+      "short_code": "SRSL-STW",
+      "department_id": "SRSL-STW-2808",
+      "access_code": "STW-28K-99P",
+      "status": "active"
+    },
+    {
       "id": "dept-tal-cad-36",
       "unit_id": "unit-tal",
       "name": "CAD & Sample",
@@ -403,24 +573,6 @@
       "status": "active"
     },
     {
-      "id": "dept-tal-esg-41",
-      "unit_id": "unit-tal",
-      "name": "ESG",
-      "short_code": "TAL-ESG",
-      "department_id": "TAL-ESG-24C7",
-      "access_code": "ESG-37K-12P",
-      "status": "active"
-    },
-    {
-      "id": "dept-tal-fin-42",
-      "unit_id": "unit-tal",
-      "name": "Finance & Accounts",
-      "short_code": "TAL-FIN",
-      "department_id": "TAL-FIN-235F",
-      "access_code": "FIN-76K-42P",
-      "status": "active"
-    },
-    {
       "id": "dept-tal-gen-43",
       "unit_id": "unit-tal",
       "name": "General",
@@ -436,15 +588,6 @@
       "short_code": "TAL-HRA",
       "department_id": "TAL-HRA-1FF7",
       "access_code": "HRA-93K-55P",
-      "status": "active"
-    },
-    {
-      "id": "dept-tal-hrc-45",
-      "unit_id": "unit-tal",
-      "name": "HR, Admin & Compliance",
-      "short_code": "TAL-HRC",
-      "department_id": "TAL-HRC-24A9",
-      "access_code": "HRC-86K-52P",
       "status": "active"
     },
     {
@@ -545,6 +688,186 @@
       "department_id": "TAL-WASH-1770",
       "access_code": "WASH-93K-94P",
       "status": "active"
+    },
+    {
+      "id": "dept-corp-esg-41",
+      "unit_id": "unit-corp",
+      "name": "ESG",
+      "short_code": "CORP-ESG",
+      "department_id": "CORP-ESG-24C7",
+      "access_code": "ESG-37K-12P",
+      "status": "active"
+    },
+    {
+      "id": "dept-corp-fin-42",
+      "unit_id": "unit-corp",
+      "name": "Finance & Accounts",
+      "short_code": "CORP-FIN",
+      "department_id": "CORP-FIN-235F",
+      "access_code": "FIN-76K-42P",
+      "status": "active"
+    },
+    {
+      "id": "dept-corp-cad-36",
+      "unit_id": "unit-corp",
+      "name": "CAD & Sample",
+      "short_code": "CORP-CAD",
+      "department_id": "CORP-CAD-A46",
+      "access_code": "CAD-74K-12P",
+      "status": "active"
+    },
+    {
+      "id": "dept-corp-com-37",
+      "unit_id": "unit-corp",
+      "name": "Commercial",
+      "short_code": "CORP-COM",
+      "department_id": "CORP-COM-24A7",
+      "access_code": "COM-19K-91P",
+      "status": "active"
+    },
+    {
+      "id": "dept-corp-dpd-38",
+      "unit_id": "unit-corp",
+      "name": "Design & Product Development",
+      "short_code": "CORP-DPD",
+      "department_id": "CORP-DPD-13A6",
+      "access_code": "DPD-66K-32P",
+      "status": "active"
+    },
+    {
+      "id": "dept-corp-eng-39",
+      "unit_id": "unit-corp",
+      "name": "Engineering & Services",
+      "short_code": "CORP-ENG",
+      "department_id": "CORP-ENG-425",
+      "access_code": "ENG-28K-34P",
+      "status": "active"
+    },
+    {
+      "id": "dept-corp-it-40",
+      "unit_id": "unit-corp",
+      "name": "ERP & IT",
+      "short_code": "CORP-IT",
+      "department_id": "CORP-IT-3EB",
+      "access_code": "IT-79K-67P",
+      "status": "active"
+    },
+    {
+      "id": "dept-corp-gen-43",
+      "unit_id": "unit-corp",
+      "name": "General",
+      "short_code": "CORP-GEN",
+      "department_id": "CORP-GEN-22A4",
+      "access_code": "GEN-36K-16P",
+      "status": "active"
+    },
+    {
+      "id": "dept-corp-hra-44",
+      "unit_id": "unit-corp",
+      "name": "HR & Admin",
+      "short_code": "CORP-HRA",
+      "department_id": "CORP-HRA-1FF7",
+      "access_code": "HRA-93K-55P",
+      "status": "active"
+    },
+    {
+      "id": "dept-corp-ie-46",
+      "unit_id": "unit-corp",
+      "name": "Industrial Engineering",
+      "short_code": "CORP-IE",
+      "department_id": "CORP-IE-899",
+      "access_code": "IE-80K-82P",
+      "status": "active"
+    },
+    {
+      "id": "dept-corp-mm-47",
+      "unit_id": "unit-corp",
+      "name": "Marketing & Merchandising",
+      "short_code": "CORP-MM",
+      "department_id": "CORP-MM-1A38",
+      "access_code": "MM-47K-86P",
+      "status": "active"
+    },
+    {
+      "id": "dept-corp-mis-48",
+      "unit_id": "unit-corp",
+      "name": "MIS & Internal Audit",
+      "short_code": "CORP-MIS",
+      "department_id": "CORP-MIS-6A7",
+      "access_code": "MIS-25K-37P",
+      "status": "active"
+    },
+    {
+      "id": "dept-corp-prod-49",
+      "unit_id": "unit-corp",
+      "name": "Production",
+      "short_code": "CORP-PROD",
+      "department_id": "CORP-PROD-745",
+      "access_code": "PROD-84K-17P",
+      "status": "active"
+    },
+    {
+      "id": "dept-corp-ppc-50",
+      "unit_id": "unit-corp",
+      "name": "Production Planning & control",
+      "short_code": "CORP-PPC",
+      "department_id": "CORP-PPC-7F7",
+      "access_code": "PPC-61K-53P",
+      "status": "active"
+    },
+    {
+      "id": "dept-corp-qa-51",
+      "unit_id": "unit-corp",
+      "name": "QA, Audit & Technical",
+      "short_code": "CORP-QA",
+      "department_id": "CORP-QA-14FE",
+      "access_code": "QA-26K-44P",
+      "status": "active"
+    },
+    {
+      "id": "dept-corp-stw-52",
+      "unit_id": "unit-corp",
+      "name": "Store & Warehouse",
+      "short_code": "CORP-STW",
+      "department_id": "CORP-STW-1F94",
+      "access_code": "STW-45K-27P",
+      "status": "active"
+    },
+    {
+      "id": "dept-corp-scm-53",
+      "unit_id": "unit-corp",
+      "name": "Supply Chain",
+      "short_code": "CORP-SCM",
+      "department_id": "CORP-SCM-265A",
+      "access_code": "SCM-16K-22P",
+      "status": "active"
+    },
+    {
+      "id": "dept-corp-ie2-54",
+      "unit_id": "unit-corp",
+      "name": "IE",
+      "short_code": "CORP-IE2",
+      "department_id": "CORP-IE2-2627",
+      "access_code": "IE2-80K-29P",
+      "status": "active"
+    },
+    {
+      "id": "dept-corp-tech-55",
+      "unit_id": "unit-corp",
+      "name": "Technical",
+      "short_code": "CORP-TECH",
+      "department_id": "CORP-TECH-75C",
+      "access_code": "TECH-92K-12P",
+      "status": "active"
+    },
+    {
+      "id": "dept-corp-wash-56",
+      "unit_id": "unit-corp",
+      "name": "Washing",
+      "short_code": "CORP-WASH",
+      "department_id": "CORP-WASH-1770",
+      "access_code": "WASH-93K-94P",
+      "status": "active"
     }
   ],
   "sections": [
@@ -592,21 +915,6 @@
       "id": "sec-bgl-9",
       "department_id": "dept-bgl-gen-8",
       "name": "General"
-    },
-    {
-      "id": "sec-bgl-10",
-      "department_id": "dept-bgl-hrc-9",
-      "name": "HR"
-    },
-    {
-      "id": "sec-bgl-11",
-      "department_id": "dept-bgl-hrc-9",
-      "name": "HR, Admin & Compliance"
-    },
-    {
-      "id": "sec-bgl-12",
-      "department_id": "dept-bgl-hrc-9",
-      "name": "Admin"
     },
     {
       "id": "sec-bgl-13",
@@ -682,6 +990,96 @@
       "id": "sec-mgl-27",
       "department_id": "dept-mgl-hra-17",
       "name": "HR"
+    },
+    {
+      "id": "sec-mgl-28",
+      "department_id": "dept-mgl-ie-m1",
+      "name": "Work Study & Line Balancing"
+    },
+    {
+      "id": "sec-mgl-29",
+      "department_id": "dept-mgl-prod-m2",
+      "name": "Sewing Floor"
+    },
+    {
+      "id": "sec-mgl-30",
+      "department_id": "dept-mgl-ppc-m3",
+      "name": "Production Planning"
+    },
+    {
+      "id": "sec-mgl-31",
+      "department_id": "dept-mgl-qa-m4",
+      "name": "Quality Audit & Inspection"
+    },
+    {
+      "id": "sec-mgl-32",
+      "department_id": "dept-mgl-cad-m5",
+      "name": "Pattern & Sample"
+    },
+    {
+      "id": "sec-mgl-33",
+      "department_id": "dept-mgl-com-m6",
+      "name": "Import & Export"
+    },
+    {
+      "id": "sec-mgl-34",
+      "department_id": "dept-mgl-it-m7",
+      "name": "ERP & Network"
+    },
+    {
+      "id": "sec-mgl-35",
+      "department_id": "dept-mgl-fin-m8",
+      "name": "Accounts & Costing"
+    },
+    {
+      "id": "sec-mgl-36",
+      "department_id": "dept-mgl-stw-m9",
+      "name": "Materials & Store"
+    },
+    {
+      "id": "sec-mgl-37",
+      "department_id": "dept-mgl-gen-m10",
+      "name": "General Admin"
+    },
+    {
+      "id": "sec-srsl-56",
+      "department_id": "dept-srsl-ie-s1",
+      "name": "IE Optimization"
+    },
+    {
+      "id": "sec-srsl-57",
+      "department_id": "dept-srsl-prod-s2",
+      "name": "Manufacturing Floor"
+    },
+    {
+      "id": "sec-srsl-58",
+      "department_id": "dept-srsl-qa-s3",
+      "name": "Quality & Technical Audit"
+    },
+    {
+      "id": "sec-srsl-59",
+      "department_id": "dept-srsl-hra-s4",
+      "name": "HR & Welfare"
+    },
+    {
+      "id": "sec-srsl-60",
+      "department_id": "dept-srsl-ppc-s5",
+      "name": "Capacity & Planning"
+    },
+    {
+      "id": "sec-srsl-61",
+      "department_id": "dept-srsl-eng-s6",
+      "name": "Engineering Maintenance"
+    },
+    {
+      "id": "sec-srsl-62",
+      "department_id": "dept-srsl-it-s7",
+      "name": "ERP Systems"
+    },
+    {
+      "id": "sec-srsl-63",
+      "department_id": "dept-srsl-stw-s8",
+      "name": "Central Store"
     },
     {
       "id": "sec-rhl-28",
@@ -762,21 +1160,6 @@
       "id": "sec-rhl-43",
       "department_id": "dept-rhl-gen-26",
       "name": "General"
-    },
-    {
-      "id": "sec-rhl-44",
-      "department_id": "dept-rhl-hrc-27",
-      "name": "HR, Admin & Compliance"
-    },
-    {
-      "id": "sec-rhl-45",
-      "department_id": "dept-rhl-hrc-27",
-      "name": "HR"
-    },
-    {
-      "id": "sec-rhl-46",
-      "department_id": "dept-rhl-hrc-27",
-      "name": "Sustainability"
     },
     {
       "id": "sec-rhl-47",
@@ -929,36 +1312,6 @@
       "name": "General"
     },
     {
-      "id": "sec-tal-77",
-      "department_id": "dept-tal-hrc-45",
-      "name": "Admin"
-    },
-    {
-      "id": "sec-tal-78",
-      "department_id": "dept-tal-hrc-45",
-      "name": "HR"
-    },
-    {
-      "id": "sec-tal-79",
-      "department_id": "dept-tal-hrc-45",
-      "name": "HR & Compliance"
-    },
-    {
-      "id": "sec-tal-80",
-      "department_id": "dept-tal-hrc-45",
-      "name": "HR, Admin & Compliance"
-    },
-    {
-      "id": "sec-tal-81",
-      "department_id": "dept-tal-hrc-45",
-      "name": "Sustainability"
-    },
-    {
-      "id": "sec-tal-82",
-      "department_id": "dept-tal-hrc-45",
-      "name": "Compliance"
-    },
-    {
       "id": "sec-tal-83",
       "department_id": "dept-tal-ie-46",
       "name": "IE"
@@ -1102,6 +1455,256 @@
       "id": "sec-tal-111",
       "department_id": "dept-tal-wash-56",
       "name": "Dry Process"
+    },
+    {
+      "id": "sec-corp-56",
+      "department_id": "dept-corp-cad-36",
+      "name": "CAD"
+    },
+    {
+      "id": "sec-corp-57",
+      "department_id": "dept-corp-cad-36",
+      "name": "Sample"
+    },
+    {
+      "id": "sec-corp-58",
+      "department_id": "dept-corp-cad-36",
+      "name": "CAD & Sample"
+    },
+    {
+      "id": "sec-corp-59",
+      "department_id": "dept-corp-com-37",
+      "name": "Commercial"
+    },
+    {
+      "id": "sec-corp-60",
+      "department_id": "dept-corp-dpd-38",
+      "name": "Store"
+    },
+    {
+      "id": "sec-corp-61",
+      "department_id": "dept-corp-dpd-38",
+      "name": "Design & Product Development"
+    },
+    {
+      "id": "sec-corp-62",
+      "department_id": "dept-corp-eng-39",
+      "name": "Maintenance"
+    },
+    {
+      "id": "sec-corp-63",
+      "department_id": "dept-corp-eng-39",
+      "name": "Utility & Engineering"
+    },
+    {
+      "id": "sec-corp-64",
+      "department_id": "dept-corp-eng-39",
+      "name": "Civil"
+    },
+    {
+      "id": "sec-corp-65",
+      "department_id": "dept-corp-it-40",
+      "name": "General"
+    },
+    {
+      "id": "sec-corp-66",
+      "department_id": "dept-corp-it-40",
+      "name": "ERP"
+    },
+    {
+      "id": "sec-corp-67",
+      "department_id": "dept-corp-it-40",
+      "name": "IT"
+    },
+    {
+      "id": "sec-corp-68",
+      "department_id": "dept-corp-esg-41",
+      "name": "Social"
+    },
+    {
+      "id": "sec-corp-69",
+      "department_id": "dept-corp-esg-41",
+      "name": "EMS"
+    },
+    {
+      "id": "sec-corp-70",
+      "department_id": "dept-corp-fin-42",
+      "name": "Finance & Accounts"
+    },
+    {
+      "id": "sec-corp-71",
+      "department_id": "dept-corp-fin-42",
+      "name": "Finance"
+    },
+    {
+      "id": "sec-corp-72",
+      "department_id": "dept-corp-gen-43",
+      "name": "General Admin"
+    },
+    {
+      "id": "sec-corp-73",
+      "department_id": "dept-corp-gen-43",
+      "name": "General"
+    },
+    {
+      "id": "sec-corp-74",
+      "department_id": "dept-corp-hra-44",
+      "name": "HR"
+    },
+    {
+      "id": "sec-corp-75",
+      "department_id": "dept-corp-hra-44",
+      "name": "Admin"
+    },
+    {
+      "id": "sec-corp-76",
+      "department_id": "dept-corp-hra-44",
+      "name": "General"
+    },
+    {
+      "id": "sec-corp-83",
+      "department_id": "dept-corp-ie-46",
+      "name": "IE"
+    },
+    {
+      "id": "sec-corp-84",
+      "department_id": "dept-corp-ie-46",
+      "name": "Technical"
+    },
+    {
+      "id": "sec-corp-85",
+      "department_id": "dept-corp-mm-47",
+      "name": "Merchandising"
+    },
+    {
+      "id": "sec-corp-86",
+      "department_id": "dept-corp-mis-48",
+      "name": "MIS & Internal Audit"
+    },
+    {
+      "id": "sec-corp-87",
+      "department_id": "dept-corp-prod-49",
+      "name": "Production"
+    },
+    {
+      "id": "sec-corp-88",
+      "department_id": "dept-corp-prod-49",
+      "name": "Cutting"
+    },
+    {
+      "id": "sec-corp-89",
+      "department_id": "dept-corp-prod-49",
+      "name": "Finishing"
+    },
+    {
+      "id": "sec-corp-90",
+      "department_id": "dept-corp-prod-49",
+      "name": "Sample"
+    },
+    {
+      "id": "sec-corp-91",
+      "department_id": "dept-corp-prod-49",
+      "name": "Sewing"
+    },
+    {
+      "id": "sec-corp-92",
+      "department_id": "dept-corp-prod-49",
+      "name": "Embroidery"
+    },
+    {
+      "id": "sec-corp-93",
+      "department_id": "dept-corp-prod-49",
+      "name": "Warehouse"
+    },
+    {
+      "id": "sec-corp-94",
+      "department_id": "dept-corp-prod-49",
+      "name": "Wet Process"
+    },
+    {
+      "id": "sec-corp-95",
+      "department_id": "dept-corp-ppc-50",
+      "name": "Planning & Coordination"
+    },
+    {
+      "id": "sec-corp-96",
+      "department_id": "dept-corp-ppc-50",
+      "name": "Planning"
+    },
+    {
+      "id": "sec-corp-97",
+      "department_id": "dept-corp-qa-51",
+      "name": "Quality"
+    },
+    {
+      "id": "sec-corp-98",
+      "department_id": "dept-corp-qa-51",
+      "name": "Sewing"
+    },
+    {
+      "id": "sec-corp-99",
+      "department_id": "dept-corp-qa-51",
+      "name": "Finishing"
+    },
+    {
+      "id": "sec-corp-100",
+      "department_id": "dept-corp-qa-51",
+      "name": "Raw Material"
+    },
+    {
+      "id": "sec-corp-101",
+      "department_id": "dept-corp-qa-51",
+      "name": "Laboratory"
+    },
+    {
+      "id": "sec-corp-102",
+      "department_id": "dept-corp-stw-52",
+      "name": "Store"
+    },
+    {
+      "id": "sec-corp-103",
+      "department_id": "dept-corp-stw-52",
+      "name": "Warehouse"
+    },
+    {
+      "id": "sec-corp-104",
+      "department_id": "dept-corp-stw-52",
+      "name": "Store & Warehouse"
+    },
+    {
+      "id": "sec-corp-105",
+      "department_id": "dept-corp-scm-53",
+      "name": "Supply Chain"
+    },
+    {
+      "id": "sec-corp-106",
+      "department_id": "dept-corp-ie2-54",
+      "name": "IE"
+    },
+    {
+      "id": "sec-corp-107",
+      "department_id": "dept-corp-tech-55",
+      "name": "Technical"
+    },
+    {
+      "id": "sec-corp-108",
+      "department_id": "dept-corp-wash-56",
+      "name": "Washing"
+    },
+    {
+      "id": "sec-corp-109",
+      "department_id": "dept-corp-wash-56",
+      "name": "Wet Process"
+    },
+    {
+      "id": "sec-corp-110",
+      "department_id": "dept-corp-wash-56",
+      "name": "R&D"
+    },
+    {
+      "id": "sec-corp-111",
+      "department_id": "dept-corp-wash-56",
+      "name": "Dry Process"
     }
   ],
   "subsections": [
@@ -1149,36 +1752,6 @@
       "id": "sub-bgl-9",
       "section_id": "sec-bgl-9",
       "name": "General"
-    },
-    {
-      "id": "sub-bgl-10",
-      "section_id": "sec-bgl-10",
-      "name": "Payroll"
-    },
-    {
-      "id": "sub-bgl-11",
-      "section_id": "sec-bgl-10",
-      "name": "HR"
-    },
-    {
-      "id": "sub-bgl-12",
-      "section_id": "sec-bgl-11",
-      "name": "General"
-    },
-    {
-      "id": "sub-bgl-13",
-      "section_id": "sec-bgl-11",
-      "name": "HR"
-    },
-    {
-      "id": "sub-bgl-14",
-      "section_id": "sec-bgl-11",
-      "name": "Compliance"
-    },
-    {
-      "id": "sub-bgl-15",
-      "section_id": "sec-bgl-12",
-      "name": "Admin"
     },
     {
       "id": "sub-bgl-16",
@@ -1384,21 +1957,6 @@
       "id": "sub-rhl-56",
       "section_id": "sec-rhl-43",
       "name": "General"
-    },
-    {
-      "id": "sub-rhl-57",
-      "section_id": "sec-rhl-44",
-      "name": "HR"
-    },
-    {
-      "id": "sub-rhl-58",
-      "section_id": "sec-rhl-45",
-      "name": "Payroll"
-    },
-    {
-      "id": "sub-rhl-59",
-      "section_id": "sec-rhl-46",
-      "name": "Compliance"
     },
     {
       "id": "sub-rhl-60",
@@ -1731,81 +2289,6 @@
       "name": "General"
     },
     {
-      "id": "sub-tal-126",
-      "section_id": "sec-tal-77",
-      "name": "General"
-    },
-    {
-      "id": "sub-tal-127",
-      "section_id": "sec-tal-77",
-      "name": "Basundhara House"
-    },
-    {
-      "id": "sub-tal-128",
-      "section_id": "sec-tal-77",
-      "name": "Transport"
-    },
-    {
-      "id": "sub-tal-129",
-      "section_id": "sec-tal-77",
-      "name": "Admin"
-    },
-    {
-      "id": "sub-tal-130",
-      "section_id": "sec-tal-78",
-      "name": "Payroll"
-    },
-    {
-      "id": "sub-tal-131",
-      "section_id": "sec-tal-78",
-      "name": "HR"
-    },
-    {
-      "id": "sub-tal-132",
-      "section_id": "sec-tal-78",
-      "name": "OD & Training"
-    },
-    {
-      "id": "sub-tal-133",
-      "section_id": "sec-tal-79",
-      "name": "HR"
-    },
-    {
-      "id": "sub-tal-134",
-      "section_id": "sec-tal-80",
-      "name": "HR"
-    },
-    {
-      "id": "sub-tal-135",
-      "section_id": "sec-tal-80",
-      "name": "General"
-    },
-    {
-      "id": "sub-tal-136",
-      "section_id": "sec-tal-80",
-      "name": "Compliance"
-    },
-    {
-      "id": "sub-tal-137",
-      "section_id": "sec-tal-80",
-      "name": "Payroll"
-    },
-    {
-      "id": "sub-tal-138",
-      "section_id": "sec-tal-80",
-      "name": "Medical"
-    },
-    {
-      "id": "sub-tal-139",
-      "section_id": "sec-tal-81",
-      "name": "Compliance"
-    },
-    {
-      "id": "sub-tal-140",
-      "section_id": "sec-tal-82",
-      "name": "EMS"
-    },
-    {
       "id": "sub-tal-141",
       "section_id": "sec-tal-83",
       "name": "IE"
@@ -2093,6 +2576,571 @@
     {
       "id": "sub-tal-198",
       "section_id": "sec-tal-111",
+      "name": "Dry Process"
+    },
+    {
+      "id": "sub-corp-71",
+      "section_id": "sec-corp-56",
+      "name": "CAD"
+    },
+    {
+      "id": "sub-corp-72",
+      "section_id": "sec-corp-56",
+      "name": "3D"
+    },
+    {
+      "id": "sub-corp-73",
+      "section_id": "sec-corp-57",
+      "name": "Sewing"
+    },
+    {
+      "id": "sub-corp-74",
+      "section_id": "sec-corp-57",
+      "name": "Quality"
+    },
+    {
+      "id": "sub-corp-75",
+      "section_id": "sec-corp-57",
+      "name": "Cutting"
+    },
+    {
+      "id": "sub-corp-76",
+      "section_id": "sec-corp-57",
+      "name": "Sample"
+    },
+    {
+      "id": "sub-corp-77",
+      "section_id": "sec-corp-57",
+      "name": "Finishing"
+    },
+    {
+      "id": "sub-corp-78",
+      "section_id": "sec-corp-57",
+      "name": "Technical"
+    },
+    {
+      "id": "sub-corp-79",
+      "section_id": "sec-corp-58",
+      "name": "Sample"
+    },
+    {
+      "id": "sub-corp-80",
+      "section_id": "sec-corp-59",
+      "name": "Export"
+    },
+    {
+      "id": "sub-corp-81",
+      "section_id": "sec-corp-59",
+      "name": "Customs"
+    },
+    {
+      "id": "sub-corp-82",
+      "section_id": "sec-corp-59",
+      "name": "Import"
+    },
+    {
+      "id": "sub-corp-83",
+      "section_id": "sec-corp-59",
+      "name": "C & F"
+    },
+    {
+      "id": "sub-corp-84",
+      "section_id": "sec-corp-59",
+      "name": "General"
+    },
+    {
+      "id": "sub-corp-85",
+      "section_id": "sec-corp-59",
+      "name": "Cash Incentive"
+    },
+    {
+      "id": "sub-corp-86",
+      "section_id": "sec-corp-60",
+      "name": "Store"
+    },
+    {
+      "id": "sub-corp-87",
+      "section_id": "sec-corp-61",
+      "name": "Fabric"
+    },
+    {
+      "id": "sub-corp-88",
+      "section_id": "sec-corp-61",
+      "name": "Design"
+    },
+    {
+      "id": "sub-corp-89",
+      "section_id": "sec-corp-62",
+      "name": "Maintenance"
+    },
+    {
+      "id": "sub-corp-90",
+      "section_id": "sec-corp-62",
+      "name": "Sample"
+    },
+    {
+      "id": "sub-corp-91",
+      "section_id": "sec-corp-62",
+      "name": "Sewing"
+    },
+    {
+      "id": "sub-corp-92",
+      "section_id": "sec-corp-62",
+      "name": "Quilting"
+    },
+    {
+      "id": "sub-corp-93",
+      "section_id": "sec-corp-62",
+      "name": "Quick change over Team"
+    },
+    {
+      "id": "sub-corp-94",
+      "section_id": "sec-corp-62",
+      "name": "Finishing"
+    },
+    {
+      "id": "sub-corp-95",
+      "section_id": "sec-corp-62",
+      "name": "Cutting"
+    },
+    {
+      "id": "sub-corp-96",
+      "section_id": "sec-corp-62",
+      "name": "Folding"
+    },
+    {
+      "id": "sub-corp-97",
+      "section_id": "sec-corp-63",
+      "name": "Utility"
+    },
+    {
+      "id": "sub-corp-98",
+      "section_id": "sec-corp-63",
+      "name": "Sample"
+    },
+    {
+      "id": "sub-corp-99",
+      "section_id": "sec-corp-63",
+      "name": "Substation"
+    },
+    {
+      "id": "sub-corp-100",
+      "section_id": "sec-corp-63",
+      "name": "Electrical"
+    },
+    {
+      "id": "sub-corp-101",
+      "section_id": "sec-corp-64",
+      "name": "Civil"
+    },
+    {
+      "id": "sub-corp-102",
+      "section_id": "sec-corp-65",
+      "name": "General"
+    },
+    {
+      "id": "sub-corp-103",
+      "section_id": "sec-corp-66",
+      "name": "Support & Customization"
+    },
+    {
+      "id": "sub-corp-104",
+      "section_id": "sec-corp-66",
+      "name": "Development"
+    },
+    {
+      "id": "sub-corp-105",
+      "section_id": "sec-corp-66",
+      "name": "Database Admin"
+    },
+    {
+      "id": "sub-corp-106",
+      "section_id": "sec-corp-67",
+      "name": "Support"
+    },
+    {
+      "id": "sub-corp-107",
+      "section_id": "sec-corp-67",
+      "name": "Core Network"
+    },
+    {
+      "id": "sub-corp-108",
+      "section_id": "sec-corp-67",
+      "name": "IT"
+    },
+    {
+      "id": "sub-corp-109",
+      "section_id": "sec-corp-68",
+      "name": "Social"
+    },
+    {
+      "id": "sub-corp-110",
+      "section_id": "sec-corp-69",
+      "name": "EMS"
+    },
+    {
+      "id": "sub-corp-111",
+      "section_id": "sec-corp-70",
+      "name": "Accounts"
+    },
+    {
+      "id": "sub-corp-112",
+      "section_id": "sec-corp-70",
+      "name": "Cash Incentive"
+    },
+    {
+      "id": "sub-corp-113",
+      "section_id": "sec-corp-70",
+      "name": "Finance"
+    },
+    {
+      "id": "sub-corp-114",
+      "section_id": "sec-corp-71",
+      "name": "Finance"
+    },
+    {
+      "id": "sub-corp-115",
+      "section_id": "sec-corp-72",
+      "name": "Secreteriate"
+    },
+    {
+      "id": "sub-corp-116",
+      "section_id": "sec-corp-72",
+      "name": "General"
+    },
+    {
+      "id": "sub-corp-117",
+      "section_id": "sec-corp-73",
+      "name": "General"
+    },
+    {
+      "id": "sub-corp-118",
+      "section_id": "sec-corp-74",
+      "name": "Compensation , Benefits & HR Analytics"
+    },
+    {
+      "id": "sub-corp-119",
+      "section_id": "sec-corp-74",
+      "name": "Talent Acquisition & Onboarding"
+    },
+    {
+      "id": "sub-corp-120",
+      "section_id": "sec-corp-74",
+      "name": "PMS, Learning & OD"
+    },
+    {
+      "id": "sub-corp-121",
+      "section_id": "sec-corp-75",
+      "name": "Cafeteria & House Keeping Management"
+    },
+    {
+      "id": "sub-corp-122",
+      "section_id": "sec-corp-75",
+      "name": "Transportation Management"
+    },
+    {
+      "id": "sub-corp-123",
+      "section_id": "sec-corp-75",
+      "name": "Safety, Security & Emergency Management"
+    },
+    {
+      "id": "sub-corp-124",
+      "section_id": "sec-corp-75",
+      "name": "General"
+    },
+    {
+      "id": "sub-corp-125",
+      "section_id": "sec-corp-76",
+      "name": "General"
+    },
+    {
+      "id": "sub-corp-141",
+      "section_id": "sec-corp-83",
+      "name": "IE"
+    },
+    {
+      "id": "sub-corp-142",
+      "section_id": "sec-corp-83",
+      "name": "Sewing"
+    },
+    {
+      "id": "sub-corp-143",
+      "section_id": "sec-corp-83",
+      "name": "Technical"
+    },
+    {
+      "id": "sub-corp-144",
+      "section_id": "sec-corp-83",
+      "name": "OPEX"
+    },
+    {
+      "id": "sub-corp-145",
+      "section_id": "sec-corp-83",
+      "name": "Finishing"
+    },
+    {
+      "id": "sub-corp-146",
+      "section_id": "sec-corp-84",
+      "name": "Sewing"
+    },
+    {
+      "id": "sub-corp-147",
+      "section_id": "sec-corp-84",
+      "name": "Technical"
+    },
+    {
+      "id": "sub-corp-148",
+      "section_id": "sec-corp-85",
+      "name": "Cluster-6"
+    },
+    {
+      "id": "sub-corp-149",
+      "section_id": "sec-corp-85",
+      "name": "Cluster-9"
+    },
+    {
+      "id": "sub-corp-150",
+      "section_id": "sec-corp-85",
+      "name": "Cluster-3"
+    },
+    {
+      "id": "sub-corp-151",
+      "section_id": "sec-corp-85",
+      "name": "Cluster-8"
+    },
+    {
+      "id": "sub-corp-152",
+      "section_id": "sec-corp-85",
+      "name": "Cluster-5"
+    },
+    {
+      "id": "sub-corp-153",
+      "section_id": "sec-corp-85",
+      "name": "Cluster-1"
+    },
+    {
+      "id": "sub-corp-154",
+      "section_id": "sec-corp-85",
+      "name": "Cluster-7"
+    },
+    {
+      "id": "sub-corp-155",
+      "section_id": "sec-corp-85",
+      "name": "Cluster-2"
+    },
+    {
+      "id": "sub-corp-156",
+      "section_id": "sec-corp-85",
+      "name": "Cluster-4"
+    },
+    {
+      "id": "sub-corp-157",
+      "section_id": "sec-corp-86",
+      "name": "MIS"
+    },
+    {
+      "id": "sub-corp-158",
+      "section_id": "sec-corp-86",
+      "name": "Internal Audit"
+    },
+    {
+      "id": "sub-corp-159",
+      "section_id": "sec-corp-87",
+      "name": "Production"
+    },
+    {
+      "id": "sub-corp-160",
+      "section_id": "sec-corp-87",
+      "name": "Sewing"
+    },
+    {
+      "id": "sub-corp-161",
+      "section_id": "sec-corp-88",
+      "name": "Cutting"
+    },
+    {
+      "id": "sub-corp-162",
+      "section_id": "sec-corp-89",
+      "name": "Finishing"
+    },
+    {
+      "id": "sub-corp-163",
+      "section_id": "sec-corp-90",
+      "name": "Sample"
+    },
+    {
+      "id": "sub-corp-164",
+      "section_id": "sec-corp-91",
+      "name": "Sewing"
+    },
+    {
+      "id": "sub-corp-165",
+      "section_id": "sec-corp-91",
+      "name": "Pilot Line-01"
+    },
+    {
+      "id": "sub-corp-166",
+      "section_id": "sec-corp-92",
+      "name": "Embroidery"
+    },
+    {
+      "id": "sub-corp-167",
+      "section_id": "sec-corp-93",
+      "name": "Fabric"
+    },
+    {
+      "id": "sub-corp-168",
+      "section_id": "sec-corp-94",
+      "name": "Wet Process"
+    },
+    {
+      "id": "sub-corp-169",
+      "section_id": "sec-corp-95",
+      "name": "Planning & Controll"
+    },
+    {
+      "id": "sub-corp-170",
+      "section_id": "sec-corp-95",
+      "name": "Planning"
+    },
+    {
+      "id": "sub-corp-171",
+      "section_id": "sec-corp-96",
+      "name": "Planning"
+    },
+    {
+      "id": "sub-corp-172",
+      "section_id": "sec-corp-96",
+      "name": "Planning & Controll"
+    },
+    {
+      "id": "sub-corp-173",
+      "section_id": "sec-corp-97",
+      "name": "Quality"
+    },
+    {
+      "id": "sub-corp-174",
+      "section_id": "sec-corp-97",
+      "name": "GPQ"
+    },
+    {
+      "id": "sub-corp-175",
+      "section_id": "sec-corp-97",
+      "name": "Sewing"
+    },
+    {
+      "id": "sub-corp-176",
+      "section_id": "sec-corp-97",
+      "name": "Sub Contract"
+    },
+    {
+      "id": "sub-corp-177",
+      "section_id": "sec-corp-97",
+      "name": "Process Control"
+    },
+    {
+      "id": "sub-corp-178",
+      "section_id": "sec-corp-98",
+      "name": "Sewing"
+    },
+    {
+      "id": "sub-corp-179",
+      "section_id": "sec-corp-99",
+      "name": "Finishing"
+    },
+    {
+      "id": "sub-corp-180",
+      "section_id": "sec-corp-100",
+      "name": "Fabric"
+    },
+    {
+      "id": "sub-corp-181",
+      "section_id": "sec-corp-101",
+      "name": "Lab"
+    },
+    {
+      "id": "sub-corp-182",
+      "section_id": "sec-corp-102",
+      "name": "Store"
+    },
+    {
+      "id": "sub-corp-183",
+      "section_id": "sec-corp-103",
+      "name": "Warehouse"
+    },
+    {
+      "id": "sub-corp-184",
+      "section_id": "sec-corp-103",
+      "name": "Trims"
+    },
+    {
+      "id": "sub-corp-185",
+      "section_id": "sec-corp-103",
+      "name": "Fabric"
+    },
+    {
+      "id": "sub-corp-186",
+      "section_id": "sec-corp-104",
+      "name": "Fabric"
+    },
+    {
+      "id": "sub-corp-187",
+      "section_id": "sec-corp-105",
+      "name": "Supply Chain (Local Purchase)"
+    },
+    {
+      "id": "sub-corp-188",
+      "section_id": "sec-corp-105",
+      "name": "Supply Chain (CAPEX)"
+    },
+    {
+      "id": "sub-corp-189",
+      "section_id": "sec-corp-106",
+      "name": "Technical"
+    },
+    {
+      "id": "sub-corp-190",
+      "section_id": "sec-corp-107",
+      "name": "Technical"
+    },
+    {
+      "id": "sub-corp-191",
+      "section_id": "sec-corp-108",
+      "name": "Wet Process"
+    },
+    {
+      "id": "sub-corp-192",
+      "section_id": "sec-corp-108",
+      "name": "Washing"
+    },
+    {
+      "id": "sub-corp-193",
+      "section_id": "sec-corp-108",
+      "name": "Sample"
+    },
+    {
+      "id": "sub-corp-194",
+      "section_id": "sec-corp-108",
+      "name": "Production"
+    },
+    {
+      "id": "sub-corp-195",
+      "section_id": "sec-corp-108",
+      "name": "Dry Process"
+    },
+    {
+      "id": "sub-corp-196",
+      "section_id": "sec-corp-109",
+      "name": "Wet Process"
+    },
+    {
+      "id": "sub-corp-197",
+      "section_id": "sec-corp-110",
+      "name": "R & D"
+    },
+    {
+      "id": "sub-corp-198",
+      "section_id": "sec-corp-111",
       "name": "Dry Process"
     }
   ]

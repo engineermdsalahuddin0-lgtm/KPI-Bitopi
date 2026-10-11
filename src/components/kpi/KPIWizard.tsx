@@ -217,7 +217,7 @@ export const KPIWizard: React.FC<KPIWizardProps> = ({
       : [ROLE_SUGGESTIONS[defaultLevel][0]]
   );
   const [newConcernInput, setNewConcernInput] = useState<string>('');
-  const [datasource, setDatasource] = useState<string>(editingKPI?.datasource || 'Official ERP / Operations Report');
+  const [datasource, setDatasource] = useState<string>(editingKPI?.datasource || '');
   const [requirements, setRequirements] = useState<string>(editingKPI?.requirements || '');
 
   // Step 4: Weight
@@ -341,10 +341,6 @@ export const KPIWizard: React.FC<KPIWizardProps> = ({
     if (step === 3) {
       if (responsibleConcern.length === 0) {
         setError('At least one Responsible Role / Concern Designation is required.');
-        return false;
-      }
-      if (!datasource.trim()) {
-        setError('Datasource is required.');
         return false;
       }
       return true;
@@ -935,7 +931,7 @@ export const KPIWizard: React.FC<KPIWizardProps> = ({
 
               <div>
                 <label className="block font-semibold text-neutral-800 mb-1">
-                  Datasource (তথ্যসূত্র)
+                  Datasource (তথ্যসূত্র) <span className="text-[10px] text-neutral-400 font-normal">(Optional / ঐচ্ছিক)</span>
                 </label>
                 <input
                   type="text"

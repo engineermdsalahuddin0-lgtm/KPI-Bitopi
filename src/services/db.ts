@@ -18,13 +18,13 @@ import {
 } from './seedData';
 
 const STORAGE_KEYS = {
-  UNITS: 'bitopi_kpi_units_v9',
-  DEPARTMENTS: 'bitopi_kpi_departments_v9',
-  SECTIONS: 'bitopi_kpi_sections_v9',
-  SUBSECTIONS: 'bitopi_kpi_subsections_v9',
-  KPIS: 'bitopi_kpi_kpis_v9',
-  MONTHLY_ENTRIES: 'bitopi_kpi_monthly_entries_v9',
-  AUDIT_LOGS: 'bitopi_kpi_audit_logs_v9',
+  UNITS: 'bitopi_kpi_units_v12',
+  DEPARTMENTS: 'bitopi_kpi_departments_v12',
+  SECTIONS: 'bitopi_kpi_sections_v12',
+  SUBSECTIONS: 'bitopi_kpi_subsections_v12',
+  KPIS: 'bitopi_kpi_kpis_v12',
+  MONTHLY_ENTRIES: 'bitopi_kpi_monthly_entries_v12',
+  AUDIT_LOGS: 'bitopi_kpi_audit_logs_v12',
 };
 
 // Generate random code in format XXX-XXX-XXX
@@ -163,7 +163,15 @@ class DatabaseService {
         const map = new Map<string, Unit>();
         (INITIAL_UNITS as Unit[]).forEach((u) => map.set(u.id, u as Unit));
         currentStored.forEach((u) => map.set(u.id, u));
-        supabaseUnits.forEach((u) => map.set(u.id, { ...map.get(u.id), ...u }));
+        supabaseUnits.forEach((u) => {
+          const init = (INITIAL_UNITS as Unit[]).find((iu) => iu.id === u.id);
+          const current = map.get(u.id) || ({} as Unit);
+          map.set(u.id, {
+            ...current,
+            ...u,
+            name: init ? init.name : u.name,
+          });
+        });
         const mergedUnits = Array.from(map.values());
         const next = JSON.stringify(mergedUnits);
         if (prev !== next) {
@@ -464,7 +472,7 @@ class DatabaseService {
 
     // Migrate previous user KPIs and monthly entries to prevent data loss
     if (!localStorage.getItem(STORAGE_KEYS.KPIS)) {
-      const prevKpis = localStorage.getItem('bitopi_kpi_kpis_v8') || localStorage.getItem('bitopi_kpi_kpis_v7') || localStorage.getItem('bitopi_kpi_kpis_v6');
+      const prevKpis = localStorage.getItem('bitopi_kpi_kpis_v11') || localStorage.getItem('bitopi_kpi_kpis_v10') || localStorage.getItem('bitopi_kpi_kpis_v9') || localStorage.getItem('bitopi_kpi_kpis_v8') || localStorage.getItem('bitopi_kpi_kpis_v7') || localStorage.getItem('bitopi_kpi_kpis_v6');
       if (prevKpis) {
         try {
           const parsed = JSON.parse(prevKpis);
@@ -475,7 +483,7 @@ class DatabaseService {
       }
     }
     if (!localStorage.getItem(STORAGE_KEYS.MONTHLY_ENTRIES)) {
-      const prevEntries = localStorage.getItem('bitopi_kpi_monthly_entries_v8') || localStorage.getItem('bitopi_kpi_monthly_entries_v7') || localStorage.getItem('bitopi_kpi_monthly_entries_v6');
+      const prevEntries = localStorage.getItem('bitopi_kpi_monthly_entries_v11') || localStorage.getItem('bitopi_kpi_monthly_entries_v10') || localStorage.getItem('bitopi_kpi_monthly_entries_v9') || localStorage.getItem('bitopi_kpi_monthly_entries_v8') || localStorage.getItem('bitopi_kpi_monthly_entries_v7') || localStorage.getItem('bitopi_kpi_monthly_entries_v6');
       if (prevEntries) {
         try {
           const parsed = JSON.parse(prevEntries);
@@ -497,11 +505,18 @@ class DatabaseService {
       storedUnits = [];
     }
     const unitMap = new Map<string, Unit>();
+    // Seed initial units
     (INITIAL_UNITS as Unit[]).forEach((u) => {
       unitMap.set(u.id, { ...u, created_at: now, updated_at: now });
     });
+    // Merge stored units but ensure official unit names are kept up-to-date
     storedUnits.forEach((u) => {
-      unitMap.set(u.id, u);
+      const init = (INITIAL_UNITS as Unit[]).find((iu) => iu.id === u.id);
+      if (init) {
+        unitMap.set(u.id, { ...u, name: init.name, code: init.code, location: init.location || u.location });
+      } else {
+        unitMap.set(u.id, u);
+      }
     });
     const finalUnits = Array.from(unitMap.values());
     localStorage.setItem(STORAGE_KEYS.UNITS, JSON.stringify(finalUnits));
@@ -666,7 +681,22 @@ class DatabaseService {
   getUnits(): Unit[] {
     this.initStorage();
     const data = localStorage.getItem(STORAGE_KEYS.UNITS);
-    return data ? JSON.parse(data) : [];
+    const list: Unit[] = data ? JSON.parse(data) : [];
+    const ORDER: Record<string, number> = {
+      CORP: 1,
+      MGL: 2,
+      BGL: 3,
+      TAL: 4,
+      RHL: 5,
+    };
+    return [...list].sort((a, b) => {
+      const codeA = (a.code || "").toUpperCase().trim();
+      const codeB = (b.code || "").toUpperCase().trim();
+      const rankA = ORDER[codeA] ?? 99;
+      const rankB = ORDER[codeB] ?? 99;
+      if (rankA !== rankB) return rankA - rankB;
+      return (a.name || "").localeCompare(b.name || "");
+    });
   }
 
   getUnitById(id: string): Unit | undefined {
@@ -697,7 +727,7 @@ class DatabaseService {
     units.push(newUnit);
     localStorage.setItem(STORAGE_KEYS.UNITS, JSON.stringify(units));
     this.broadcastUpdate();
-    if (supabase) {
+    if (supabase && this.hasUnitsTable !== false) {
       Promise.resolve(supabase.from('units').upsert(newUnit)).catch(() => {});
     }
     return newUnit;

@@ -15,6 +15,7 @@ interface KPITableProps {
   onDuplicateKPI: (kpi: KPI) => void;
   onDeleteKPI: (kpi: KPI) => void;
   onOpenMonthlyCell: (kpi: KPI, month: number, monthName: string, entry?: KPIMonthlyEntry) => void;
+  onOpenDetails?: (kpi: KPI) => void;
   onAddKPI: () => void;
 }
 
@@ -35,6 +36,7 @@ export const KPITable: React.FC<KPITableProps> = ({
   onDuplicateKPI,
   onDeleteKPI,
   onOpenMonthlyCell,
+  onOpenDetails,
   onAddKPI,
 }) => {
   const isAdmin = session.role === 'admin';
@@ -166,6 +168,7 @@ export const KPITable: React.FC<KPITableProps> = ({
                 onDuplicateKPI={onDuplicateKPI}
                 onDeleteKPI={onDeleteKPI}
                 onOpenMonthlyCell={onOpenMonthlyCell}
+                onOpenDetails={onOpenDetails}
               />
             ))}
           </tbody>

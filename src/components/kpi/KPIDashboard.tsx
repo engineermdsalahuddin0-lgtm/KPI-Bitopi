@@ -18,6 +18,7 @@ import { KPICellEditModal } from './KPICellEditModal';
 import { DeleteConfirmModal } from './DeleteConfirmModal';
 import { HierarchyJsonModal } from './HierarchyJsonModal';
 import { UnitManagementModal } from '../departments/UnitManagementModal';
+import { KPIDetailsModal } from './KPIDetailsModal';
 import {
   Plus,
   Search,
@@ -88,6 +89,7 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ session, onNavigateT
   const [wizardOpen, setWizardOpen] = useState(false);
   const [editingKPI, setEditingKPI] = useState<KPI | null>(null);
   const [deleteTargetKPI, setDeleteTargetKPI] = useState<KPI | null>(null);
+  const [detailsModalKPI, setDetailsModalKPI] = useState<KPI | null>(null);
 
   // Cell Edit Modal State
   const [cellEditState, setCellEditState] = useState<{
@@ -487,12 +489,12 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ session, onNavigateT
                 </select>
                 <button
                   type="button"
-                  onClick={() => (onNavigateToUnits ? onNavigateToUnits() : setUnitModalOpen(true))}
-                  className="px-2 py-1.5 rounded-md border border-neutral-300 bg-white hover:bg-neutral-50 text-neutral-700 text-xs font-semibold flex items-center gap-1 transition-colors shadow-2xs"
-                  title="Manage Business Units (Add / Edit / Delete)"
+                  onClick={() => setUnitModalOpen(true)}
+                  className="px-2.5 py-1.5 rounded-md border border-emerald-300 bg-emerald-50/80 hover:bg-emerald-100 text-emerald-900 text-xs font-semibold flex items-center gap-1 transition-colors shadow-2xs cursor-pointer"
+                  title="Add & Manage Business Units"
                 >
                   <Plus className="w-3.5 h-3.5 text-emerald-700" />
-                  <span>Units</span>
+                  <span>+ Unit</span>
                 </button>
               </div>
             )}
@@ -803,6 +805,7 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ session, onNavigateT
         onDuplicateKPI={handleDuplicateKPI}
         onDeleteKPI={handleDeleteKPI}
         onOpenMonthlyCell={handleOpenMonthlyCell}
+        onOpenDetails={(kpi) => setDetailsModalKPI(kpi)}
         onAddKPI={handleOpenAddWizard}
       />
 
@@ -860,6 +863,24 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ session, onNavigateT
           onCancel={() => setDeleteTargetKPI(null)}
         />
       )}
+
+      {/* KPI Card-shaped Details Modal */}
+      <KPIDetailsModal
+        kpi={detailsModalKPI}
+        isOpen={Boolean(detailsModalKPI)}
+        onClose={() => setDetailsModalKPI(null)}
+        monthlyEntries={monthlyEntries}
+        selectedYear={selectedYear}
+        departments={departments}
+        onEdit={(kpi: KPI) => {
+          setDetailsModalKPI(null);
+          handleOpenEditWizard(kpi);
+        }}
+        onOpenMonthly={(kpi: KPI) => {
+          setDetailsModalKPI(null);
+          handleOpenMonthlyCell(kpi, typeof selectedMonth === "number" ? selectedMonth : 1, "Jan");
+        }}
+      />
 
       {/* Company JSON Import / Export Modal */}
       <HierarchyJsonModal

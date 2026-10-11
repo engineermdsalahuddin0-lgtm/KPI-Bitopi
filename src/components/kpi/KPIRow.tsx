@@ -26,6 +26,7 @@ interface KPIRowProps {
   onDuplicateKPI: (kpi: KPI) => void;
   onDeleteKPI: (kpi: KPI) => void;
   onOpenMonthlyCell: (kpi: KPI, month: number, monthName: string, entry?: KPIMonthlyEntry) => void;
+  onOpenDetails?: (kpi: KPI) => void;
 }
 
 const MONTH_NAMES = [
@@ -45,6 +46,7 @@ export const KPIRow: React.FC<KPIRowProps> = ({
   onDuplicateKPI,
   onDeleteKPI,
   onOpenMonthlyCell,
+  onOpenDetails,
 }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -145,7 +147,13 @@ export const KPIRow: React.FC<KPIRowProps> = ({
 
         {/* Sticky Column 4: KPI (Plain statement) with shadow delimiter */}
         <td className="sticky left-[348px] z-20 bg-white group-hover:bg-neutral-50/90 py-2 px-3 whitespace-nowrap border-r-2 border-neutral-300 text-neutral-900 font-medium min-w-[180px] max-w-[240px] truncate shadow-[2px_0_5px_-2px_rgba(0,0,0,0.06)]" title={kpi.smart_kpi_text}>
-          {kpi.smart_kpi_text}
+          <span
+            onClick={() => onOpenDetails && onOpenDetails(kpi)}
+            className="cursor-pointer hover:text-emerald-800 hover:underline transition-colors"
+            title="Click to view KPI details card"
+          >
+            {kpi.smart_kpi_text}
+          </span>
         </td>
 
         {/* Column 5: Perspective */}
@@ -294,12 +302,16 @@ export const KPIRow: React.FC<KPIRowProps> = ({
                     <button
                       onClick={() => {
                         setMenuOpen(false);
-                        setIsExpanded(!isExpanded);
+                        if (onOpenDetails) {
+                          onOpenDetails(kpi);
+                        } else {
+                          setIsExpanded(!isExpanded);
+                        }
                       }}
-                      className="w-full text-left px-3 py-1.5 flex items-center gap-2 hover:bg-neutral-50 text-neutral-700"
+                      className="w-full text-left px-3 py-1.5 flex items-center gap-2 hover:bg-emerald-50 text-emerald-950 font-medium"
                     >
-                      <Eye className="w-3 h-3 text-neutral-500" />
-                      <span>{isExpanded ? 'Hide Details' : 'View Details'}</span>
+                      <Eye className="w-3 h-3 text-emerald-700" />
+                      <span>View KPI Details Card</span>
                     </button>
 
                     <button
