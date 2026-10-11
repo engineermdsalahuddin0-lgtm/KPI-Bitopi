@@ -18,13 +18,13 @@ import {
 } from './seedData';
 
 const STORAGE_KEYS = {
-  UNITS: 'bitopi_kpi_units_v12',
-  DEPARTMENTS: 'bitopi_kpi_departments_v12',
-  SECTIONS: 'bitopi_kpi_sections_v12',
-  SUBSECTIONS: 'bitopi_kpi_subsections_v12',
-  KPIS: 'bitopi_kpi_kpis_v12',
-  MONTHLY_ENTRIES: 'bitopi_kpi_monthly_entries_v12',
-  AUDIT_LOGS: 'bitopi_kpi_audit_logs_v12',
+  UNITS: 'bitopi_kpi_units_v13',
+  DEPARTMENTS: 'bitopi_kpi_departments_v13',
+  SECTIONS: 'bitopi_kpi_sections_v13',
+  SUBSECTIONS: 'bitopi_kpi_subsections_v13',
+  KPIS: 'bitopi_kpi_kpis_v13',
+  MONTHLY_ENTRIES: 'bitopi_kpi_monthly_entries_v13',
+  AUDIT_LOGS: 'bitopi_kpi_audit_logs_v13',
 };
 
 // Generate random code in format XXX-XXX-XXX
@@ -230,54 +230,32 @@ class DatabaseService {
         }
       }
 
-      // KPIs: Never wipe local KPIs with empty array! Merge and push missing to Supabase
+      // KPIs: Supabase is the single live source of truth.
+      // If deleted from Supabase, it is deleted everywhere.
       const localKpisRaw = localStorage.getItem(STORAGE_KEYS.KPIS);
-      const localKpis: KPI[] = localKpisRaw ? JSON.parse(localKpisRaw) : [];
-
       if (kpisRes.data !== null && Array.isArray(kpisRes.data)) {
-        const supabaseKpis = kpisRes.data as KPI[];
-        if (supabaseKpis.length > 0) {
-          const kpiMap = new Map<string, KPI>();
-          localKpis.forEach((k) => kpiMap.set(k.id, k));
-          supabaseKpis.forEach((k) => kpiMap.set(k.id, k));
-          const merged = Array.from(kpiMap.values());
-          const next = JSON.stringify(merged);
-          if (localKpisRaw !== next) {
-            localStorage.setItem(STORAGE_KEYS.KPIS, next);
-            changed = true;
+        const supabaseKpis = (kpisRes.data as KPI[]).map((sk) => {
+          if (!sk.unit_id && sk.department_id) {
+            const d = this.getDepartmentById(sk.department_id);
+            if (d?.unit_id) return { ...sk, unit_id: d.unit_id };
           }
-          // Push any local KPIs that Supabase doesn't have yet
-          for (const lk of localKpis) {
-            if (!supabaseKpis.some((sk) => sk.id === lk.id)) {
-              this.syncKPIToSupabase(lk);
-            }
-          }
-        } else if (localKpis.length > 0) {
-          // Supabase has 0 KPIs but localStorage has user-created KPIs: push them up!
-          for (const lk of localKpis) {
-            this.syncKPIToSupabase(lk);
-          }
+          return sk;
+        });
+        const next = JSON.stringify(supabaseKpis);
+        if (localKpisRaw !== next) {
+          localStorage.setItem(STORAGE_KEYS.KPIS, next);
+          changed = true;
         }
       }
 
-      // Monthly Entries: Merge without data loss
+      // Monthly Entries: Supabase is the single live source of truth.
       const localEntriesRaw = localStorage.getItem(STORAGE_KEYS.MONTHLY_ENTRIES);
-      const localEntries: KPIMonthlyEntry[] = localEntriesRaw ? JSON.parse(localEntriesRaw) : [];
-
       if (entriesRes.data !== null && Array.isArray(entriesRes.data)) {
         const supabaseEntries = entriesRes.data as KPIMonthlyEntry[];
-        if (supabaseEntries.length > 0) {
-          const entryMap = new Map<string, KPIMonthlyEntry>();
-          localEntries.forEach((e) => entryMap.set(`${e.kpi_id}-${e.year}-${e.month}`, e));
-          supabaseEntries.forEach((e) => entryMap.set(`${e.kpi_id}-${e.year}-${e.month}`, e));
-          const merged = Array.from(entryMap.values());
-          const next = JSON.stringify(merged);
-          if (localEntriesRaw !== next) {
-            localStorage.setItem(STORAGE_KEYS.MONTHLY_ENTRIES, next);
-            changed = true;
-          }
-        } else if (localEntries.length > 0) {
-          await supabase.from('kpi_monthly_entries').upsert(localEntries);
+        const next = JSON.stringify(supabaseEntries);
+        if (localEntriesRaw !== next) {
+          localStorage.setItem(STORAGE_KEYS.MONTHLY_ENTRIES, next);
+          changed = true;
         }
       }
 
@@ -1465,10 +1443,10 @@ class DatabaseService {
     return this.getNodeAllocatedWeight({ level: 'department', departmentId }, excludeKpiId);
   }
 
-  createKPI(
+  async createKPI(
     kpiData: Omit<KPI, 'id' | 'kpi_code' | 'created_at' | 'updated_at'>,
     actor?: { role: UserRole; identifier: string }
-  ): KPI {
+  ): Promise<KPI> {
     const kpis = this.getKPIs();
     const currentAllocated = this.getNodeAllocatedWeight({
       level: kpiData.aligned_org_goal_level,
@@ -1539,19 +1517,21 @@ class DatabaseService {
     this.broadcastUpdate();
 
     if (supabase) {
-      this.syncKPIToSupabase(newKpi).catch((err) =>
-        console.error('Failed to sync new KPI to Supabase:', err)
-      );
+      try {
+        await this.syncKPIToSupabase(newKpi);
+      } catch (err) {
+        console.error('Failed to sync new KPI to Supabase:', err);
+      }
     }
 
     return newKpi;
   }
 
-  updateKPI(
+  async updateKPI(
     id: string,
     updates: Partial<KPI>,
     actor?: { role: UserRole; identifier: string }
-  ): KPI | null {
+  ): Promise<KPI | null> {
     const kpis = this.getKPIs();
     const index = kpis.findIndex((k) => k.id === id);
     if (index === -1) return null;
@@ -1603,18 +1583,20 @@ class DatabaseService {
     this.broadcastUpdate();
 
     if (supabase) {
-      this.syncKPIToSupabase(kpis[index]).catch((err) =>
-        console.error('Failed to update KPI in Supabase:', err)
-      );
+      try {
+        await this.syncKPIToSupabase(kpis[index]);
+      } catch (err) {
+        console.error('Failed to update KPI in Supabase:', err);
+      }
     }
 
     return kpis[index];
   }
 
-  duplicateKPI(
+  async duplicateKPI(
     id: string,
     actor?: { role: UserRole; identifier: string }
-  ): KPI | null {
+  ): Promise<KPI | null> {
     const original = this.getKPIById(id);
     if (!original) return null;
 
@@ -1664,10 +1646,16 @@ class DatabaseService {
 
     if (supabase) {
       try {
-        await supabase.from('kpi_monthly_entries').delete().eq('kpi_id', id);
-        await supabase.from('kpis').delete().eq('id', id);
+        const delEntriesRes = await supabase.from('kpi_monthly_entries').delete().eq('kpi_id', id);
+        if (delEntriesRes.error) {
+          console.error('Supabase delete monthly entries error:', delEntriesRes.error);
+        }
+        const delKpiRes = await supabase.from('kpis').delete().eq('id', id);
+        if (delKpiRes.error) {
+          console.error('Supabase delete KPI error:', delKpiRes.error);
+        }
       } catch (err) {
-        console.error('Supabase delete error:', err);
+        console.error('Supabase delete exception:', err);
       }
     }
 
@@ -1700,9 +1688,9 @@ class DatabaseService {
     return all.filter((e) => kpiIds.includes(e.kpi_id) && e.year === year);
   }
 
-  upsertMonthlyEntry(
+  async upsertMonthlyEntry(
     entry: Omit<KPIMonthlyEntry, 'id' | 'created_at' | 'updated_at'> & { id?: string }
-  ): KPIMonthlyEntry {
+  ): Promise<KPIMonthlyEntry> {
     const entries = this.getAllMonthlyEntries();
     const now = new Date().toISOString();
 
@@ -1736,9 +1724,11 @@ class DatabaseService {
     }
 
     if (supabase) {
-      Promise.resolve(supabase.from('kpi_monthly_entries').upsert(savedEntry)).catch((err) =>
-        console.error('Supabase upsert entry error:', err)
-      );
+      try {
+        await supabase.from('kpi_monthly_entries').upsert(savedEntry);
+      } catch (err) {
+        console.error('Supabase upsert entry error:', err);
+      }
     }
 
     return savedEntry;

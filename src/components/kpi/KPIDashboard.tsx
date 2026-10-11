@@ -284,7 +284,7 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ session, onNavigateT
     setWizardOpen(true);
   };
 
-  const handleSaveKPI = (kpiData: Omit<KPI, 'id' | 'kpi_code' | 'created_at' | 'updated_at'>) => {
+  const handleSaveKPI = async (kpiData: Omit<KPI, 'id' | 'kpi_code' | 'created_at' | 'updated_at'>) => {
     const actor = {
       role: session.role,
       identifier:
@@ -328,17 +328,17 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ session, onNavigateT
       dataToSave.unit_id = 'unit-bgl';
     }
 
-    if (editingKPI) {
-      db.updateKPI(editingKPI.id, dataToSave, actor);
-    } else {
-      db.createKPI(dataToSave, actor);
-    }
     setWizardOpen(false);
     setEditingKPI(null);
+    if (editingKPI) {
+      await db.updateKPI(editingKPI.id, dataToSave, actor);
+    } else {
+      await db.createKPI(dataToSave, actor);
+    }
     refreshKPIsAndEntries();
   };
 
-  const handleDuplicateKPI = (kpi: KPI) => {
+  const handleDuplicateKPI = async (kpi: KPI) => {
     try {
       const actor = {
         role: session.role,
@@ -351,7 +351,7 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ session, onNavigateT
             ? session.sectionName || session.departmentCode || 'section'
             : session.departmentCode || 'department',
       };
-      db.duplicateKPI(kpi.id, actor);
+      await db.duplicateKPI(kpi.id, actor);
       refreshKPIsAndEntries();
     } catch (err: any) {
       alert(err.message || 'Failed to duplicate KPI');
@@ -396,11 +396,11 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ session, onNavigateT
     });
   };
 
-  const handleSaveMonthlyEntry = (
+  const handleSaveMonthlyEntry = async (
     updatedEntry: Omit<KPIMonthlyEntry, 'id' | 'created_at' | 'updated_at'>
   ) => {
-    db.upsertMonthlyEntry(updatedEntry);
     setCellEditState({ open: false });
+    await db.upsertMonthlyEntry(updatedEntry);
     refreshKPIsAndEntries();
   };
 
