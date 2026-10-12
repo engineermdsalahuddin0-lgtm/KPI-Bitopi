@@ -53,16 +53,20 @@ export const KPITable: React.FC<KPITableProps> = ({
         <h3 className="text-sm font-semibold text-neutral-900">No KPIs found</h3>
         <p className="text-xs text-neutral-500 mt-1 max-w-sm mx-auto">
           {isAdmin
-            ? 'This department or filter selection does not have any KPIs configured yet. Click below to add the first KPI.'
-            : 'Your department does not have any active KPIs configured yet. Click below to add your department\'s first KPI.'}
+            ? 'This scope does not have any KPIs configured yet. Click below to configure the first KPI.'
+            : session.role === 'subsection'
+            ? 'Your sub-section does not have any active KPIs configured yet. Click below to add your first KPI.'
+            : 'No active KPIs configured for this view. KPIs are entered at the sub-section level or by administrator.'}
         </p>
-        <button
-          onClick={onAddKPI}
-          className="mt-4 inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold rounded-md bg-emerald-800 hover:bg-emerald-900 text-white shadow-xs transition-colors hover:-translate-y-px active:translate-y-0"
-        >
-          <Plus className="w-3.5 h-3.5" />
-          <span>{isAdmin ? 'Add KPI' : 'Add Department KPI'}</span>
-        </button>
+        {(isAdmin || session.role === 'subsection') && (
+          <button
+            onClick={onAddKPI}
+            className="mt-4 inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold rounded-md bg-emerald-800 hover:bg-emerald-900 text-white shadow-xs transition-colors hover:-translate-y-px active:translate-y-0"
+          >
+            <Plus className="w-3.5 h-3.5" />
+            <span>{isAdmin ? 'Add KPI' : '+ Add Sub-section KPI'}</span>
+          </button>
+        )}
       </div>
     );
   }

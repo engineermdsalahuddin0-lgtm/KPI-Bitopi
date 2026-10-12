@@ -63,8 +63,12 @@ export const KPIRow: React.FC<KPIRowProps> = ({
       session.departmentId === kpi.department_id &&
       (!kpi.subsection_id || kpi.subsection_id === session.subsectionId));
 
-  const canEditMonthly = matchesScope;
-  const canManageKPI = matchesScope;
+  // Monthly Entry: Sub-section users (entry point) & Admin can edit monthly scores;
+  // Department & Section heads have view-only monitoring privileges.
+  const canEditMonthly = isAdmin || (session.role === 'subsection' && matchesScope);
+
+  // KPI Definition (Edit/Delete/Duplicate): Admin only (as requested: "ar admin can change and add kpi")
+  const canManageKPI = isAdmin;
 
   const currentDept = departments?.find((d) => d.id === kpi.department_id);
 

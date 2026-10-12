@@ -18,13 +18,13 @@ import {
 } from './seedData';
 
 const STORAGE_KEYS = {
-  UNITS: 'bitopi_kpi_units_v14',
-  DEPARTMENTS: 'bitopi_kpi_departments_v14',
-  SECTIONS: 'bitopi_kpi_sections_v14',
-  SUBSECTIONS: 'bitopi_kpi_subsections_v14',
-  KPIS: 'bitopi_kpi_kpis_v14',
-  MONTHLY_ENTRIES: 'bitopi_kpi_monthly_entries_v14',
-  AUDIT_LOGS: 'bitopi_kpi_audit_logs_v14',
+  UNITS: 'bitopi_kpi_units_v15',
+  DEPARTMENTS: 'bitopi_kpi_departments_v15',
+  SECTIONS: 'bitopi_kpi_sections_v15',
+  SUBSECTIONS: 'bitopi_kpi_subsections_v15',
+  KPIS: 'bitopi_kpi_kpis_v15',
+  MONTHLY_ENTRIES: 'bitopi_kpi_monthly_entries_v15',
+  AUDIT_LOGS: 'bitopi_kpi_audit_logs_v15',
 };
 
 // Generate random code in format XXX-XXX-XXX
@@ -450,7 +450,7 @@ class DatabaseService {
 
     // Migrate previous user KPIs and monthly entries to prevent data loss
     if (!localStorage.getItem(STORAGE_KEYS.KPIS)) {
-      const prevKpis = localStorage.getItem('bitopi_kpi_kpis_v11') || localStorage.getItem('bitopi_kpi_kpis_v10') || localStorage.getItem('bitopi_kpi_kpis_v9') || localStorage.getItem('bitopi_kpi_kpis_v8') || localStorage.getItem('bitopi_kpi_kpis_v7') || localStorage.getItem('bitopi_kpi_kpis_v6');
+      const prevKpis = localStorage.getItem('bitopi_kpi_kpis_v14') || localStorage.getItem('bitopi_kpi_kpis_v13') || localStorage.getItem('bitopi_kpi_kpis_v12') || localStorage.getItem('bitopi_kpi_kpis_v9') || localStorage.getItem('bitopi_kpi_kpis_v8') || localStorage.getItem('bitopi_kpi_kpis_v7') || localStorage.getItem('bitopi_kpi_kpis_v6');
       if (prevKpis) {
         try {
           const parsed = JSON.parse(prevKpis);
@@ -461,7 +461,7 @@ class DatabaseService {
       }
     }
     if (!localStorage.getItem(STORAGE_KEYS.MONTHLY_ENTRIES)) {
-      const prevEntries = localStorage.getItem('bitopi_kpi_monthly_entries_v11') || localStorage.getItem('bitopi_kpi_monthly_entries_v10') || localStorage.getItem('bitopi_kpi_monthly_entries_v9') || localStorage.getItem('bitopi_kpi_monthly_entries_v8') || localStorage.getItem('bitopi_kpi_monthly_entries_v7') || localStorage.getItem('bitopi_kpi_monthly_entries_v6');
+      const prevEntries = localStorage.getItem('bitopi_kpi_monthly_entries_v14') || localStorage.getItem('bitopi_kpi_monthly_entries_v13') || localStorage.getItem('bitopi_kpi_monthly_entries_v12') || localStorage.getItem('bitopi_kpi_monthly_entries_v9') || localStorage.getItem('bitopi_kpi_monthly_entries_v8') || localStorage.getItem('bitopi_kpi_monthly_entries_v7') || localStorage.getItem('bitopi_kpi_monthly_entries_v6');
       if (prevEntries) {
         try {
           const parsed = JSON.parse(prevEntries);

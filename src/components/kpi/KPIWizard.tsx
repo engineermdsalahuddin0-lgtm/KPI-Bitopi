@@ -64,6 +64,15 @@ export const KPIWizard: React.FC<KPIWizardProps> = ({
   onClose,
 }) => {
   const [currentStep, setCurrentStep] = useState<number>(1);
+  const isAdmin = session?.role === 'admin';
+
+  // Security Check: If a non-admin attempts to edit an existing KPI, close and alert
+  useEffect(() => {
+    if (editingKPI && !isAdmin) {
+      alert("KPI Definitions can only be edited by administrators. Department and Section heads have view-only access.");
+      onClose();
+    }
+  }, [editingKPI, isAdmin, onClose]);
   const units = db.getUnits();
 
   // Role permissions
@@ -74,15 +83,9 @@ export const KPIWizard: React.FC<KPIWizardProps> = ({
 
   // 1. Goal Level / Node Point
   const defaultLevel: OrgGoalLevel = editingKPI?.aligned_org_goal_level ||
-    (isSubsectionUser
+    (isAdmin
       ? 'subsection'
-      : isSectionUser
-      ? 'section'
-      : isDeptUser
-      ? 'department'
-      : isUnitUser
-      ? 'unit'
-      : 'department');
+      : 'subsection');
 
   const [orgGoalLevel, setOrgGoalLevel] = useState<OrgGoalLevel>(defaultLevel);
 
@@ -510,13 +513,13 @@ export const KPIWizard: React.FC<KPIWizardProps> = ({
                 <div className="grid grid-cols-4 gap-2">
                   <button
                     type="button"
-                    disabled={isDeptUser || isSectionUser || isSubsectionUser}
+                    disabled={!isAdmin}
                     onClick={() => setOrgGoalLevel('unit')}
                     className={`py-2 px-2 text-center rounded-lg border font-medium text-xs flex flex-col items-center justify-center gap-1 transition-colors ${
                       orgGoalLevel === 'unit'
                         ? 'bg-emerald-800 text-white border-emerald-800 shadow-2xs font-semibold'
-                        : isDeptUser || isSectionUser || isSubsectionUser
-                        ? 'bg-neutral-100 text-neutral-400 border-neutral-200 cursor-not-allowed opacity-60'
+                        : !isAdmin
+                        ? 'bg-neutral-100 text-neutral-400 border-neutral-200 cursor-not-allowed opacity-50'
                         : 'bg-white text-neutral-700 border-neutral-300 hover:bg-neutral-50'
                     }`}
                   >
@@ -526,13 +529,13 @@ export const KPIWizard: React.FC<KPIWizardProps> = ({
 
                   <button
                     type="button"
-                    disabled={isSectionUser || isSubsectionUser}
+                    disabled={!isAdmin}
                     onClick={() => setOrgGoalLevel('department')}
                     className={`py-2 px-2 text-center rounded-lg border font-medium text-xs flex flex-col items-center justify-center gap-1 transition-colors ${
                       orgGoalLevel === 'department'
                         ? 'bg-emerald-800 text-white border-emerald-800 shadow-2xs font-semibold'
-                        : isSectionUser || isSubsectionUser
-                        ? 'bg-neutral-100 text-neutral-400 border-neutral-200 cursor-not-allowed opacity-60'
+                        : !isAdmin
+                        ? 'bg-neutral-100 text-neutral-400 border-neutral-200 cursor-not-allowed opacity-50'
                         : 'bg-white text-neutral-700 border-neutral-300 hover:bg-neutral-50'
                     }`}
                   >
@@ -542,13 +545,13 @@ export const KPIWizard: React.FC<KPIWizardProps> = ({
 
                   <button
                     type="button"
-                    disabled={isSubsectionUser}
+                    disabled={!isAdmin}
                     onClick={() => setOrgGoalLevel('section')}
                     className={`py-2 px-2 text-center rounded-lg border font-medium text-xs flex flex-col items-center justify-center gap-1 transition-colors ${
                       orgGoalLevel === 'section'
                         ? 'bg-emerald-800 text-white border-emerald-800 shadow-2xs font-semibold'
-                        : isSubsectionUser
-                        ? 'bg-neutral-100 text-neutral-400 border-neutral-200 cursor-not-allowed opacity-60'
+                        : !isAdmin
+                        ? 'bg-neutral-100 text-neutral-400 border-neutral-200 cursor-not-allowed opacity-50'
                         : 'bg-white text-neutral-700 border-neutral-300 hover:bg-neutral-50'
                     }`}
                   >
