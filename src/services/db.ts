@@ -18,7 +18,6 @@ import {
 } from './seedData';
 
 const STORAGE_KEYS = {
-<<<<<<< HEAD
   UNITS: 'bitopi_kpi_units_v17',
   DEPARTMENTS: 'bitopi_kpi_departments_v17',
   SECTIONS: 'bitopi_kpi_sections_v17',
@@ -26,15 +25,6 @@ const STORAGE_KEYS = {
   KPIS: 'bitopi_kpi_kpis_v17',
   MONTHLY_ENTRIES: 'bitopi_kpi_monthly_entries_v17',
   AUDIT_LOGS: 'bitopi_kpi_audit_logs_v17',
-=======
-  UNITS: 'bitopi_kpi_units_v15',
-  DEPARTMENTS: 'bitopi_kpi_departments_v15',
-  SECTIONS: 'bitopi_kpi_sections_v15',
-  SUBSECTIONS: 'bitopi_kpi_subsections_v15',
-  KPIS: 'bitopi_kpi_kpis_v15',
-  MONTHLY_ENTRIES: 'bitopi_kpi_monthly_entries_v15',
-  AUDIT_LOGS: 'bitopi_kpi_audit_logs_v15',
->>>>>>> 7ad21e9e5364190a0bafcdbe5ade16a66209227d
 };
 
 // Generate random code in format XXX-XXX-XXX
@@ -365,10 +355,7 @@ class DatabaseService {
       const kpiPayload: Record<string, any> = {
         id: kpi.id,
         kpi_code: kpi.kpi_code,
-<<<<<<< HEAD
         division: kpi.division || 'Non-Corporate',
-=======
->>>>>>> 7ad21e9e5364190a0bafcdbe5ade16a66209227d
         department_id: kpi.department_id || null,
         section_id: kpi.section_id || null,
         subsection_id: kpi.subsection_id || null,
@@ -377,10 +364,7 @@ class DatabaseService {
         aligned_org_goal_level: kpi.aligned_org_goal_level || 'department',
         aligned_org_goal_id: kpi.aligned_org_goal_id || kpi.department_id || 'general',
         aligned_org_goal_label: kpi.aligned_org_goal_label || null,
-<<<<<<< HEAD
         aligned_goal_no: kpi.aligned_goal_no ? Number(kpi.aligned_goal_no) : null,
-=======
->>>>>>> 7ad21e9e5364190a0bafcdbe5ade16a66209227d
         smart_kpi_text: kpi.smart_kpi_text || 'KPI Indicator',
         specific_s: kpi.specific_s || null,
         measure_m: kpi.measure_m || null,
@@ -427,11 +411,7 @@ class DatabaseService {
       }
 
       if (res.error) {
-<<<<<<< HEAD
         console.warn('Supabase upsert KPI note (offline or schema fallback):', res.error?.message || res.error);
-=======
-        console.error('Supabase upsert KPI error:', res.error);
->>>>>>> 7ad21e9e5364190a0bafcdbe5ade16a66209227d
         return; // Halt: Do not attempt monthly entries if the KPI was not saved
       }
 
@@ -518,14 +498,10 @@ class DatabaseService {
         unitMap.set(u.id, u);
       }
     });
-<<<<<<< HEAD
     const finalUnits = Array.from(unitMap.values()).filter(
       (u) => u.id !== 'unit-srsl' && u.code !== 'SRSL' && !u.name.toLowerCase().includes('sheba') &&
              u.id !== 'unit-corp' && u.code !== 'CORP' && u.name.toLowerCase() !== 'corporate'
     );
-=======
-    const finalUnits = Array.from(unitMap.values());
->>>>>>> 7ad21e9e5364190a0bafcdbe5ade16a66209227d
     localStorage.setItem(STORAGE_KEYS.UNITS, JSON.stringify(finalUnits));
 
     // 2. Departments: Guarantee official hierarchy and eliminate legacy test duplicates
@@ -552,19 +528,12 @@ class DatabaseService {
     }
     if (storedSections.length < INITIAL_SECTIONS.length || storedSections.some((s) => !s.department_id)) {
       const now = new Date().toISOString();
-<<<<<<< HEAD
       const sections: Section[] = (INITIAL_SECTIONS as any[])
         .filter((s) => !s.id.includes('srsl') && !s.department_id?.includes('srsl'))
         .map((s) => ({
           ...s,
           created_at: now,
         }));
-=======
-      const sections: Section[] = INITIAL_SECTIONS.map((s) => ({
-        ...s,
-        created_at: now,
-      }));
->>>>>>> 7ad21e9e5364190a0bafcdbe5ade16a66209227d
       localStorage.setItem(STORAGE_KEYS.SECTIONS, JSON.stringify(sections));
     }
 
@@ -578,19 +547,12 @@ class DatabaseService {
     }
     if (storedSubs.length < INITIAL_SUBSECTIONS.length || storedSubs.some((sub) => !sub.section_id)) {
       const now = new Date().toISOString();
-<<<<<<< HEAD
       const subsections: Subsection[] = (INITIAL_SUBSECTIONS as any[])
         .filter((sub) => !sub.id.includes('srsl') && !sub.section_id?.includes('srsl'))
         .map((sub) => ({
           ...sub,
           created_at: now,
         }));
-=======
-      const subsections: Subsection[] = INITIAL_SUBSECTIONS.map((sub) => ({
-        ...sub,
-        created_at: now,
-      }));
->>>>>>> 7ad21e9e5364190a0bafcdbe5ade16a66209227d
       localStorage.setItem(STORAGE_KEYS.SUBSECTIONS, JSON.stringify(subsections));
     }
 
@@ -706,18 +668,12 @@ class DatabaseService {
   getUnits(): Unit[] {
     this.initStorage();
     const data = localStorage.getItem(STORAGE_KEYS.UNITS);
-<<<<<<< HEAD
     const rawList: Unit[] = data ? JSON.parse(data) : [];
     const list = rawList.filter((u) => 
       u.id !== 'unit-srsl' && u.code !== 'SRSL' && !u.name.toLowerCase().includes('sheba') &&
       u.id !== 'unit-corp' && u.code !== 'CORP' && u.name.toLowerCase() !== 'corporate'
     );
     const ORDER: Record<string, number> = {
-=======
-    const list: Unit[] = data ? JSON.parse(data) : [];
-    const ORDER: Record<string, number> = {
-      CORP: 1,
->>>>>>> 7ad21e9e5364190a0bafcdbe5ade16a66209227d
       MGL: 2,
       BGL: 3,
       TAL: 4,
@@ -979,13 +935,9 @@ class DatabaseService {
       list = INITIAL_DEPARTMENTS as Department[];
     }
 
-<<<<<<< HEAD
     list = this.sanitizeAndDeduplicateDepartments(list).filter(
       (d) => d.unit_id !== 'unit-srsl' && !d.short_code?.startsWith('SRSL')
     );
-=======
-    list = this.sanitizeAndDeduplicateDepartments(list);
->>>>>>> 7ad21e9e5364190a0bafcdbe5ade16a66209227d
 
     if (unitId && unitId !== 'all') {
       const cleanUnitId = unitId.toLowerCase().trim();
@@ -1021,11 +973,7 @@ class DatabaseService {
     return this.getDepartments().find((d) => d.id === id || d.department_id === id);
   }
 
-<<<<<<< HEAD
   createDepartment(name: string, shortCode: string, unitId?: string, division?: 'Corporate' | 'Non-Corporate'): Department {
-=======
-  createDepartment(name: string, shortCode: string, unitId?: string): Department {
->>>>>>> 7ad21e9e5364190a0bafcdbe5ade16a66209227d
     const departments = this.getDepartments();
     const cleanCode = (shortCode || 'DEP').toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 4);
 
@@ -1041,10 +989,7 @@ class DatabaseService {
     const newDept: Department = {
       id: `dept-${Date.now()}`,
       unit_id: unitId || 'unit-bgl',
-<<<<<<< HEAD
       division: division || (unitId === 'unit-corp' ? 'Corporate' : 'Non-Corporate'),
-=======
->>>>>>> 7ad21e9e5364190a0bafcdbe5ade16a66209227d
       name: name.trim(),
       short_code: cleanCode,
       department_id: deptId,
@@ -1069,10 +1014,7 @@ class DatabaseService {
     const client = supabase;
     const payload: Record<string, any> = {
       id: dept.id,
-<<<<<<< HEAD
       division: dept.division || 'Non-Corporate',
-=======
->>>>>>> 7ad21e9e5364190a0bafcdbe5ade16a66209227d
       name: dept.name,
       short_code: dept.short_code,
       department_id: dept.department_id,
@@ -1408,10 +1350,7 @@ class DatabaseService {
     departmentId?: string;
     sectionId?: string;
     subsectionId?: string;
-<<<<<<< HEAD
     division?: 'all' | 'Corporate' | 'Non-Corporate';
-=======
->>>>>>> 7ad21e9e5364190a0bafcdbe5ade16a66209227d
     perspective?: string;
     level?: OrgGoalLevel | 'all';
     search?: string;
@@ -1446,7 +1385,6 @@ class DatabaseService {
         list = list.filter((k) => k.subsection_id === filter.subsectionId);
       }
 
-<<<<<<< HEAD
       // Division Filter:
       if (filter.division && filter.division !== 'all') {
         list = list.filter((k) => {
@@ -1456,8 +1394,6 @@ class DatabaseService {
         });
       }
 
-=======
->>>>>>> 7ad21e9e5364190a0bafcdbe5ade16a66209227d
       // 5. Goal Level Filter:
       if (filter.level && filter.level !== 'all') {
         list = list.filter((k) => k.aligned_org_goal_level === filter.level);
@@ -1657,10 +1593,7 @@ class DatabaseService {
     kpis[index] = {
       ...currentKpi,
       ...finalUpdates,
-<<<<<<< HEAD
       division: finalUpdates.division !== undefined ? finalUpdates.division : currentKpi.division,
-=======
->>>>>>> 7ad21e9e5364190a0bafcdbe5ade16a66209227d
       updated_at: new Date().toISOString(),
     };
 

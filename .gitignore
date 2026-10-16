@@ -5,8 +5,4 @@ coverage/
 .DS_Store
 *.log
 .env*
-<<<<<<< HEAD
 !.env.example
-=======
-.env.example
->>>>>>> 7ad21e9e5364190a0bafcdbe5ade16a66209227d

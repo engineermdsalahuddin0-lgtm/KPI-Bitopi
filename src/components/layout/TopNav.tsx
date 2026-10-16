@@ -176,39 +176,6 @@ export const TopNav: React.FC<TopNavProps> = ({
                     </p>
                   </div>
 
-<<<<<<< HEAD
-=======
-                  <div className="py-1">
-                    <div className="px-3 py-1 text-[10px] font-semibold text-neutral-500 uppercase tracking-wider">
-                      Role / Scope
-                    </div>
-
-                    {session.role === 'department' ? (
-                      <button
-                        onClick={() => {
-                          setUserMenuOpen(false);
-                          onSwitchRole('admin');
-                        }}
-                        className="w-full text-left px-3 py-2 flex items-center gap-2 hover:bg-neutral-50 text-neutral-700"
-                      >
-                        <Shield className="w-3.5 h-3.5 text-emerald-700" />
-                        <span>Switch to Admin Login</span>
-                      </button>
-                    ) : (
-                      <button
-                        onClick={() => {
-                          setUserMenuOpen(false);
-                          onSwitchRole('department');
-                        }}
-                        className="w-full text-left px-3 py-2 flex items-center gap-2 hover:bg-neutral-50 text-neutral-700"
-                      >
-                        <KeyRound className="w-3.5 h-3.5 text-neutral-600" />
-                        <span>Switch to Department Login</span>
-                      </button>
-                    )}
-                  </div>
-
->>>>>>> 7ad21e9e5364190a0bafcdbe5ade16a66209227d
                   <div className="border-t border-neutral-100 pt-1">
                     <button
                       onClick={() => {
