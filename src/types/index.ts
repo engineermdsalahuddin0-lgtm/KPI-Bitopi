@@ -1,4 +1,7 @@
+<<<<<<< HEAD
 export type DivisionType = 'Corporate' | 'Non-Corporate';
+=======
+>>>>>>> 7ad21e9e5364190a0bafcdbe5ade16a66209227d
 export type UserRole = 'admin' | 'unit' | 'department' | 'section' | 'subsection';
 
 export interface UserSession {
@@ -40,7 +43,10 @@ export interface Unit {
 export interface Department {
   id: string; // UUID
   unit_id?: string; // Belongs to a business unit
+<<<<<<< HEAD
   division?: DivisionType; // 'Corporate' | 'Non-Corporate'
+=======
+>>>>>>> 7ad21e9e5364190a0bafcdbe5ade16a66209227d
   name: string;
   short_code: string;
   department_id: string; // e.g. IE-7F29
@@ -70,7 +76,10 @@ export interface KPI {
   id: string; // UUID
   kpi_code: string; // e.g. KPI-001
   unit_id?: string;
+<<<<<<< HEAD
   division?: DivisionType; // 'Corporate' | 'Non-Corporate'
+=======
+>>>>>>> 7ad21e9e5364190a0bafcdbe5ade16a66209227d
   department_id?: string;
   section_id?: string;
   subsection_id?: string;
@@ -81,7 +90,10 @@ export interface KPI {
   aligned_org_goal_level: OrgGoalLevel;
   aligned_org_goal_id: string;
   aligned_org_goal_label?: string;
+<<<<<<< HEAD
   aligned_goal_no?: number; // 1 to 15 (Aligned With ORG./SBU(Factory)/Dept./Sec Goal No./Sub sec goal no.)
+=======
+>>>>>>> 7ad21e9e5364190a0bafcdbe5ade16a66209227d
 
   smart_kpi_text: string;
 

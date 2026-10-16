@@ -45,11 +45,14 @@ export const KPIExpandPanel: React.FC<KPIExpandPanelProps> = ({
               <span className="text-[10px] text-neutral-500 ml-1.5 uppercase font-mono">
                 ({kpi.aligned_org_goal_level})
               </span>
+<<<<<<< HEAD
               {kpi.aligned_goal_no && (
                 <span className="ml-1.5 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-950 border border-emerald-300">
                   Goal #{kpi.aligned_goal_no}
                 </span>
               )}
+=======
+>>>>>>> 7ad21e9e5364190a0bafcdbe5ade16a66209227d
             </div>
           </div>
 

@@ -119,11 +119,14 @@ export const KPIDetailsModal: React.FC<KPIDetailsModalProps> = ({
               </div>
               <div>
                 <span className="font-semibold">Aligned Goal:</span> {kpi.aligned_org_goal_label || 'Department Goal'}
+<<<<<<< HEAD
                 {kpi.aligned_goal_no && (
                   <span className="ml-1.5 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-700 text-white shadow-2xs">
                     Goal #{kpi.aligned_goal_no}
                   </span>
                 )}
+=======
+>>>>>>> 7ad21e9e5364190a0bafcdbe5ade16a66209227d
               </div>
             </div>
           </div>

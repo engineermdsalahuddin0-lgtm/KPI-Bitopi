@@ -41,10 +41,16 @@ export const DepartmentManagement: React.FC<DepartmentManagementProps> = ({
   const [hierarchyModalDept, setHierarchyModalDept] = useState<Department | null>(null);
 
   // Add Department Form State
+<<<<<<< HEAD
   const [newDeptUnitId, setNewDeptUnitId] = useState<string>(() => db.getUnits()[0]?.id || 'unit-bgl');
   const [newDeptName, setNewDeptName] = useState<string>('');
   const [newDeptCode, setNewDeptCode] = useState<string>('');
   const [newDeptDivision, setNewDeptDivision] = useState<'Corporate' | 'Non-Corporate'>('Corporate');
+=======
+  const [newDeptUnitId, setNewDeptUnitId] = useState<string>(() => db.getUnits()[0]?.id || 'unit-corp');
+  const [newDeptName, setNewDeptName] = useState<string>('');
+  const [newDeptCode, setNewDeptCode] = useState<string>('');
+>>>>>>> 7ad21e9e5364190a0bafcdbe5ade16a66209227d
   const [addError, setAddError] = useState<string | null>(null);
   const [createdCredentials, setCreatedCredentials] = useState<{
     name: string;
@@ -142,7 +148,11 @@ export const DepartmentManagement: React.FC<DepartmentManagementProps> = ({
     }
 
     try {
+<<<<<<< HEAD
       const created = db.createDepartment(newDeptName, newDeptCode, newDeptUnitId, newDeptDivision);
+=======
+      const created = db.createDepartment(newDeptName, newDeptCode, newDeptUnitId);
+>>>>>>> 7ad21e9e5364190a0bafcdbe5ade16a66209227d
       setCreatedCredentials({
         name: created.name,
         departmentId: created.department_id,
@@ -315,7 +325,11 @@ export const DepartmentManagement: React.FC<DepartmentManagementProps> = ({
           <table className="w-full border-collapse text-left text-xs">
             <thead className="bg-neutral-50 border-b border-neutral-200 font-semibold text-neutral-600 uppercase tracking-wider text-[11px]">
               <tr>
+<<<<<<< HEAD
                                 <th className="py-2.5 px-4">Department</th>
+=======
+                <th className="py-2.5 px-4">Department</th>
+>>>>>>> 7ad21e9e5364190a0bafcdbe5ade16a66209227d
                 <th className="py-2.5 px-3">Unit</th>
                 <th className="py-2.5 px-3">Code</th>
                 <th className="py-2.5 px-3">Department ID</th>
@@ -333,7 +347,10 @@ export const DepartmentManagement: React.FC<DepartmentManagementProps> = ({
                     key={dept.id}
                     className="hover:bg-neutral-50/70 transition-colors text-neutral-800"
                   >
+<<<<<<< HEAD
                     
+=======
+>>>>>>> 7ad21e9e5364190a0bafcdbe5ade16a66209227d
                     <td className="py-2.5 px-4 font-semibold text-neutral-900">
                       {dept.name}
                     </td>
@@ -506,11 +523,15 @@ export const DepartmentManagement: React.FC<DepartmentManagementProps> = ({
                   </label>
                   <select
                     value={newDeptUnitId}
+<<<<<<< HEAD
                     onChange={(e) => {
                       const uId = e.target.value;
                       setNewDeptUnitId(uId);
                       setNewDeptDivision(uId === 'unit-bgl' ? 'Corporate' : 'Non-Corporate');
                     }}
+=======
+                    onChange={(e) => setNewDeptUnitId(e.target.value)}
+>>>>>>> 7ad21e9e5364190a0bafcdbe5ade16a66209227d
                     className="w-full px-2.5 py-1.5 rounded border border-neutral-300 bg-white text-xs text-neutral-900 focus:outline-hidden focus:ring-1 focus:ring-emerald-700"
                   >
                     {units.map((u) => (

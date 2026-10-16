@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import {
   Plus,
@@ -6,6 +7,12 @@ import {
 } from 'lucide-react';
 import { KPI, KPIMonthlyEntry, UserSession, Department } from '../../types';
 import { KPIRow } from './KPIRow';
+=======
+import React from 'react';
+import { KPI, KPIMonthlyEntry, UserSession, Department } from '../../types';
+import { KPIRow } from './KPIRow';
+import { Plus, Inbox } from 'lucide-react';
+>>>>>>> 7ad21e9e5364190a0bafcdbe5ade16a66209227d
 
 interface KPITableProps {
   kpis: KPI[];
@@ -18,18 +25,23 @@ interface KPITableProps {
   onEditKPI: (kpi: KPI) => void;
   onDuplicateKPI: (kpi: KPI) => void;
   onDeleteKPI: (kpi: KPI) => void;
+<<<<<<< HEAD
   onOpenMonthlyCell: (
     kpi: KPI,
     month: number,
     monthName: string,
     entry?: KPIMonthlyEntry
   ) => void;
+=======
+  onOpenMonthlyCell: (kpi: KPI, month: number, monthName: string, entry?: KPIMonthlyEntry) => void;
+>>>>>>> 7ad21e9e5364190a0bafcdbe5ade16a66209227d
   onOpenDetails?: (kpi: KPI) => void;
   onAddKPI: () => void;
 }
 
 const MONTH_NAMES = [
   'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+<<<<<<< HEAD
   'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
 ];
 
@@ -65,6 +77,11 @@ const DEFAULT_WIDTHS: ColumnWidths = {
 
 const STORAGE_KEY = 'bitopi_kpi_table_col_widths_v2';
 
+=======
+  'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+];
+
+>>>>>>> 7ad21e9e5364190a0bafcdbe5ade16a66209227d
 export const KPITable: React.FC<KPITableProps> = ({
   kpis,
   monthlyEntries,
@@ -82,6 +99,7 @@ export const KPITable: React.FC<KPITableProps> = ({
 }) => {
   const isAdmin = session.role === 'admin';
   const totalWeight = kpis.reduce((acc, k) => acc + (k.weight || 0), 0);
+<<<<<<< HEAD
   const uniqueDepts = new Set(kpis.map((k) => k.department_id).filter(Boolean));
   const isMultiDept = uniqueDepts.size > 1;
 
@@ -155,6 +173,11 @@ export const KPITable: React.FC<KPITableProps> = ({
     } catch {}
   };
 
+=======
+  const uniqueDepts = new Set(kpis.map((k) => k.department_id));
+  const isMultiDept = uniqueDepts.size > 1;
+
+>>>>>>> 7ad21e9e5364190a0bafcdbe5ade16a66209227d
   if (kpis.length === 0) {
     return (
       <div className="bg-white rounded-lg border border-neutral-200 p-12 text-center shadow-2xs">
@@ -169,10 +192,17 @@ export const KPITable: React.FC<KPITableProps> = ({
             ? 'Your sub-section does not have any active KPIs configured yet. Click below to add your first KPI.'
             : 'No active KPIs configured for this view. KPIs are entered at the sub-section level or by administrator.'}
         </p>
+<<<<<<< HEAD
         {isAdmin && (
           <button
             onClick={onAddKPI}
             className="mt-4 inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold rounded-md bg-emerald-800 hover:bg-emerald-900 text-white shadow-xs transition-colors hover:-translate-y-px active:translate-y-0 cursor-pointer"
+=======
+        {(isAdmin || session.role === 'subsection') && (
+          <button
+            onClick={onAddKPI}
+            className="mt-4 inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold rounded-md bg-emerald-800 hover:bg-emerald-900 text-white shadow-xs transition-colors hover:-translate-y-px active:translate-y-0"
+>>>>>>> 7ad21e9e5364190a0bafcdbe5ade16a66209227d
           >
             <Plus className="w-3.5 h-3.5" />
             <span>{isAdmin ? 'Add KPI' : '+ Add Sub-section KPI'}</span>
@@ -182,6 +212,7 @@ export const KPITable: React.FC<KPITableProps> = ({
     );
   }
 
+<<<<<<< HEAD
   // Resizer handle component
   const Resizer = ({ colKey }: { colKey: keyof ColumnWidths }) => (
     <div
@@ -330,6 +361,64 @@ export const KPITable: React.FC<KPITableProps> = ({
               >
                 <span>Target</span>
                 <Resizer colKey="target" />
+=======
+  return (
+    <div className="bg-white rounded-lg border border-neutral-200/90 shadow-2xs overflow-hidden flex flex-col">
+      {/* Horizontally scrollable container with sticky header and columns */}
+      <div className="overflow-x-auto scrollbar-thin">
+        <table className="w-full border-collapse text-left min-w-[1250px]">
+          {/* Sticky Table Header (#16, #17) */}
+          <thead className="bg-neutral-50 border-b border-neutral-200 text-[11px] font-semibold text-neutral-600 uppercase tracking-wider sticky top-0 z-30 select-none">
+            <tr>
+              {/* Sticky Col 1: ID */}
+              <th className="sticky left-0 z-30 bg-neutral-50 py-2.5 px-2.5 border-r border-neutral-200 min-w-[78px]">
+                ID
+              </th>
+
+              {/* Sticky Col 2: KRA */}
+              <th className="sticky left-[78px] z-30 bg-neutral-50 py-2.5 px-3 border-r border-neutral-200 min-w-[120px]">
+                KRA
+              </th>
+
+              {/* Sticky Col 3: MO */}
+              <th className="sticky left-[198px] z-30 bg-neutral-50 py-2.5 px-3 border-r border-neutral-200 min-w-[150px]">
+                MO
+              </th>
+
+              {/* Sticky Col 4: KPI */}
+              <th className="sticky left-[348px] z-30 bg-neutral-50 py-2.5 px-3 border-r-2 border-neutral-300 min-w-[200px] shadow-[2px_0_5px_-2px_rgba(0,0,0,0.06)]">
+                KPI
+              </th>
+
+              {/* Column 5: Perspective */}
+              <th className="py-2.5 px-2.5 border-r border-neutral-200 min-w-[100px]">
+                Perspective
+              </th>
+
+              {/* Column 6: Responsible concern */}
+              <th className="py-2.5 px-2.5 border-r border-neutral-200 min-w-[140px]">
+                Responsible concern
+              </th>
+
+              {/* Column 7: Weight */}
+              <th className="py-2.5 px-2.5 border-r border-neutral-200 text-right min-w-[70px]">
+                Weight
+              </th>
+
+              {/* Column 8: Datasource */}
+              <th className="py-2.5 px-2.5 border-r border-neutral-200 min-w-[120px]">
+                Datasource
+              </th>
+
+              {/* Column 9: Base */}
+              <th className="py-2.5 px-2.5 border-r border-neutral-200 text-right min-w-[75px]">
+                Base
+              </th>
+
+              {/* Column 10: Target */}
+              <th className="py-2.5 px-2.5 border-r border-neutral-200 text-right min-w-[80px]">
+                Target
+>>>>>>> 7ad21e9e5364190a0bafcdbe5ade16a66209227d
               </th>
 
               {/* Monthly Columns (Jan .. Dec) */}
@@ -337,13 +426,18 @@ export const KPITable: React.FC<KPITableProps> = ({
                 MONTH_NAMES.map((mName, idx) => (
                   <th
                     key={mName}
+<<<<<<< HEAD
                     style={{ width: `${colWidths.month}px` }}
                     className={`py-2.5 px-2 border-r border-neutral-200 text-right relative group truncate ${
+=======
+                    className={`py-2.5 px-2 border-r border-neutral-200 text-right min-w-[70px] ${
+>>>>>>> 7ad21e9e5364190a0bafcdbe5ade16a66209227d
                       idx + 1 === focusedMonth
                         ? 'bg-emerald-100/60 text-emerald-950 font-bold'
                         : ''
                     }`}
                   >
+<<<<<<< HEAD
                     <span>{mName}</span>
                     {idx === MONTH_NAMES.length - 1 && <Resizer colKey="month" />}
                   </th>
@@ -365,6 +459,20 @@ export const KPITable: React.FC<KPITableProps> = ({
               >
                 <span>Actions</span>
                 <Resizer colKey="actions" />
+=======
+                    {mName}
+                  </th>
+                ))
+              ) : (
+                <th className="py-2.5 px-3 border-r border-neutral-200 text-right min-w-[100px] bg-emerald-100/60 text-emerald-950 font-bold">
+                  {typeof focusedMonth === 'number' ? `${MONTH_NAMES[focusedMonth - 1]} (Selected)` : 'Full Year'}
+                </th>
+              )}
+
+              {/* Actions Header (#48) */}
+              <th className="py-2.5 px-3 text-right sticky right-0 bg-neutral-50 z-30 border-l border-neutral-200 min-w-[110px]">
+                Actions
+>>>>>>> 7ad21e9e5364190a0bafcdbe5ade16a66209227d
               </th>
             </tr>
           </thead>
@@ -386,22 +494,32 @@ export const KPITable: React.FC<KPITableProps> = ({
                 onDeleteKPI={onDeleteKPI}
                 onOpenMonthlyCell={onOpenMonthlyCell}
                 onOpenDetails={onOpenDetails}
+<<<<<<< HEAD
                 leftOffsets={{
                   dept: leftDept,
                   kra: leftKra,
                   mo: leftMo,
                   kpi: leftKpi,
                 }}
+=======
+>>>>>>> 7ad21e9e5364190a0bafcdbe5ade16a66209227d
               />
             ))}
           </tbody>
 
+<<<<<<< HEAD
           {/* Table Footer: Total Weight Allocation check */}
+=======
+          {/* Table Footer: Total Weight Allocation check (#24) */}
+>>>>>>> 7ad21e9e5364190a0bafcdbe5ade16a66209227d
           <tfoot className="bg-neutral-50/90 border-t-2 border-neutral-200 text-xs text-neutral-700 font-medium">
             <tr>
               <td
                 colSpan={6}
+<<<<<<< HEAD
                 style={{ width: `${leftKpi + colWidths.kpi + colWidths.aligned + colWidths.responsible}px` }}
+=======
+>>>>>>> 7ad21e9e5364190a0bafcdbe5ade16a66209227d
                 className="py-2.5 px-3 sticky left-0 z-20 bg-neutral-50/90 border-r-2 border-neutral-300 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.06)]"
               >
                 <div className="flex items-center justify-between">

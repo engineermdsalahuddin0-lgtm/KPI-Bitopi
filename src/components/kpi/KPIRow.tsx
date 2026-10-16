@@ -27,12 +27,15 @@ interface KPIRowProps {
   onDeleteKPI: (kpi: KPI) => void;
   onOpenMonthlyCell: (kpi: KPI, month: number, monthName: string, entry?: KPIMonthlyEntry) => void;
   onOpenDetails?: (kpi: KPI) => void;
+<<<<<<< HEAD
   leftOffsets?: {
     dept: number;
     kra: number;
     mo: number;
     kpi: number;
   };
+=======
+>>>>>>> 7ad21e9e5364190a0bafcdbe5ade16a66209227d
 }
 
 const MONTH_NAMES = [
@@ -40,6 +43,7 @@ const MONTH_NAMES = [
   'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
 ];
 
+<<<<<<< HEAD
 // Distinctive Department Color Palettes for clear visual grouping & identification across 100+ departments
 const DEPT_COLORS: Record<string, { bg: string; text: string; border: string; pillBg: string; borderLeft: string }> = {
   // Production
@@ -97,6 +101,8 @@ function getDeptVisuals(deptCode?: string) {
   return palettes[Math.abs(hash) % palettes.length];
 }
 
+=======
+>>>>>>> 7ad21e9e5364190a0bafcdbe5ade16a66209227d
 export const KPIRow: React.FC<KPIRowProps> = ({
   kpi,
   monthlyEntries,
@@ -110,7 +116,10 @@ export const KPIRow: React.FC<KPIRowProps> = ({
   onDeleteKPI,
   onOpenMonthlyCell,
   onOpenDetails,
+<<<<<<< HEAD
   leftOffsets = { dept: 0, kra: 140, mo: 260, kpi: 410 },
+=======
+>>>>>>> 7ad21e9e5364190a0bafcdbe5ade16a66209227d
 }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -135,7 +144,10 @@ export const KPIRow: React.FC<KPIRowProps> = ({
   const canManageKPI = isAdmin;
 
   const currentDept = departments?.find((d) => d.id === kpi.department_id);
+<<<<<<< HEAD
   const deptVisuals = getDeptVisuals(currentDept?.short_code || currentDept?.id);
+=======
+>>>>>>> 7ad21e9e5364190a0bafcdbe5ade16a66209227d
 
   // Map month 1..12 to monthly entry
   const getEntryForMonth = (m: number) => {
@@ -146,6 +158,7 @@ export const KPIRow: React.FC<KPIRowProps> = ({
 
   return (
     <>
+<<<<<<< HEAD
       <tr className={`transition-colors border-b border-neutral-200/80 text-xs text-neutral-800 group ${deptVisuals.bg} hover:brightness-95`}>
         
         {/* Sticky Column 1: Department (Replaced raw ID as requested) */}
@@ -157,6 +170,15 @@ export const KPIRow: React.FC<KPIRowProps> = ({
             <button
               onClick={() => setIsExpanded(!isExpanded)}
               className="p-0.5 rounded text-neutral-400 hover:text-neutral-700 hover:bg-neutral-200/60 transition-colors cursor-pointer"
+=======
+      <tr className="hover:bg-neutral-50/80 transition-colors border-b border-neutral-200/80 text-xs text-neutral-800 group">
+        {/* Sticky Column 1: Expand + ID + Department Badge */}
+        <td className="sticky left-0 z-20 bg-white group-hover:bg-neutral-50/90 py-2 px-2.5 whitespace-nowrap border-r border-neutral-200">
+          <div className="flex items-center gap-1.5">
+            <button
+              onClick={() => setIsExpanded(!isExpanded)}
+              className="p-0.5 rounded text-neutral-400 hover:text-neutral-700 hover:bg-neutral-200/60 transition-colors"
+>>>>>>> 7ad21e9e5364190a0bafcdbe5ade16a66209227d
               title={isExpanded ? 'Collapse row details' : 'Expand row details'}
             >
               {isExpanded ? (
@@ -165,6 +187,7 @@ export const KPIRow: React.FC<KPIRowProps> = ({
                 <ChevronRight className="w-3.5 h-3.5" />
               )}
             </button>
+<<<<<<< HEAD
             {/* Prominent Colored Department Tag */}
             <span
               className={`px-2 py-0.5 rounded-md font-bold text-[10.5px] uppercase tracking-wide truncate max-w-[110px] shadow-2xs ${deptVisuals.pillBg}`}
@@ -176,51 +199,101 @@ export const KPIRow: React.FC<KPIRowProps> = ({
               <span
                 className="px-1 py-0.5 rounded text-[8.5px] font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200"
                 title="Unit Level"
+=======
+            <span className="font-mono font-semibold text-neutral-900 text-[11px] tracking-tight">
+              {kpi.kpi_code}
+            </span>
+            {currentDept && (
+              <span
+                className="px-1.5 py-0.5 rounded text-[9px] font-bold bg-neutral-100 text-neutral-700 border border-neutral-200 tracking-wider"
+                title={`Department: ${currentDept.name.replace(/\s*\([^)]*\)/g, '').trim()}`}
+              >
+                {currentDept.short_code}
+              </span>
+            )}
+            {kpi.aligned_org_goal_level === 'unit' ? (
+              <span
+                className="px-1.5 py-0.5 rounded text-[9px] font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200 tracking-tight"
+                title={`Unit Level: ${kpi.aligned_org_goal_label || 'Unit'}`}
+>>>>>>> 7ad21e9e5364190a0bafcdbe5ade16a66209227d
               >
                 Unit
               </span>
             ) : kpi.aligned_org_goal_level === 'subsection' || kpi.subsection_id ? (
               <span
+<<<<<<< HEAD
                 className="px-1 py-0.5 rounded text-[8.5px] font-semibold bg-amber-50 text-amber-800 border border-amber-200"
                 title="Sub-section Level"
+=======
+                className="px-1.5 py-0.5 rounded text-[9px] font-semibold bg-amber-50 text-amber-800 border border-amber-200 tracking-tight"
+                title={`Sub-section: ${kpi.aligned_org_goal_label || 'Sub-section'}`}
+>>>>>>> 7ad21e9e5364190a0bafcdbe5ade16a66209227d
               >
                 Sub
               </span>
             ) : kpi.aligned_org_goal_level === 'section' || kpi.section_id ? (
               <span
+<<<<<<< HEAD
                 className="px-1 py-0.5 rounded text-[8.5px] font-semibold bg-sky-50 text-sky-800 border border-sky-200"
                 title="Section Level"
               >
                 Sec
               </span>
             ) : null}
+=======
+                className="px-1.5 py-0.5 rounded text-[9px] font-semibold bg-sky-50 text-sky-800 border border-sky-200 tracking-tight"
+                title={`Section: ${kpi.aligned_org_goal_label || 'Section'}`}
+              >
+                Sec
+              </span>
+            ) : (
+              <span
+                className="px-1.5 py-0.5 rounded text-[9px] font-medium bg-neutral-100 text-neutral-600 border border-neutral-200 tracking-tight"
+                title="Department Level"
+              >
+                Dept
+              </span>
+            )}
+>>>>>>> 7ad21e9e5364190a0bafcdbe5ade16a66209227d
           </div>
         </td>
 
         {/* Sticky Column 2: KRA */}
+<<<<<<< HEAD
         <td
           style={{ left: `${leftOffsets.kra}px` }}
           className="sticky z-20 bg-white/95 group-hover:bg-neutral-50/95 py-2 px-3 whitespace-nowrap border-r border-neutral-200 font-medium text-neutral-900 truncate"
           title={kpi.kra}
         >
+=======
+        <td className="sticky left-[78px] z-20 bg-white group-hover:bg-neutral-50/90 py-2 px-3 whitespace-nowrap border-r border-neutral-200 font-medium text-neutral-900 min-w-[110px] max-w-[140px] truncate" title={kpi.kra}>
+>>>>>>> 7ad21e9e5364190a0bafcdbe5ade16a66209227d
           {kpi.kra}
         </td>
 
         {/* Sticky Column 3: Major Objective (MO) */}
+<<<<<<< HEAD
         <td
           style={{ left: `${leftOffsets.mo}px` }}
           className="sticky z-20 bg-white/95 group-hover:bg-neutral-50/95 py-2 px-3 whitespace-nowrap border-r border-neutral-200 text-neutral-700 truncate"
           title={kpi.major_objective}
         >
+=======
+        <td className="sticky left-[198px] z-20 bg-white group-hover:bg-neutral-50/90 py-2 px-3 whitespace-nowrap border-r border-neutral-200 text-neutral-700 min-w-[140px] max-w-[180px] truncate" title={kpi.major_objective}>
+>>>>>>> 7ad21e9e5364190a0bafcdbe5ade16a66209227d
           {kpi.major_objective}
         </td>
 
         {/* Sticky Column 4: KPI (Plain statement) with shadow delimiter */}
+<<<<<<< HEAD
         <td
           style={{ left: `${leftOffsets.kpi}px` }}
           className="sticky z-20 bg-white/95 group-hover:bg-neutral-50/95 py-2 px-3 whitespace-nowrap border-r-2 border-neutral-300 text-neutral-900 font-medium truncate shadow-[2px_0_5px_-2px_rgba(0,0,0,0.06)]"
           title={kpi.smart_kpi_text}
         >
+=======
+        <td className="sticky left-[348px] z-20 bg-white group-hover:bg-neutral-50/90 py-2 px-3 whitespace-nowrap border-r-2 border-neutral-300 text-neutral-900 font-medium min-w-[180px] max-w-[240px] truncate shadow-[2px_0_5px_-2px_rgba(0,0,0,0.06)]" title={kpi.smart_kpi_text}>
+>>>>>>> 7ad21e9e5364190a0bafcdbe5ade16a66209227d
           <span
             onClick={() => onOpenDetails && onOpenDetails(kpi)}
             className="cursor-pointer hover:text-emerald-800 hover:underline transition-colors"
@@ -230,6 +303,7 @@ export const KPIRow: React.FC<KPIRowProps> = ({
           </span>
         </td>
 
+<<<<<<< HEAD
         {/* Column: Aligned With ORG./SBU(Factory)/Dept./Sec Goal No./Sub sec goal no. */}
         <td className="py-2 px-2.5 whitespace-nowrap border-r border-neutral-200 text-center text-xs min-w-[130px] max-w-[160px]">
           {kpi.aligned_goal_no ? (
@@ -246,6 +320,13 @@ export const KPIRow: React.FC<KPIRowProps> = ({
 
 
 
+=======
+        {/* Column 5: Perspective */}
+        <td className="py-2 px-2.5 whitespace-nowrap border-r border-neutral-200 text-neutral-600 text-[11px] min-w-[95px]">
+          {kpi.perspective}
+        </td>
+
+>>>>>>> 7ad21e9e5364190a0bafcdbe5ade16a66209227d
         {/* Column 6: Responsible concern */}
         <td className="py-2 px-2.5 whitespace-nowrap border-r border-neutral-200 text-neutral-700 min-w-[120px] max-w-[150px] truncate" title={kpi.responsible_concern.join(', ')}>
           <div className="flex items-center gap-1 overflow-hidden">
@@ -464,7 +545,11 @@ export const KPIRow: React.FC<KPIRowProps> = ({
       {/* Expanded Row Panel */}
       {isExpanded && (
         <tr>
+<<<<<<< HEAD
           <td colSpan={showAllMonths ? 22 : 11} className="p-0">
+=======
+          <td colSpan={showAllMonths ? 23 : 12} className="p-0">
+>>>>>>> 7ad21e9e5364190a0bafcdbe5ade16a66209227d
             <KPIExpandPanel
               kpi={kpi}
               monthlyEntries={monthlyEntries}

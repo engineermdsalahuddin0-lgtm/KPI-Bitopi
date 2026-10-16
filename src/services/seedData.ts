@@ -1,7 +1,18 @@
 import { Unit, Department, Section, Subsection } from '../types';
 
 export const INITIAL_UNITS: Omit<Unit, 'created_at' | 'updated_at'>[] = [
+<<<<<<< HEAD
 
+=======
+  {
+    "id": "unit-corp",
+    "name": "Corporate",
+    "code": "CORP",
+    "location": "Corporate Head Office, Dhaka",
+    "access_code": "CORP-919-C1P",
+    "status": "active"
+  },
+>>>>>>> 7ad21e9e5364190a0bafcdbe5ade16a66209227d
   {
     "id": "unit-mgl",
     "name": "Misami Garments Ltd.",
@@ -33,6 +44,17 @@ export const INITIAL_UNITS: Omit<Unit, 'created_at' | 'updated_at'>[] = [
     "location": "Adamjee EPZ, Narayanganj",
     "access_code": "RHL-782-X2M",
     "status": "active"
+<<<<<<< HEAD
+=======
+  },
+  {
+    "id": "unit-srsl",
+    "name": "Sheba Ready Made Solutions Ltd.",
+    "code": "SRSL",
+    "location": "Corporate Studio, Dhaka",
+    "access_code": "SRS-319-Q5L",
+    "status": "active"
+>>>>>>> 7ad21e9e5364190a0bafcdbe5ade16a66209227d
   }
 ];
 
@@ -219,8 +241,12 @@ export const INITIAL_DEPARTMENTS: Omit<Department, 'created_at' | 'updated_at'>[
   },
   {
     "id": "dept-corp-esg-41",
+<<<<<<< HEAD
     "unit_id": "unit-bgl",
     "division": "Corporate",
+=======
+    "unit_id": "unit-corp",
+>>>>>>> 7ad21e9e5364190a0bafcdbe5ade16a66209227d
     "name": "ESG",
     "short_code": "CORP-ESG",
     "department_id": "CORP-ESG-24C7",
@@ -229,8 +255,12 @@ export const INITIAL_DEPARTMENTS: Omit<Department, 'created_at' | 'updated_at'>[
   },
   {
     "id": "dept-corp-fin-42",
+<<<<<<< HEAD
     "unit_id": "unit-bgl",
     "division": "Corporate",
+=======
+    "unit_id": "unit-corp",
+>>>>>>> 7ad21e9e5364190a0bafcdbe5ade16a66209227d
     "name": "Finance & Accounts",
     "short_code": "CORP-FIN",
     "department_id": "CORP-FIN-235F",
@@ -239,8 +269,12 @@ export const INITIAL_DEPARTMENTS: Omit<Department, 'created_at' | 'updated_at'>[
   },
   {
     "id": "dept-corp-cad-36",
+<<<<<<< HEAD
     "unit_id": "unit-bgl",
     "division": "Corporate",
+=======
+    "unit_id": "unit-corp",
+>>>>>>> 7ad21e9e5364190a0bafcdbe5ade16a66209227d
     "name": "CAD & Sample",
     "short_code": "CORP-CAD",
     "department_id": "CORP-CAD-A46",
@@ -249,8 +283,12 @@ export const INITIAL_DEPARTMENTS: Omit<Department, 'created_at' | 'updated_at'>[
   },
   {
     "id": "dept-corp-com-37",
+<<<<<<< HEAD
     "unit_id": "unit-bgl",
     "division": "Corporate",
+=======
+    "unit_id": "unit-corp",
+>>>>>>> 7ad21e9e5364190a0bafcdbe5ade16a66209227d
     "name": "Commercial",
     "short_code": "CORP-COM",
     "department_id": "CORP-COM-24A7",
@@ -259,8 +297,12 @@ export const INITIAL_DEPARTMENTS: Omit<Department, 'created_at' | 'updated_at'>[
   },
   {
     "id": "dept-corp-dpd-38",
+<<<<<<< HEAD
     "unit_id": "unit-bgl",
     "division": "Corporate",
+=======
+    "unit_id": "unit-corp",
+>>>>>>> 7ad21e9e5364190a0bafcdbe5ade16a66209227d
     "name": "Design & Product Development",
     "short_code": "CORP-DPD",
     "department_id": "CORP-DPD-13A6",
@@ -269,8 +311,12 @@ export const INITIAL_DEPARTMENTS: Omit<Department, 'created_at' | 'updated_at'>[
   },
   {
     "id": "dept-corp-eng-39",
+<<<<<<< HEAD
     "unit_id": "unit-bgl",
     "division": "Corporate",
+=======
+    "unit_id": "unit-corp",
+>>>>>>> 7ad21e9e5364190a0bafcdbe5ade16a66209227d
     "name": "Engineering & Services",
     "short_code": "CORP-ENG",
     "department_id": "CORP-ENG-425",
@@ -279,8 +325,12 @@ export const INITIAL_DEPARTMENTS: Omit<Department, 'created_at' | 'updated_at'>[
   },
   {
     "id": "dept-corp-it-40",
+<<<<<<< HEAD
     "unit_id": "unit-bgl",
     "division": "Corporate",
+=======
+    "unit_id": "unit-corp",
+>>>>>>> 7ad21e9e5364190a0bafcdbe5ade16a66209227d
     "name": "ERP & IT",
     "short_code": "CORP-IT",
     "department_id": "CORP-IT-3EB",
@@ -289,8 +339,12 @@ export const INITIAL_DEPARTMENTS: Omit<Department, 'created_at' | 'updated_at'>[
   },
   {
     "id": "dept-corp-gen-43",
+<<<<<<< HEAD
     "unit_id": "unit-bgl",
     "division": "Corporate",
+=======
+    "unit_id": "unit-corp",
+>>>>>>> 7ad21e9e5364190a0bafcdbe5ade16a66209227d
     "name": "General",
     "short_code": "CORP-GEN",
     "department_id": "CORP-GEN-22A4",
@@ -299,8 +353,12 @@ export const INITIAL_DEPARTMENTS: Omit<Department, 'created_at' | 'updated_at'>[
   },
   {
     "id": "dept-corp-hra-44",
+<<<<<<< HEAD
     "unit_id": "unit-bgl",
     "division": "Corporate",
+=======
+    "unit_id": "unit-corp",
+>>>>>>> 7ad21e9e5364190a0bafcdbe5ade16a66209227d
     "name": "HR & Admin",
     "short_code": "CORP-HRA",
     "department_id": "CORP-HRA-1FF7",
@@ -309,8 +367,12 @@ export const INITIAL_DEPARTMENTS: Omit<Department, 'created_at' | 'updated_at'>[
   },
   {
     "id": "dept-corp-ie-46",
+<<<<<<< HEAD
     "unit_id": "unit-bgl",
     "division": "Corporate",
+=======
+    "unit_id": "unit-corp",
+>>>>>>> 7ad21e9e5364190a0bafcdbe5ade16a66209227d
     "name": "Industrial Engineering",
     "short_code": "CORP-IE",
     "department_id": "CORP-IE-899",
@@ -319,8 +381,12 @@ export const INITIAL_DEPARTMENTS: Omit<Department, 'created_at' | 'updated_at'>[
   },
   {
     "id": "dept-corp-mm-47",
+<<<<<<< HEAD
     "unit_id": "unit-bgl",
     "division": "Corporate",
+=======
+    "unit_id": "unit-corp",
+>>>>>>> 7ad21e9e5364190a0bafcdbe5ade16a66209227d
     "name": "Marketing & Merchandising",
     "short_code": "CORP-MM",
     "department_id": "CORP-MM-1A38",
@@ -329,8 +395,12 @@ export const INITIAL_DEPARTMENTS: Omit<Department, 'created_at' | 'updated_at'>[
   },
   {
     "id": "dept-corp-mis-48",
+<<<<<<< HEAD
     "unit_id": "unit-bgl",
     "division": "Corporate",
+=======
+    "unit_id": "unit-corp",
+>>>>>>> 7ad21e9e5364190a0bafcdbe5ade16a66209227d
     "name": "MIS & Internal Audit",
     "short_code": "CORP-MIS",
     "department_id": "CORP-MIS-6A7",
@@ -339,8 +409,12 @@ export const INITIAL_DEPARTMENTS: Omit<Department, 'created_at' | 'updated_at'>[
   },
   {
     "id": "dept-corp-prod-49",
+<<<<<<< HEAD
     "unit_id": "unit-bgl",
     "division": "Corporate",
+=======
+    "unit_id": "unit-corp",
+>>>>>>> 7ad21e9e5364190a0bafcdbe5ade16a66209227d
     "name": "Production",
     "short_code": "CORP-PROD",
     "department_id": "CORP-PROD-745",
@@ -349,8 +423,12 @@ export const INITIAL_DEPARTMENTS: Omit<Department, 'created_at' | 'updated_at'>[
   },
   {
     "id": "dept-corp-ppc-50",
+<<<<<<< HEAD
     "unit_id": "unit-bgl",
     "division": "Corporate",
+=======
+    "unit_id": "unit-corp",
+>>>>>>> 7ad21e9e5364190a0bafcdbe5ade16a66209227d
     "name": "Production Planning & control",
     "short_code": "CORP-PPC",
     "department_id": "CORP-PPC-7F7",
@@ -359,8 +437,12 @@ export const INITIAL_DEPARTMENTS: Omit<Department, 'created_at' | 'updated_at'>[
   },
   {
     "id": "dept-corp-qa-51",
+<<<<<<< HEAD
     "unit_id": "unit-bgl",
     "division": "Corporate",
+=======
+    "unit_id": "unit-corp",
+>>>>>>> 7ad21e9e5364190a0bafcdbe5ade16a66209227d
     "name": "QA, Audit & Technical",
     "short_code": "CORP-QA",
     "department_id": "CORP-QA-14FE",
@@ -369,8 +451,12 @@ export const INITIAL_DEPARTMENTS: Omit<Department, 'created_at' | 'updated_at'>[
   },
   {
     "id": "dept-corp-stw-52",
+<<<<<<< HEAD
     "unit_id": "unit-bgl",
     "division": "Corporate",
+=======
+    "unit_id": "unit-corp",
+>>>>>>> 7ad21e9e5364190a0bafcdbe5ade16a66209227d
     "name": "Store & Warehouse",
     "short_code": "CORP-STW",
     "department_id": "CORP-STW-1F94",
@@ -379,8 +465,12 @@ export const INITIAL_DEPARTMENTS: Omit<Department, 'created_at' | 'updated_at'>[
   },
   {
     "id": "dept-corp-scm-53",
+<<<<<<< HEAD
     "unit_id": "unit-bgl",
     "division": "Corporate",
+=======
+    "unit_id": "unit-corp",
+>>>>>>> 7ad21e9e5364190a0bafcdbe5ade16a66209227d
     "name": "Supply Chain",
     "short_code": "CORP-SCM",
     "department_id": "CORP-SCM-265A",
@@ -389,8 +479,12 @@ export const INITIAL_DEPARTMENTS: Omit<Department, 'created_at' | 'updated_at'>[
   },
   {
     "id": "dept-corp-ie2-54",
+<<<<<<< HEAD
     "unit_id": "unit-bgl",
     "division": "Corporate",
+=======
+    "unit_id": "unit-corp",
+>>>>>>> 7ad21e9e5364190a0bafcdbe5ade16a66209227d
     "name": "IE",
     "short_code": "CORP-IE2",
     "department_id": "CORP-IE2-2627",
@@ -399,8 +493,12 @@ export const INITIAL_DEPARTMENTS: Omit<Department, 'created_at' | 'updated_at'>[
   },
   {
     "id": "dept-corp-tech-55",
+<<<<<<< HEAD
     "unit_id": "unit-bgl",
     "division": "Corporate",
+=======
+    "unit_id": "unit-corp",
+>>>>>>> 7ad21e9e5364190a0bafcdbe5ade16a66209227d
     "name": "Technical",
     "short_code": "CORP-TECH",
     "department_id": "CORP-TECH-75C",
@@ -409,8 +507,12 @@ export const INITIAL_DEPARTMENTS: Omit<Department, 'created_at' | 'updated_at'>[
   },
   {
     "id": "dept-corp-wash-56",
+<<<<<<< HEAD
     "unit_id": "unit-bgl",
     "division": "Corporate",
+=======
+    "unit_id": "unit-corp",
+>>>>>>> 7ad21e9e5364190a0bafcdbe5ade16a66209227d
     "name": "Washing",
     "short_code": "CORP-WASH",
     "department_id": "CORP-WASH-1770",
