@@ -1,0 +1,1461 @@
+[
+  {
+    "name": "BGL",
+    "code": "BGL",
+    "departments": [
+      {
+        "name": "HR & Admin",
+        "sections": [
+          {
+            "name": "Admin",
+            "subsections": [
+              {
+                "name": "Transportation Management"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "Industrial Engineering",
+        "sections": [
+          {
+            "name": "IE",
+            "subsections": [
+              {
+                "name": "IE"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "CAD & Sample",
+        "sections": [
+          {
+            "name": "CAD",
+            "subsections": [
+              {
+                "name": "CAD"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "Commercial",
+        "sections": [
+          {
+            "name": "Commercial",
+            "subsections": [
+              {
+                "name": "Export"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "Engineering & Services",
+        "sections": [
+          {
+            "name": "Maintenance",
+            "subsections": [
+              {
+                "name": "Maintenance"
+              }
+            ]
+          },
+          {
+            "name": "Utility & Engineering",
+            "subsections": [
+              {
+                "name": "Utility"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "ERP & IT",
+        "sections": [
+          {
+            "name": "IT",
+            "subsections": [
+              {
+                "name": "IT"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "Finance & Accounts",
+        "sections": [
+          {
+            "name": "Finance & Accounts",
+            "subsections": [
+              {
+                "name": "Accounts"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "General",
+        "sections": [
+          {
+            "name": "General",
+            "subsections": [
+              {
+                "name": "General"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "HR, Admin & Compliance",
+        "sections": [
+          {
+            "name": "HR",
+            "subsections": [
+              {
+                "name": "Payroll"
+              },
+              {
+                "name": "HR"
+              }
+            ]
+          },
+          {
+            "name": "HR, Admin & Compliance",
+            "subsections": [
+              {
+                "name": "General"
+              },
+              {
+                "name": "HR"
+              },
+              {
+                "name": "Compliance"
+              }
+            ]
+          },
+          {
+            "name": "Admin",
+            "subsections": [
+              {
+                "name": "Admin"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "MIS & Internal Audit",
+        "sections": [
+          {
+            "name": "MIS & Internal Audit",
+            "subsections": [
+              {
+                "name": "Internal Audit"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "Production",
+        "sections": [
+          {
+            "name": "Cutting",
+            "subsections": [
+              {
+                "name": "Cutting"
+              },
+              {
+                "name": "General"
+              }
+            ]
+          },
+          {
+            "name": "Production",
+            "subsections": [
+              {
+                "name": "Sewing"
+              },
+              {
+                "name": "Finishing"
+              },
+              {
+                "name": "Cutting"
+              },
+              {
+                "name": "Production"
+              }
+            ]
+          },
+          {
+            "name": "Finishing",
+            "subsections": [
+              {
+                "name": "Finishing"
+              }
+            ]
+          },
+          {
+            "name": "Technical",
+            "subsections": [
+              {
+                "name": "Technical"
+              }
+            ]
+          },
+          {
+            "name": "Sewing",
+            "subsections": [
+              {
+                "name": "Sewing"
+              },
+              {
+                "name": "Technical"
+              }
+            ]
+          },
+          {
+            "name": "Printing",
+            "subsections": [
+              {
+                "name": "Printing"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "Production Planning & control",
+        "sections": [
+          {
+            "name": "Planning",
+            "subsections": [
+              {
+                "name": "Planning & Controll"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "QA, Audit & Technical",
+        "sections": [
+          {
+            "name": "Quality",
+            "subsections": [
+              {
+                "name": "Quality"
+              },
+              {
+                "name": "GPQ"
+              },
+              {
+                "name": "Sewing"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "Store & Warehouse",
+        "sections": [
+          {
+            "name": "Store",
+            "subsections": [
+              {
+                "name": "Store"
+              }
+            ]
+          },
+          {
+            "name": "Warehouse",
+            "subsections": [
+              {
+                "name": "Warehouse"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "Technical",
+        "sections": [
+          {
+            "name": "Technical",
+            "subsections": [
+              {
+                "name": "Technical"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "MGL",
+    "code": "MGL",
+    "departments": [
+      {
+        "name": "Engineering & Services",
+        "sections": [
+          {
+            "name": "Utility & Engineering",
+            "subsections": [
+              {
+                "name": "Utility"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "HR & Admin",
+        "sections": [
+          {
+            "name": "Admin",
+            "subsections": [
+              {
+                "name": "Cafeteria & House Keeping Management"
+              },
+              {
+                "name": "Safety, Security & Emergency Management"
+              },
+              {
+                "name": "Transportation Management"
+              }
+            ]
+          },
+          {
+            "name": "HR",
+            "subsections": [
+              {
+                "name": "Compensation , Benefits & HR Analytics"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "RHL",
+    "code": "RHL",
+    "departments": [
+      {
+        "name": "CAD & Sample",
+        "sections": [
+          {
+            "name": "General",
+            "subsections": [
+              {
+                "name": "General"
+              }
+            ]
+          },
+          {
+            "name": "Sample",
+            "subsections": [
+              {
+                "name": "Sample"
+              }
+            ]
+          },
+          {
+            "name": "CAD",
+            "subsections": [
+              {
+                "name": "CAD"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "Commercial",
+        "sections": [
+          {
+            "name": "Commercial",
+            "subsections": [
+              {
+                "name": "Export"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "HR & Admin",
+        "sections": [
+          {
+            "name": "Admin",
+            "subsections": [
+              {
+                "name": "Transportation Management"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "Production",
+        "sections": [
+          {
+            "name": "Production",
+            "subsections": [
+              {
+                "name": "Production"
+              },
+              {
+                "name": "Cutting"
+              }
+            ]
+          },
+          {
+            "name": "Sewing",
+            "subsections": [
+              {
+                "name": "Sewing"
+              }
+            ]
+          },
+          {
+            "name": "Finishing",
+            "subsections": [
+              {
+                "name": "Finishing"
+              }
+            ]
+          },
+          {
+            "name": "Cutting",
+            "subsections": [
+              {
+                "name": "Cutting"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "Production Planning & control",
+        "sections": [
+          {
+            "name": "Planning",
+            "subsections": [
+              {
+                "name": "Planning & Controll"
+              }
+            ]
+          },
+          {
+            "name": "Planning & Coordination",
+            "subsections": [
+              {
+                "name": "Planning & Controll"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "Engineering & Services",
+        "sections": [
+          {
+            "name": "Maintenance",
+            "subsections": [
+              {
+                "name": "Maintenance"
+              }
+            ]
+          },
+          {
+            "name": "Utility & Engineering",
+            "subsections": [
+              {
+                "name": "Utility"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "ERP & IT",
+        "sections": [
+          {
+            "name": "IT",
+            "subsections": [
+              {
+                "name": "IT"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "Finance & Accounts",
+        "sections": [
+          {
+            "name": "Finance & Accounts",
+            "subsections": [
+              {
+                "name": "Accounts"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "General",
+        "sections": [
+          {
+            "name": "General",
+            "subsections": [
+              {
+                "name": "General"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "HR, Admin & Compliance",
+        "sections": [
+          {
+            "name": "HR, Admin & Compliance",
+            "subsections": [
+              {
+                "name": "HR"
+              }
+            ]
+          },
+          {
+            "name": "HR",
+            "subsections": [
+              {
+                "name": "Payroll"
+              }
+            ]
+          },
+          {
+            "name": "Sustainability",
+            "subsections": [
+              {
+                "name": "Compliance"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "Industrial Engineering",
+        "sections": [
+          {
+            "name": "IE",
+            "subsections": [
+              {
+                "name": "IE"
+              },
+              {
+                "name": "Finishing"
+              },
+              {
+                "name": "Sewing"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "MIS & Internal Audit",
+        "sections": [
+          {
+            "name": "MIS & Internal Audit",
+            "subsections": [
+              {
+                "name": "Internal Audit"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "QA, Audit & Technical",
+        "sections": [
+          {
+            "name": "Quality",
+            "subsections": [
+              {
+                "name": "Quality"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "Store & Warehouse",
+        "sections": [
+          {
+            "name": "Store & Warehouse",
+            "subsections": [
+              {
+                "name": "Store"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "Washing",
+        "sections": [
+          {
+            "name": "Washing",
+            "subsections": [
+              {
+                "name": "Washing"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "SRSL",
+    "code": "SRSL",
+    "departments": [
+      {
+        "name": "Design & Product Development",
+        "sections": [
+          {
+            "name": "Design & Product Development",
+            "subsections": [
+              {
+                "name": "Design"
+              }
+            ]
+          },
+          {
+            "name": "Development",
+            "subsections": [
+              {
+                "name": "Development"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "Finance & Accounts",
+        "sections": [
+          {
+            "name": "Finance",
+            "subsections": [
+              {
+                "name": "Finance"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "General",
+        "sections": [
+          {
+            "name": "General Admin",
+            "subsections": [
+              {
+                "name": "General"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "TAL",
+    "code": "TAL",
+    "departments": [
+      {
+        "name": "CAD & Sample",
+        "sections": [
+          {
+            "name": "CAD",
+            "subsections": [
+              {
+                "name": "CAD"
+              },
+              {
+                "name": "3D"
+              }
+            ]
+          },
+          {
+            "name": "Sample",
+            "subsections": [
+              {
+                "name": "Sewing"
+              },
+              {
+                "name": "Quality"
+              },
+              {
+                "name": "Cutting"
+              },
+              {
+                "name": "Sample"
+              },
+              {
+                "name": "Finishing"
+              },
+              {
+                "name": "Technical"
+              }
+            ]
+          },
+          {
+            "name": "CAD & Sample",
+            "subsections": [
+              {
+                "name": "Sample"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "Commercial",
+        "sections": [
+          {
+            "name": "Commercial",
+            "subsections": [
+              {
+                "name": "Export"
+              },
+              {
+                "name": "Customs"
+              },
+              {
+                "name": "Import"
+              },
+              {
+                "name": "C & F"
+              },
+              {
+                "name": "General"
+              },
+              {
+                "name": "Cash Incentive"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "Design & Product Development",
+        "sections": [
+          {
+            "name": "Store",
+            "subsections": [
+              {
+                "name": "Store"
+              }
+            ]
+          },
+          {
+            "name": "Design & Product Development",
+            "subsections": [
+              {
+                "name": "Fabric"
+              },
+              {
+                "name": "Design"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "Engineering & Services",
+        "sections": [
+          {
+            "name": "Maintenance",
+            "subsections": [
+              {
+                "name": "Maintenance"
+              },
+              {
+                "name": "Sample"
+              },
+              {
+                "name": "Sewing"
+              },
+              {
+                "name": "Quilting"
+              },
+              {
+                "name": "Quick change over Team"
+              },
+              {
+                "name": "Finishing"
+              },
+              {
+                "name": "Cutting"
+              },
+              {
+                "name": "Folding"
+              }
+            ]
+          },
+          {
+            "name": "Utility & Engineering",
+            "subsections": [
+              {
+                "name": "Utility"
+              },
+              {
+                "name": "Sample"
+              },
+              {
+                "name": "Substation"
+              },
+              {
+                "name": "Electrical"
+              }
+            ]
+          },
+          {
+            "name": "Civil",
+            "subsections": [
+              {
+                "name": "Civil"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "ERP & IT",
+        "sections": [
+          {
+            "name": "General",
+            "subsections": [
+              {
+                "name": "General"
+              }
+            ]
+          },
+          {
+            "name": "ERP",
+            "subsections": [
+              {
+                "name": "Support & Customization"
+              },
+              {
+                "name": "Development"
+              },
+              {
+                "name": "Database Admin"
+              }
+            ]
+          },
+          {
+            "name": "IT",
+            "subsections": [
+              {
+                "name": "Support"
+              },
+              {
+                "name": "Core Network"
+              },
+              {
+                "name": "IT"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "ESG",
+        "sections": [
+          {
+            "name": "Social",
+            "subsections": [
+              {
+                "name": "Social"
+              }
+            ]
+          },
+          {
+            "name": "EMS",
+            "subsections": [
+              {
+                "name": "EMS"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "Finance & Accounts",
+        "sections": [
+          {
+            "name": "Finance & Accounts",
+            "subsections": [
+              {
+                "name": "Accounts"
+              },
+              {
+                "name": "Cash Incentive"
+              },
+              {
+                "name": "Finance"
+              }
+            ]
+          },
+          {
+            "name": "Finance",
+            "subsections": [
+              {
+                "name": "Finance"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "General",
+        "sections": [
+          {
+            "name": "General Admin",
+            "subsections": [
+              {
+                "name": "Secreteriate"
+              },
+              {
+                "name": "General"
+              }
+            ]
+          },
+          {
+            "name": "General",
+            "subsections": [
+              {
+                "name": "General"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "HR & Admin",
+        "sections": [
+          {
+            "name": "HR",
+            "subsections": [
+              {
+                "name": "Compensation , Benefits & HR Analytics"
+              },
+              {
+                "name": "Talent Acquisition & Onboarding"
+              },
+              {
+                "name": "PMS, Learning & OD"
+              }
+            ]
+          },
+          {
+            "name": "Admin",
+            "subsections": [
+              {
+                "name": "Cafeteria & House Keeping Management"
+              },
+              {
+                "name": "Transportation Management"
+              },
+              {
+                "name": "Safety, Security & Emergency Management"
+              },
+              {
+                "name": "General"
+              }
+            ]
+          },
+          {
+            "name": "General",
+            "subsections": [
+              {
+                "name": "General"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "HR, Admin & Compliance",
+        "sections": [
+          {
+            "name": "Admin",
+            "subsections": [
+              {
+                "name": "General"
+              },
+              {
+                "name": "Basundhara House"
+              },
+              {
+                "name": "Transport"
+              },
+              {
+                "name": "Admin"
+              }
+            ]
+          },
+          {
+            "name": "HR",
+            "subsections": [
+              {
+                "name": "Payroll"
+              },
+              {
+                "name": "HR"
+              },
+              {
+                "name": "OD & Training"
+              }
+            ]
+          },
+          {
+            "name": "HR & Compliance",
+            "subsections": [
+              {
+                "name": "HR"
+              }
+            ]
+          },
+          {
+            "name": "HR, Admin & Compliance",
+            "subsections": [
+              {
+                "name": "HR"
+              },
+              {
+                "name": "General"
+              },
+              {
+                "name": "Compliance"
+              },
+              {
+                "name": "Payroll"
+              },
+              {
+                "name": "Medical"
+              }
+            ]
+          },
+          {
+            "name": "Sustainability",
+            "subsections": [
+              {
+                "name": "Compliance"
+              }
+            ]
+          },
+          {
+            "name": "Compliance",
+            "subsections": [
+              {
+                "name": "EMS"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "Industrial Engineering",
+        "sections": [
+          {
+            "name": "IE",
+            "subsections": [
+              {
+                "name": "IE"
+              },
+              {
+                "name": "Sewing"
+              },
+              {
+                "name": "Technical"
+              },
+              {
+                "name": "OPEX"
+              },
+              {
+                "name": "Finishing"
+              }
+            ]
+          },
+          {
+            "name": "Technical",
+            "subsections": [
+              {
+                "name": "Sewing"
+              },
+              {
+                "name": "Technical"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "Marketing & Merchandising",
+        "sections": [
+          {
+            "name": "Merchandising",
+            "subsections": [
+              {
+                "name": "Cluster-6"
+              },
+              {
+                "name": "Cluster-9"
+              },
+              {
+                "name": "Cluster-3"
+              },
+              {
+                "name": "Cluster-8"
+              },
+              {
+                "name": "Cluster-5"
+              },
+              {
+                "name": "Cluster-1"
+              },
+              {
+                "name": "Cluster-7"
+              },
+              {
+                "name": "Cluster-2"
+              },
+              {
+                "name": "Cluster-4"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "MIS & Internal Audit",
+        "sections": [
+          {
+            "name": "MIS & Internal Audit",
+            "subsections": [
+              {
+                "name": "MIS"
+              },
+              {
+                "name": "Internal Audit"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "Production",
+        "sections": [
+          {
+            "name": "Production",
+            "subsections": [
+              {
+                "name": "Production"
+              },
+              {
+                "name": "Sewing"
+              }
+            ]
+          },
+          {
+            "name": "Cutting",
+            "subsections": [
+              {
+                "name": "Cutting"
+              }
+            ]
+          },
+          {
+            "name": "Finishing",
+            "subsections": [
+              {
+                "name": "Finishing"
+              }
+            ]
+          },
+          {
+            "name": "Sample",
+            "subsections": [
+              {
+                "name": "Sample"
+              }
+            ]
+          },
+          {
+            "name": "Sewing",
+            "subsections": [
+              {
+                "name": "Sewing"
+              },
+              {
+                "name": "Pilot Line-01"
+              }
+            ]
+          },
+          {
+            "name": "Embroidery",
+            "subsections": [
+              {
+                "name": "Embroidery"
+              }
+            ]
+          },
+          {
+            "name": "Warehouse",
+            "subsections": [
+              {
+                "name": "Fabric"
+              }
+            ]
+          },
+          {
+            "name": "Wet Process",
+            "subsections": [
+              {
+                "name": "Wet Process"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "Production Planning & control",
+        "sections": [
+          {
+            "name": "Planning & Coordination",
+            "subsections": [
+              {
+                "name": "Planning & Controll"
+              },
+              {
+                "name": "Planning"
+              }
+            ]
+          },
+          {
+            "name": "Planning",
+            "subsections": [
+              {
+                "name": "Planning"
+              },
+              {
+                "name": "Planning & Controll"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "QA, Audit & Technical",
+        "sections": [
+          {
+            "name": "Quality",
+            "subsections": [
+              {
+                "name": "Quality"
+              },
+              {
+                "name": "GPQ"
+              },
+              {
+                "name": "Sewing"
+              },
+              {
+                "name": "Sub Contract"
+              },
+              {
+                "name": "Process Control"
+              }
+            ]
+          },
+          {
+            "name": "Sewing",
+            "subsections": [
+              {
+                "name": "Sewing"
+              }
+            ]
+          },
+          {
+            "name": "Finishing",
+            "subsections": [
+              {
+                "name": "Finishing"
+              }
+            ]
+          },
+          {
+            "name": "Raw Material",
+            "subsections": [
+              {
+                "name": "Fabric"
+              }
+            ]
+          },
+          {
+            "name": "Laboratory",
+            "subsections": [
+              {
+                "name": "Lab"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "Store & Warehouse",
+        "sections": [
+          {
+            "name": "Store",
+            "subsections": [
+              {
+                "name": "Store"
+              }
+            ]
+          },
+          {
+            "name": "Warehouse",
+            "subsections": [
+              {
+                "name": "Warehouse"
+              },
+              {
+                "name": "Trims"
+              },
+              {
+                "name": "Fabric"
+              }
+            ]
+          },
+          {
+            "name": "Store & Warehouse",
+            "subsections": [
+              {
+                "name": "Fabric"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "Supply Chain",
+        "sections": [
+          {
+            "name": "Supply Chain",
+            "subsections": [
+              {
+                "name": "Supply Chain (Local Purchase)"
+              },
+              {
+                "name": "Supply Chain (CAPEX)"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "IE",
+        "sections": [
+          {
+            "name": "IE",
+            "subsections": [
+              {
+                "name": "Technical"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "Technical",
+        "sections": [
+          {
+            "name": "Technical",
+            "subsections": [
+              {
+                "name": "Technical"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "Washing",
+        "sections": [
+          {
+            "name": "Washing",
+            "subsections": [
+              {
+                "name": "Wet Process"
+              },
+              {
+                "name": "Washing"
+              },
+              {
+                "name": "Sample"
+              },
+              {
+                "name": "Production"
+              },
+              {
+                "name": "Dry Process"
+              }
+            ]
+          },
+          {
+            "name": "Wet Process",
+            "subsections": [
+              {
+                "name": "Wet Process"
+              }
+            ]
+          },
+          {
+            "name": "R&D",
+            "subsections": [
+              {
+                "name": "R & D"
+              }
+            ]
+          },
+          {
+            "name": "Dry Process",
+            "subsections": [
+              {
+                "name": "Dry Process"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+]

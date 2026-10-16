@@ -1,0 +1,6 @@
+{
+  "name": "Bitopi Group - Industry KPI Management System",
+  "description": "Enterprise KPI management platform for Bitopi Group featuring department-level KPI boards, monthly performance tracking, weight allocation, and role-based access.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
